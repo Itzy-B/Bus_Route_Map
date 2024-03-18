@@ -20,6 +20,9 @@ public class CalculateDistance {
     private static ArrayList<Double> longitude = new ArrayList<Double>();
     private static final int EARTH_RADIUS = 6371;
 
+    /**
+     * Reads the data from the Excel file and stores it in the zipCodes and latitude arrays.
+     */
     public static void getData() {
         boolean isFirstRow = true; // Flag to indicate the first row
         try (FileInputStream fis = new FileInputStream("resources/MassZipLatLon.xlsx");
@@ -40,14 +43,14 @@ public class CalculateDistance {
                             if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
                                 latitude.add(cell.getNumericCellValue());
                             } else {
-                                // Handle unexpected cell type
+                                throw new IllegalArgumentException("Latitude column must be numeric");
                             }
                             break;
                         case 2: // Longitude Column
                             if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
                                 longitude.add(cell.getNumericCellValue());
                             } else {
-                                // Handle unexpected cell type
+                                throw new IllegalArgumentException("Longitude column must be numeric");
                             }
                             break;
                         default:
@@ -61,12 +64,23 @@ public class CalculateDistance {
         }
     }
 
-    public static String getDistance(String p1, String p2) {
-        getData();
-        Collections.sort(zipCodes);
-        int indexP1 = Collections.binarySearch(zipCodes, p1);
-        int indexP2 = Collections.binarySearch(zipCodes, p2);
+    /**
+     * Calculates the distance between two zip codes using the Haversine formula.
+     * If the zip codes are not present in the data, an API call is made to retrieve the coordinates.
+     * @param p1 the first zip code
+     * @param p2 the second zip code
+     * @return the distance between the two zip codes in kilometers or meters, depending on the distance
+     */
+    public static double getDistance(String p1, String p2) {
+        getData(); // Initialize the data arrays
         double distance = 0;
+
+        Collections.sort(zipCodes); // Sort the zip codes
+
+        int indexP1 = Collections.binarySearch(zipCodes, p1); //Finding the index of the zip code with a binary search
+        int indexP2 = Collections.binarySearch(zipCodes, p2);
+
+        //If both zip codes are present in the data array we calculate the distance between them
         if (indexP1 >= 0 && indexP2 >= 0) {
             double lat1Rad = Math.toRadians(latitude.get(indexP1));
             double lon1Rad = Math.toRadians(longitude.get(indexP1));
@@ -85,16 +99,20 @@ public class CalculateDistance {
             distance = EARTH_RADIUS * c;
 
 
-        } else {
+        }
+        //If either of the zip codes are not present we make an API call and find the latitude and longitude from there
+        else {
             //API Call
         }
-        DecimalFormat df = new DecimalFormat("#.##"); // Format to two decimal places
+        // Format to two decimal places
+        DecimalFormat df = new DecimalFormat("#.##");
         distance = Double.parseDouble(df.format(distance));
+
         if(distance >= 1){
-            return distance + " Kilometers";
+            return distance;
         }
         else{
-            return distance * 100 + " meters";
+            return distance * 100;
         }
 
     }
