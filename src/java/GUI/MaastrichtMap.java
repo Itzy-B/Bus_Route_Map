@@ -1,6 +1,7 @@
 package src.java.GUI;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,29 +16,29 @@ import java.util.ArrayList;
 
 public class MaastrichtMap extends Application{
 
-    private static final double ZOOM_FACTOR = 1.1;
-    private static final double MAP_WIDTH = 600.0;
-    private static final double MAP_HEIGHT = 400.0;
-    private static final double WINDOW_WIDTH = 800.0;
-    private static final double WINDOW_HEIGHT = 400.0;
+    private static final double MAP_WIDTH = 1200.0;
+    private static final double MAP_HEIGHT = 1000.0;
+    private static final double WINDOW_WIDTH = 1600.0;
+    private static final double WINDOW_HEIGHT = 1000.0;
 
     // Google Map static API key
     private static final String API_KEY = "AIzaSyDnJH0pu5NzqH0b6GjiPyTDfdkBDugYw6w";
 
     private ImageView mapView;
-    private double scale = 1.0;
+    private static int scale = 1;
+    private static int zoomLevel = 13;
 
     private TextField zipCode1;
     private TextField zipCode2;
-    private ArrayList<Place> places;
+    private Place place1;
+    private Place place2;
 
 
     @Override
     public void start(Stage primaryStage) {
         // Sample locations
-        places = new ArrayList<>();
-        places.add(new Place(50.8552328455939, 5.69223719348659, "6211AL"));
-        places.add(new Place(50.8966117277777, 5.70705921111111, "6223GR"));
+        place1 = new Place(50.8552328455939, 5.69223719348659, "6211AL");
+        place2 = new Place(50.8481651222222, 5.69188224444444, "6211GZ");
 
         // Construct the URL for the map image of Maastricht
         String mapUrl = constructMapUrl();
@@ -96,36 +97,29 @@ public class MaastrichtMap extends Application{
     }
 
     private void zoomIn() {
-        scale *= ZOOM_FACTOR;
-        mapView.setScaleX(scale);
-        mapView.setScaleY(scale);
+        zoomLevel += 1;
+        scale *= 2;
+        Platform.runLater(this::updateMap);
     }
 
     private void zoomOut() {
-        scale /= ZOOM_FACTOR;
-        mapView.setScaleX(scale);
-        mapView.setScaleY(scale);
+        zoomLevel -= 1;
+        scale /= 2;
+        Platform.runLater(this::updateMap);
     }
 
     private String constructMapUrl() {
         StringBuilder mapUrlBuilder = new StringBuilder("https://maps.googleapis.com/maps/api/staticmap");
         mapUrlBuilder.append("?center=Maastricht");
-        mapUrlBuilder.append("&zoom=13");
-        mapUrlBuilder.append("&size=600x400");
+        mapUrlBuilder.append("&zoom=").append(zoomLevel);
+        mapUrlBuilder.append("&size=600x500");
+        mapUrlBuilder.append("&scale=").append(scale);
 
-        // Add markers for each location
-        for (Place p : places) {
-            mapUrlBuilder.append("&markers=color:red%7Clabel:")
-                    .append(p.getZipCode())
-                    .append("%7C")
-                    .append(p.getLatitude())
-                    .append(",")
-                    .append(p.getLongitude());
-        }
+        // TODO: show the path between two points
+
 
         // Add API Key
-        mapUrlBuilder.append("&key=");
-        mapUrlBuilder.append(API_KEY);
+        mapUrlBuilder.append("&key=").append(API_KEY);
 
         return mapUrlBuilder.toString();
     }
@@ -135,17 +129,17 @@ public class MaastrichtMap extends Application{
         double latitude = 0.0; // Example latitude
         double longitude = 0.0; // Example longitude
 
-        // Add new place to the list
-        places.add(new Place(latitude, longitude, zipCode));
 
         // Update the map
         updateMap();
     }
 
     private void updateMap() {
-        String mapUrl = constructMapUrl();
-        Image mapImage = new Image(mapUrl);
-        mapView.setImage(mapImage);
+        Platform.runLater(() -> {
+            String mapUrl = constructMapUrl();
+            Image mapImage = new Image(mapUrl);
+            mapView.setImage(mapImage);
+        });
     }
 
     public static void main(String[] args) {
