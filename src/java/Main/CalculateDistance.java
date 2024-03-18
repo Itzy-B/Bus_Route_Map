@@ -2,7 +2,7 @@ package src.java.Main;
 
 import com.microsoft.schemas.office.visio.x2012.main.CellType;
 
-import src.java.API.retrievePostalWithAPI;
+import src.java.API.RetrievePostalWithAPI;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -89,7 +89,7 @@ public class CalculateDistance {
         //If either of the zip codes are not present we make an API call and find the latitude and longitude from there
         else {
             //API call
-            ArrayList<Double> latLong = retrievePostalWithAPI.getPCode(p1);
+            ArrayList<Double> latLong = RetrievePostalWithAPI.getPCode(p1);
             if (latLong.size() > 0) {
                 distance = distanceBetween(latLong.get(0), latLong.get(1), latLong.get(2), latLong.get(3));
             }
