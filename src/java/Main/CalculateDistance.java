@@ -84,34 +84,14 @@ public class CalculateDistance {
 
         //If both zip codes are present in the data array we calculate the distance between them
         if (indexP1 >= 0 && indexP2 >= 0) {
-            double lat1Rad = Math.toRadians(latitude.get(indexP1));
-            double lon1Rad = Math.toRadians(longitude.get(indexP1));
-            double lat2Rad = Math.toRadians(latitude.get(indexP2));
-            double lon2Rad = Math.toRadians(longitude.get(indexP2));
-
-            // Calculate the change in coordinates
-            double deltaLat = lat2Rad - lat1Rad;
-            double deltaLon = lon2Rad - lon1Rad;
-
-            // Calculate the distance using the Haversine formula
-            double a = Math.pow(Math.sin(deltaLat / 2), 2) +
-                    Math.cos(lat1Rad) * Math.cos(lat2Rad) *
-                            Math.pow(Math.sin(deltaLon / 2), 2);
-            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            distance = EARTH_RADIUS * c;
-
-
+            distance = distanceBetween(latitude.get(indexP1), longitude.get(indexP1), latitude.get(indexP2), longitude.get(indexP2));
         }
         //If either of the zip codes are not present we make an API call and find the latitude and longitude from there
         else {
             //API call
             ArrayList<Double> latLong = retrievePostalWithAPI.getPCode(p1);
             if (latLong.size() > 0) {
-                double lat1Rad = Math.toRadians(latLong.get(0));
-                double lon1Rad = Math.toRadians(latLong.get(1));
-                double lat2Rad = Math.toRadians(latLong.get(2));
-                double lon2Rad = Math.toRadians(latLong.get(3));
-                //Do calculation, needs refactoring, because calculation is already done in the if statement above
+                distance = distanceBetween(latLong.get(0), latLong.get(1), latLong.get(2), latLong.get(3));
             }
 
             else {
@@ -131,11 +111,41 @@ public class CalculateDistance {
 
     }
 
+    /**
+     * Calculates the distance between two points on the earth.
+     *
+     * @param lat1 the latitude of the first point
+     * @param lon1 the longitude of the first point
+     * @param lat2 the latitude of the second point
+     * @param lon2 the longitude of the second point
+     * @return the distance between the two points in kilometers
+     */
+    public static double distanceBetween(double lat1, double lon1, double lat2, double lon2) {
+
+        double lat1Rad = Math.toRadians(lat1);
+        double lon1Rad = Math.toRadians(lon1);
+        double lat2Rad = Math.toRadians(lat2);
+        double lon2Rad = Math.toRadians(lon2);
+
+        // Calculate the change in coordinates
+        double deltaLat = lat2Rad - lat1Rad;
+        double deltaLon = lon2Rad - lon1Rad;
+
+        // Calculate the distance using the Haversine formula
+        double a = Math.pow(Math.sin(deltaLat / 2), 2) +
+                Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+                        Math.pow(Math.sin(deltaLon / 2), 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return EARTH_RADIUS * c;
+    }
+
+
     public static String printDistance(String p1, String p2) throws IOException {
-        if (getDistance(p1, p2) >= 1) {
-            return getDistance(p1, p2) + " Kilometers";
+        double distance = getDistance(p1, p2);
+        if (distance >= 1) {
+            return distance + " Kilometers";
         } else {
-            return getDistance(p1, p2) + " Meters";
+            return distance + " Meters";
         }
     }
 
