@@ -117,11 +117,11 @@ public class CalculateDistance {
 
     }
 
-    public static void printDistance(String p1, String p2) {
+    public static String printDistance(String p1, String p2) {
         if (getDistance(p1, p2) >= 1) {
-            System.out.println(getDistance(p1, p2) + " Kilometers");
+            return getDistance(p1, p2) + " Kilometers";
         } else {
-            System.out.println(getDistance(p1, p2) + " Meters");
+            return getDistance(p1, p2) + " Meters";
         }
     }
 
