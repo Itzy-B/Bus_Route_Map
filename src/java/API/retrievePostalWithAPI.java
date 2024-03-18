@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.net.*;
 import java.util.ArrayList;
 
-public class RetrievePostalWithAPI{
+public class retrievePostalWithAPI{
     public static ArrayList<Double> getPCode(String pCode) throws IOException{
         ArrayList<Double> LatLong = new ArrayList<Double>();
         try {
