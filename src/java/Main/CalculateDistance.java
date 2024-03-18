@@ -1,6 +1,8 @@
 package src.java.Main;
 
 import com.microsoft.schemas.office.visio.x2012.main.CellType;
+
+import src.java.API.RetrievePostalWithAPI;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -71,7 +73,7 @@ public class CalculateDistance {
      * @param p2 the second zip code
      * @return the distance between the two zip codes in kilometers or meters, depending on the distance
      */
-    public static double getDistance(String p1, String p2) {
+    public static double getDistance(String p1, String p2) throws IOException {
         getData(); // Initialize the data arrays
         double distance = 0;
 
@@ -102,7 +104,19 @@ public class CalculateDistance {
         }
         //If either of the zip codes are not present we make an API call and find the latitude and longitude from there
         else {
-            //API Call
+            //API call
+            ArrayList<Double> latLong = RetrievePostalWithAPI.getPCode(p1);
+            if (latLong != null) {
+                double lat1Rad = Math.toRadians(latLong.get(0));
+                double lon1Rad = Math.toRadians(latLong.get(1));
+                double lat2Rad = Math.toRadians(latLong.get(2));
+                double lon2Rad = Math.toRadians(latLong.get(3));
+                //Do calculation, needs refactoring, because calculation is already done in the if statement above
+            }
+
+            else {
+                throw new IllegalArgumentException("Invalid postal code or postal code in not in database");
+            }
         }
         // Format to two decimal places
         DecimalFormat df = new DecimalFormat("#.##");
@@ -117,7 +131,7 @@ public class CalculateDistance {
 
     }
 
-    public static String printDistance(String p1, String p2) {
+    public static String printDistance(String p1, String p2) throws IOException {
         if (getDistance(p1, p2) >= 1) {
             return getDistance(p1, p2) + " Kilometers";
         } else {
