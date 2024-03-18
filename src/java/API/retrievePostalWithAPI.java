@@ -9,9 +9,10 @@ import java.util.ArrayList;
 
 public class RetrievePostalWithAPI{
     public static ArrayList<Double> getPCode(String pCode) throws IOException{
+        ArrayList<Double> LatLong = new ArrayList<Double>();
+        try {
         @SuppressWarnings("deprecation")
         URL obj = new URL("https://www.computerscience.dacs.unimaas.nl");
-        ArrayList<Double> LatLong = new ArrayList<Double>();
 
         HttpURLConnection httpURLConnection = (HttpURLConnection) obj.openConnection();
         httpURLConnection.setRequestMethod("POST");
@@ -26,7 +27,11 @@ public class RetrievePostalWithAPI{
         System.out.println(responseCode);
         System.out.println(httpURLConnection.getInputStream());
         
-        //Do something with LatLong once the dacs website works again.
+        //Do something with Lat
+        }
+        catch (Exception e) {
+
+        }
         return LatLong;
         
     }

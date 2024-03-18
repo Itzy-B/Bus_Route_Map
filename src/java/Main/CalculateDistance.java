@@ -27,7 +27,7 @@ public class CalculateDistance {
      */
     public static void getData() {
         boolean isFirstRow = true; // Flag to indicate the first row
-        try (FileInputStream fis = new FileInputStream("resources/MassZipLatLon.xlsx");
+        try (FileInputStream fis = new FileInputStream("src/java/Resources/MassZipLatLon.xlsx");
              XSSFWorkbook wb = new XSSFWorkbook(fis)) {
 
             XSSFSheet sheet = wb.getSheetAt(0);
@@ -106,7 +106,7 @@ public class CalculateDistance {
         else {
             //API call
             ArrayList<Double> latLong = RetrievePostalWithAPI.getPCode(p1);
-            if (latLong != null) {
+            if (latLong.size() > 0) {
                 double lat1Rad = Math.toRadians(latLong.get(0));
                 double lon1Rad = Math.toRadians(latLong.get(1));
                 double lat2Rad = Math.toRadians(latLong.get(2));
