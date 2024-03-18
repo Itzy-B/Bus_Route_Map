@@ -26,7 +26,7 @@ public class RetrievePostalWithAPI{
         System.out.println(responseCode);
         System.out.println(httpURLConnection.getInputStream());
         
-        //Do something with LatLong once the dacs website works again
+        //Do something with LatLong once the dacs website works again.
         return LatLong;
         
     }
