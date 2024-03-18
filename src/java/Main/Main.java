@@ -1,9 +1,7 @@
 package src.java.Main;
 //Main Will Be Instancing of GUI
 
-import static src.java.Main.CalculateDistance.getDistance;
-import static src.java.Main.CalculateDistance.printDistance;
-
+import static src.java.Main.CalculateDistance.*;
 
 public class Main {
     public static void main(String[] args) {
