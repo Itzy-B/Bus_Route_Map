@@ -61,13 +61,13 @@ public class CalculateDistance {
         }
     }
 
-    public static double getDistance(String p1, String p2) {
+    public static String getDistance(String p1, String p2) {
         getData();
         Collections.sort(zipCodes);
         int indexP1 = Collections.binarySearch(zipCodes, p1);
         int indexP2 = Collections.binarySearch(zipCodes, p2);
         double distance = 0;
-        if(indexP1 >= 0 && indexP2 >= 0) {
+        if (indexP1 >= 0 && indexP2 >= 0) {
             double lat1Rad = Math.toRadians(latitude.get(indexP1));
             double lon1Rad = Math.toRadians(longitude.get(indexP1));
             double lat2Rad = Math.toRadians(latitude.get(indexP2));
@@ -85,17 +85,16 @@ public class CalculateDistance {
             distance = EARTH_RADIUS * c;
 
 
-        }
-        else{
+        } else {
             //API Call
         }
         DecimalFormat df = new DecimalFormat("#.##"); // Format to two decimal places
         distance = Double.parseDouble(df.format(distance));
         if(distance >= 1){
-            return distance;
+            return distance + " Kilometers";
         }
         else{
-            return distance * 100;
+            return distance * 100 + " meters";
         }
 
     }
