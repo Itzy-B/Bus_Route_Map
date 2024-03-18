@@ -1,4 +1,4 @@
-package API;
+package src.API;
 
 public class retrievePostalWithAPI {
 
