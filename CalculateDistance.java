@@ -59,14 +59,8 @@ public class CalculateDistance {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        getData();
-        System.out.println(getDistance("6211AL", "6213HD"));
-    }
-
-
-
     public static double getDistance(String p1, String p2) {
+        getData();
         Collections.sort(zipCodes);
         int indexP1 = Collections.binarySearch(zipCodes, p1);
         int indexP2 = Collections.binarySearch(zipCodes, p2);
