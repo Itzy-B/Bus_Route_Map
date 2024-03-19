@@ -18,8 +18,6 @@ public class RetrievePostalWithAPI{
 
     public static ArrayList<Double> getPCode(String pCode) throws IOException{
 
-
-
         UserObject userObject = retrieveUserObject("userObject.ser");
         if (userObject.getIP().equals(getIP()) == false) {
             userObject = new UserObject(getIP());
@@ -67,22 +65,59 @@ public class RetrievePostalWithAPI{
     }
 
     public static boolean userAllowedToInteract(UserObject userObject)  {
+        //5 Seconds 1 request per IP
+        //1 Minute 5 requests per IP
+        //1 Hour 40 requests per IP
+        //1 Day 100 requests per IP
         ArrayList<String> callsList = userObject.getCallsList();
+        int startingIndex = 0;
+        int amountOfCallsToday = 0;
         if (callsList.size() == 0) {
             return true;
         }
 
-        long timeDifference = calculateTimeDifference(callsList.get(callsList.size()), getCurrentTime());
-        //Work in progress
-        if (timeDifference >= 5.0) {
-            return true;
+        long timeDifference = calculateTimeDifference(callsList.get(callsList.size() - 1), getCurrentTime());
+        
+        getIndexToCalculateAllowance(callsList);
+
+        for (;startingIndex < callsList.size(); startingIndex++) {
+            amountOfCallsToday++;
         }
 
-        //     5 Seconds 1 request per IP
-// 1 Minute 5 requests per IP
-// 1 Hour 40 requests per IP
-// 1 Day 100 requests per IP
+        if (amountOfCallsToday > 100) {
+            return false;
+        }
+        System.out.println(amountOfCallsToday);
         return false;
+    }
+
+    public static int getIndexToCalculateAllowance(ArrayList<String> callsList) { 
+        int startingIndex = 0;       
+        for (String call: callsList) {
+            long difference = calculateTimeDifference(call, getCurrentTime());
+
+            if (difference >= 86400) { //86400 is the amount of seconds in a day
+                int indexDay = callsList.indexOf(call);
+                startingIndex = indexDay;
+            }
+
+            if (difference >= 3600) {
+                int indexHour = callsList.indexOf(call);
+                startingIndex =  indexHour;
+            }
+
+            if (difference >= 60) {
+                int indexMinute = callsList.indexOf(call);
+                startingIndex = indexMinute;
+            }
+
+            if (difference >= 5) {
+                int indexSecond = callsList.indexOf(call);
+                startingIndex = indexSecond;
+            }
+        }
+
+        return startingIndex;
     }
 
     public static long calculateTimeDifference (String time1, String time2) {
