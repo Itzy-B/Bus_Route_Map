@@ -95,7 +95,7 @@ public class CalculateDistance {
             }
 
             else {
-                throw new IllegalArgumentException("Invalid postal code or postal code in not in database");
+                //TODO: restore this line after done debugging, throw new IllegalArgumentException("Invalid postal code or postal code in not in database");
             }
         }
         // Format to two decimal places
@@ -143,10 +143,11 @@ public class CalculateDistance {
     public static String printDistance(String p1, String p2) throws IOException {
         double distance = getDistance(p1, p2);
         if (distance >= 1) {
-            return distance + " Kilometers";
+            // return distance + " Kilometers";
         } else {
-            return distance + " Meters";
+            // return distance + " Meters";
         }
+        return "";
     }
 
 
