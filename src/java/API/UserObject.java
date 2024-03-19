@@ -9,6 +9,7 @@ public class UserObject implements Serializable {
 
     UserObject(String ipAddress) {
         this.ipAddress = ipAddress;
+        this.callsList = new ArrayList<>();
     }
 
     public void addInteraction(String callTime) {
@@ -17,6 +18,10 @@ public class UserObject implements Serializable {
 
     public String getIP() {
         return this.ipAddress;
+    }
+
+    public ArrayList<String> getCallsList() {
+        return this.callsList;
     }
 
 

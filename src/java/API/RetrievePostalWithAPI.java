@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 import src.java.Singletons.FileManager;
@@ -40,7 +41,8 @@ public class RetrievePostalWithAPI{
     }
 
     public static ArrayList<Double> sentPostRequest() {
-                // try {
+        //TODO: Uncomment this when connect to WiFi from UM
+        // try {
         // @SuppressWarnings("deprecation")
         // URL obj = new URL("https://www.computerscience.dacs.unimaas.nl");
 
@@ -57,7 +59,7 @@ public class RetrievePostalWithAPI{
         // System.out.println(responseCode);
         // System.out.println(httpURLConnection.getInputStream());
         
-        //Do something with Lat
+        //Do something with LatLong
         // }
         // catch (Exception e) {
         ArrayList<Double> LatLong = new ArrayList<Double>();
@@ -65,11 +67,31 @@ public class RetrievePostalWithAPI{
     }
 
     public static boolean userAllowedToInteract(UserObject userObject)  {
+        ArrayList<String> callsList = userObject.getCallsList();
+        if (callsList.size() == 0) {
+            return true;
+        }
+
+        long timeDifference = calculateTimeDifference(callsList.get(callsList.size()), getCurrentTime());
+        //Work in progress
+        if (timeDifference >= 5.0) {
+            return true;
+        }
+
         //     5 Seconds 1 request per IP
 // 1 Minute 5 requests per IP
 // 1 Hour 40 requests per IP
 // 1 Day 100 requests per IP
         return false;
+    }
+
+    public static long calculateTimeDifference (String time1, String time2) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss");
+
+        LocalDateTime formattedTime1 = LocalDateTime.parse(time1, formatter);   
+        LocalDateTime formattedTime2 = LocalDateTime.parse(time2, formatter);   
+        
+        return ChronoUnit.SECONDS.between(formattedTime1, formattedTime2);
     }
 
     public static UserObject retrieveUserObject(String objectFileName) throws IOException {
