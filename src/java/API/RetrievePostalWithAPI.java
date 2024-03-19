@@ -4,16 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutput;
-import java.io.OutputStream;
 import java.net.*;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import src.java.Singletons.FileManager;
 
@@ -22,8 +16,31 @@ public class RetrievePostalWithAPI{
     static FileManager fileManager = FileManager.getInstance();
 
     public static ArrayList<Double> getPCode(String pCode) throws IOException{
-        ArrayList<Double> LatLong = new ArrayList<Double>();
-        // try {
+
+
+
+        UserObject userObject = retrieveUserObject("userObject.ser");
+        if (userObject.getIP().equals(getIP()) == false) {
+            userObject = new UserObject(getIP());
+        }
+        
+        if (userAllowedToInteract(userObject)) {
+            userObject.addInteraction(getCurrentTime());
+        }
+        
+        
+        
+        
+        
+        fileManager.serializeObject(userObject, "userObject.ser");
+
+        ArrayList<Double> LatLong = sentPostRequest();
+
+        return LatLong;
+    }
+
+    public static ArrayList<Double> sentPostRequest() {
+                // try {
         // @SuppressWarnings("deprecation")
         // URL obj = new URL("https://www.computerscience.dacs.unimaas.nl");
 
@@ -43,41 +60,16 @@ public class RetrievePostalWithAPI{
         //Do something with Lat
         // }
         // catch (Exception e) {
-
-        // }
-
-        List<String> stream = fileManager.getFile("src/java/Resources/currentIP.txt");
-
-
-
-        UserObject userObject = retrieveUserObject("userObject.ser");
-        if (userObject.getIP().equals(getIP())) {
-            System.out.println("retart");
-        }
-        
+        ArrayList<Double> LatLong = new ArrayList<Double>();
         return LatLong;
-        // ObjectOutput serializedUserObject = fileManager.serializeObject(userObject, "src/java/Resources/");
+    }
 
-        // String[] IPInstance = {"value"};
-        // String currentIp = "";
-        // if (stream.size() != 0) {
-        //     IPInstance = stream.get(0).split(",");
-        //     currentIp = getIP();
-        //     if (currentIp.equals(IPInstance[0])) {
-        //         int amountOfCalls = Integer.parseInt(IPInstance[1]);
-        //         System.out.println("found in file");
-        //         String IpInstance = createIpInstance(currentIp, amountOfCalls + 1);
-        //         FileManager.getInstance().writeToFile("src/java/Resources/","currentIP.txt", IpInstance);
-
-        //     }
-
-        //     else {
-        //         FileManager.getInstance().writeToFile("src/java/Resources/","currentIP.txt", createIpInstance(IPInstance, 1, true));
-        //     }
-        // }
-
-        // System.out.println(stream);
-        
+    public static boolean userAllowedToInteract(UserObject userObject)  {
+        //     5 Seconds 1 request per IP
+// 1 Minute 5 requests per IP
+// 1 Hour 40 requests per IP
+// 1 Day 100 requests per IP
+        return false;
     }
 
     public static UserObject retrieveUserObject(String objectFileName) throws IOException {
@@ -118,13 +110,4 @@ public class RetrievePostalWithAPI{
         
         return string;
     }
-
-//     5 Seconds 1 request per IP
-// 1 Minute 5 requests per IP
-// 1 Hour 40 requests per IP
-// 1 Day 100 requests per IP
-
-
-
-
 }   
