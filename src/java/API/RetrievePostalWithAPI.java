@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,9 +11,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 import src.java.Singletons.FileManager;
-
-import src.java.API.UserObject;
-
 
 public class RetrievePostalWithAPI {
 
@@ -33,13 +29,12 @@ public class RetrievePostalWithAPI {
         
         if (userAllowedToInteract(userObject)) {
             userObject.addInteraction(getCurrentTime());
-            System.out.println("Allowed to call! Succes");
             fileManager.serializeObject(userObject, "userObject.ser");
-            LatLong = sentPostRequest("6218HW");
+            LatLong = sentPostRequest(pCode);
         }
 
         else {
-            System.out.println("Request failed");
+            System.out.println("Too many requests, try again later");
         }
         
         return LatLong;
@@ -51,21 +46,31 @@ public class RetrievePostalWithAPI {
         try {
         @SuppressWarnings("deprecation")
         
-        URL obj = new URL("https://www.computerscience.dacs.unimaas.nl/get_coordinates");
+        // URL obj = new URL("https://www.computerscience.dacs.unimaas.nl/get_coordinates");
+        URL obj = new URL("https://postal-code-api-phi.vercel.app/latlng/6217HG");
+        URLConnection yc = obj.openConnection();
+        BufferedReader in = new BufferedReader(
+                                new InputStreamReader(
+                                yc.getInputStream()));
+        String inputLine;
 
-        HttpURLConnection httpURLConnection = (HttpURLConnection) obj.openConnection();
-        httpURLConnection.setRequestMethod("POST");
-        httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0");
-        String POST_PARAMS = "{\"postcode\": \"6229EN\"}";
-        httpURLConnection.setDoOutput(true);
-        OutputStream os = httpURLConnection.getOutputStream();
-        int responseCode = httpURLConnection.getResponseCode();
-        System.out.println(responseCode);
-        os.write(POST_PARAMS.getBytes());
-        os.flush();
-        os.close();
-        System.out.println(httpURLConnection.getInputStream());
-        LatLong = new ArrayList<Double>();
+        while ((inputLine = in.readLine()) != null) 
+            System.out.println(inputLine);
+        in.close();
+
+        // HttpURLConnection httpURLConnection = (HttpURLConnection) obj.openConnection();
+        // httpURLConnection.setRequestMethod("POST");
+        // httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0");
+        // String POST_PARAMS = "{\"postcode\": \"6229EN\"}";
+        // httpURLConnection.setDoOutput(true);
+        // OutputStream os = httpURLConnection.getOutputStream();
+        // int responseCode = httpURLConnection.getResponseCode();
+        // System.out.println(responseCode);
+        // os.write(POST_PARAMS.getBytes());
+        // os.flush();
+        // os.close(); 
+        // System.out.println(httpURLConnection.getInputStream());
+        // LatLong = new ArrayList<Double>();
 
         }
         catch (Exception e){
