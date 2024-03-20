@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,11 +13,17 @@ import java.util.ArrayList;
 
 import src.java.Singletons.FileManager;
 
+import src.java.API.UserObject;
 
-public class RetrievePostalWithAPI{
+
+public class RetrievePostalWithAPI {
+
+    public RetrievePostalWithAPI() {
+
+    }
     static FileManager fileManager = FileManager.getInstance();
 
-    public static ArrayList<Double> getPCode(String pCode) throws IOException{
+    public ArrayList<Double> getPCode(String pCode) throws IOException{
         ArrayList<Double> LatLong = null;
         UserObject userObject = retrieveUserObject("userObject.ser");
         if (userObject.getIP().equals(getIP()) == false) {
@@ -28,7 +35,7 @@ public class RetrievePostalWithAPI{
             userObject.addInteraction(getCurrentTime());
             System.out.println("Allowed to call! Succes");
             fileManager.serializeObject(userObject, "userObject.ser");
-            LatLong = sentPostRequest();
+            LatLong = sentPostRequest("6218HW");
         }
 
         else {
@@ -38,33 +45,36 @@ public class RetrievePostalWithAPI{
         return LatLong;
     }
 
-    public static ArrayList<Double> sentPostRequest() {
+    public ArrayList<Double> sentPostRequest(String pCode) {
+        ArrayList<Double> LatLong = null;
         //TODO: Uncomment this when connected to WiFi from UM
-        // try {
-        // @SuppressWarnings("deprecation")
-        // URL obj = new URL("https://www.computerscience.dacs.unimaas.nl");
-
-        // HttpURLConnection httpURLConnection = (HttpURLConnection) obj.openConnection();
-        // httpURLConnection.setRequestMethod("POST");
-        // httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0");
-        // String POST_PARAMS = "/get_coordinates?postcode={6217HG}";
-        // httpURLConnection.setDoOutput(true);
-        // OutputStream os = httpURLConnection.getOutputStream();
-        // os.write(POST_PARAMS.getBytes());
-        // os.flush();
-        // os.close();
-        // int responseCode = httpURLConnection.getResponseCode();
-        // System.out.println(responseCode);
-        // System.out.println(httpURLConnection.getInputStream());
+        try {
+        @SuppressWarnings("deprecation")
         
-        //Do something with LatLong
-        // }
-        // catch (Exception e) {
-        ArrayList<Double> LatLong = new ArrayList<Double>();
+        URL obj = new URL("https://www.computerscience.dacs.unimaas.nl/get_coordinates");
+
+        HttpURLConnection httpURLConnection = (HttpURLConnection) obj.openConnection();
+        httpURLConnection.setRequestMethod("POST");
+        httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0");
+        String POST_PARAMS = "{\"postcode\": \"6229EN\"}";
+        httpURLConnection.setDoOutput(true);
+        OutputStream os = httpURLConnection.getOutputStream();
+        int responseCode = httpURLConnection.getResponseCode();
+        System.out.println(responseCode);
+        os.write(POST_PARAMS.getBytes());
+        os.flush();
+        os.close();
+        System.out.println(httpURLConnection.getInputStream());
+        LatLong = new ArrayList<Double>();
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
         return LatLong;
     }
 
-    public static boolean userAllowedToInteract(UserObject userObject)  {
+    public boolean userAllowedToInteract(UserObject userObject)  {
         //5 Seconds 1 request per IP
         //1 Minute 5 requests per IP
         //1 Hour 40 requests per IP
@@ -83,7 +93,7 @@ public class RetrievePostalWithAPI{
     }
 
 
-    public static boolean determineIfAllowanceExceeded(ArrayList<String> callsList) {//Has to be refactored
+    public boolean determineIfAllowanceExceeded(ArrayList<String> callsList) {//Has to be refactored
         int startingIndex = 0;       
         for (String call: callsList) {
             long difference = getTimeDifference(call, getCurrentTime());
@@ -95,7 +105,7 @@ public class RetrievePostalWithAPI{
                     return false;
                 }
             }
-            
+
             if (difference <= 3600) {
                 int indexHour = callsList.indexOf(call);
                 startingIndex =  indexHour;
@@ -125,7 +135,7 @@ public class RetrievePostalWithAPI{
         return true;
     }
 
-    public static int getAmountOfCalls(int startingIndex, ArrayList<String> callsList) {
+    public int getAmountOfCalls(int startingIndex, ArrayList<String> callsList) {
         int amountOfCallsToday = 0;
 
         for (;startingIndex < callsList.size(); startingIndex++) {
@@ -135,7 +145,7 @@ public class RetrievePostalWithAPI{
         return amountOfCallsToday;
     }
 
-    public static long getTimeDifference (String time1, String time2) {
+    public long getTimeDifference (String time1, String time2) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss");
 
         LocalDateTime formattedTime1 = LocalDateTime.parse(time1, formatter);   
@@ -144,7 +154,7 @@ public class RetrievePostalWithAPI{
         return ChronoUnit.SECONDS.between(formattedTime1, formattedTime2);
     }
 
-    public static UserObject retrieveUserObject(String objectFileName) throws IOException {
+    public UserObject retrieveUserObject(String objectFileName) throws IOException {
         UserObject userObject = null;
         File file = new File(objectFileName);
         if (file.exists()) {
@@ -164,7 +174,7 @@ public class RetrievePostalWithAPI{
         return userObject;
     }
 
-    public static String getCurrentTime() {
+    public String getCurrentTime() {
         LocalDateTime timeCurrent = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss");
         String formattedDateTime = timeCurrent.format(formatter);
@@ -172,7 +182,7 @@ public class RetrievePostalWithAPI{
     }
 
     //Helps in enforcing a rate limit on API calls (See Project 1-2 manual)
-    public static String getIP() throws IOException{
+    public String getIP() throws IOException{
         String urlString = "http://checkip.amazonaws.com/";
         String string = "";
         URL url = new URL(urlString);
