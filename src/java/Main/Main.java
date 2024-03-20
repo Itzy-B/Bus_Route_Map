@@ -6,8 +6,11 @@ import src.java.API.RetrievePostalWithAPI;
 
 import java.io.IOException;
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         // System.out.println(printDistance("ABCD", "6213HD")); 
-        RetrievePostalWithAPI.getPCode("43"); 
+        while (true) {
+            Thread.sleep(200);
+            RetrievePostalWithAPI.getPCode("43"); 
+        }
     }
 }
