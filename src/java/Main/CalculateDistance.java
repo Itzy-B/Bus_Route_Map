@@ -81,8 +81,16 @@ public class CalculateDistance {
         return EARTH_RADIUS * c;
     }
 
+    /**
+     * Calculates the midpoint between two points on the earth.
+     *
+     * @param p1 the first point
+     * @param p2 the second point
+     * @return the midpoint between the two points as an ArrayList of two Doubles, where the first element is the latitude and the second element is the longitude
+     * @throws IOException if there is an error retrieving the coordinates from the data file or making an API call
+     */
     public static ArrayList<Double> findMidpoint(Place p1, Place p2) throws IOException {
-        ArrayList<Double> midpoint = new ArrayList<Double>();
+        ArrayList<Double> midpoint = new ArrayList<>();
 
         double lat1 = p1.getLatitude();
         double lon1 = p1.getLongitude();
