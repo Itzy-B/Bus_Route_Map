@@ -12,14 +12,15 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MaastrichtMap extends Application{
 
-    private static final double MAP_WIDTH = 1200.0;
-    private static final double MAP_HEIGHT = 1000.0;
-    private static final double WINDOW_WIDTH = 1600.0;
-    private static final double WINDOW_HEIGHT = 1000.0;
+    private static final double MAP_WIDTH =900.0;
+    private static final double MAP_HEIGHT = 00.0;
+    private static final double WINDOW_WIDTH = 1540;
+    private static final double WINDOW_HEIGHT = 780.0;
 
     // Google Map static API key
     private static final String API_KEY = "AIzaSyDnJH0pu5NzqH0b6GjiPyTDfdkBDugYw6w";
@@ -35,10 +36,12 @@ public class MaastrichtMap extends Application{
 
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws IOException {
+        Data.getData();
+
         // Sample locations
-        place1 = new Place(50.8552328455939, 5.69223719348659, "6211AL");
-        place2 = new Place(50.8481651222222, 5.69188224444444, "6211GZ");
+        place1 = new Place("6211AL");
+        place2 = new Place("6211GZ");
 
         // Construct the URL for the map image of Maastricht
         String mapUrl = constructMapUrl();
@@ -103,9 +106,11 @@ public class MaastrichtMap extends Application{
     }
 
     private void zoomOut() {
-        zoomLevel -= 1;
-        scale /= 2;
-        Platform.runLater(this::updateMap);
+        if (zoomLevel>=1) {
+            zoomLevel -= 1;
+            scale /= 2;
+            Platform.runLater(this::updateMap);    
+        }
     }
 
     private String constructMapUrl() {

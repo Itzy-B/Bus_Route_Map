@@ -1,2 +1,6 @@
 /out/
 src/java/Resources/currentIP.txt
+.vscode/launch.json
+.vscode/settings.json
+userObject.ser
+/lib/javafx-sdk-21.0.2/
