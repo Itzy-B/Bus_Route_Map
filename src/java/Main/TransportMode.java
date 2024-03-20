@@ -15,23 +15,3 @@ abstract class TransportMode {
     }
 }
 
-// Concrete class for walking
-class Walk extends TransportMode {
-    public Walk() {
-        super(5);
-    }
-}
-
-// Concrete class for car
-class Car extends TransportMode {
-    public Car() {
-        super(50);
-    }
-}
-
-// Concrete class for bike
-class Bike extends TransportMode {
-    public Bike() {
-        super(15);
-    }
-}

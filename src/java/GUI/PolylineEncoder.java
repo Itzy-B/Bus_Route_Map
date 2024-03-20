@@ -30,20 +30,16 @@ public class PolylineEncoder {
     // Encodes a single coordinate value into an encoded polyline
     private static void encodeValue(long value, StringBuilder result) {
         // Shift the value left by 1 and if it's negative, invert it
-        value = value << 1;
-        if (value < 0) {
-            value = ~value;
-        }
+        value = value < 0 ? ~(value << 1) : value << 1;
 
         // While value is greater than or equal to 0x20, take the lowest 5 bits of it and add 0x20 to them
         while (value >= 0x20) {
-            int nextValue = (int) (0x20 | (value & 0x1f)) + 63;
-            result.append((char) nextValue);
+            result.append(Character.toChars((int) ((0x20 | (value & 0x1f)) + 63)));
             value >>= 5;
         }
 
         // The lowest 5 bits of the final value are stored directly
-        result.append((char) (value + 63));
+        result.append(Character.toChars((int) (value + 63)));
     }
 
 }

@@ -7,7 +7,7 @@ public class TimeCalculator {
     
     private static int MinutesInHours = 60;
 
-    public double calculateAverageTimeTaken(String zipCode1, String zipCode2, TransportMode mode) throws IOException {
+    public static double calculateAverageTimeTaken(String zipCode1, String zipCode2, TransportMode mode) throws IOException {
         double distance = CalculateDistance.getDistance(zipCode1, zipCode2, false);
         double averageVelocity = mode.getVelocity();
         
@@ -18,23 +18,24 @@ public class TimeCalculator {
         return (distance / averageVelocity) * MinutesInHours;
     }
     
-    // public static void main(String[] args) {
-    //     TimeCalculator calculator = new TimeCalculator();
+    /*  Main test code
+    public static void main(String[] args) {
+         TimeCalculator calculator = new TimeCalculator();
         
-    //     TransportMode mode = new Car();
-    //     // Change this to new Walk() or new Bike() to calculate for different modes
-        
-         
-        // try {
-                    
-
-        //     double averageTimeTaken = calculator.calculateAverageTimeTaken(zipCode1, zipCode2, mode);
+         TransportMode mode = new Car();
+         // Change this to new Walk() or new Bike() to calculate for different modes
+         String zipCode1 = "6211AL";
+         String zipCode2 = "6211PK";
+         try {
+             double averageTimeTaken = calculator.calculateAverageTimeTaken(zipCode1, zipCode2, mode);
             
-        //     System.out.println("Average Time Taken: " + averageTimeTaken + " minutes");
-        // } catch (IOException e) {
-        //     System.err.println("An error occurred while calculating the distance: " + e.getMessage());
-        //     e.printStackTrace();
-        // }
+             System.out.println("Average Time Taken: " + averageTimeTaken + " minutes");
+         } catch (IOException e) {
+             System.err.println("An error occurred while calculating the distance: " + e.getMessage());
+             e.printStackTrace();
+         }
+
+     */
     }
 
 
