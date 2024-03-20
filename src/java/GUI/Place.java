@@ -18,7 +18,6 @@ public class Place {
 
     }
 
-
     public double getLatitude() {
         return latitude;
     }
