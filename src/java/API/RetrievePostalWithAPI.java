@@ -44,19 +44,19 @@ public class RetrievePostalWithAPI {
         ArrayList<Double> LatLong = null;
         //TODO: Uncomment this when connected to WiFi from UM
         try {
-        @SuppressWarnings("deprecation")
+        // @SuppressWarnings("deprecation")
         
-        // URL obj = new URL("https://www.computerscience.dacs.unimaas.nl/get_coordinates");
-        URL obj = new URL("https://postal-code-api-phi.vercel.app/latlng/6217HG");
-        URLConnection yc = obj.openConnection();
-        BufferedReader in = new BufferedReader(
-                                new InputStreamReader(
-                                yc.getInputStream()));
-        String inputLine;
+        // // URL obj = new URL("https://www.computerscience.dacs.unimaas.nl/get_coordinates");
+        // URL obj = new URL("https://postal-code-api-phi.vercel.app/latlng/6217HG");
+        // URLConnection yc = obj.openConnection();
+        // BufferedReader in = new BufferedReader(
+        //                         new InputStreamReader(
+        //                         yc.getInputStream()));
+        // String inputLine;
 
-        while ((inputLine = in.readLine()) != null) 
-            System.out.println(inputLine);
-        in.close();
+        // while ((inputLine = in.readLine()) != null) 
+        //     System.out.println(inputLine);
+        // in.close();
 
         // HttpURLConnection httpURLConnection = (HttpURLConnection) obj.openConnection();
         // httpURLConnection.setRequestMethod("POST");

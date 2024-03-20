@@ -7,12 +7,20 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import src.java.GUI.Data;
 import src.java.GUI.Place;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +37,7 @@ public class CalculateDistance {
      * @param p2 the second zip code
      * @return the distance between the two zip codes in kilometers or meters, depending on the distance
      */
-    public static double getDistance(String p1, String p2) throws IOException {
+    public static double getDistance(String p1, String p2, boolean grassHopperEnabled) throws IOException {
         //Initialize data
         Data data = new Data();
         data.getData();
@@ -38,11 +46,18 @@ public class CalculateDistance {
         //Get LatLong Arrays from data class
         ArrayList<Double> latLong1 = data.getLatLong(p1);
         ArrayList<Double> latLong2 = data.getLatLong(p2);
-        //Calculate distance between
-        distance = distanceBetween(latLong1.get(0), latLong1.get(1), latLong2.get(0), latLong2.get(1));
-        // Format to two decimal places
-        DecimalFormat df = new DecimalFormat("#.##");
-        distance = Double.parseDouble(df.format(distance));
+        if (!(grassHopperEnabled)) {
+            //Calculate distance between
+            distance = distanceBetween(latLong1.get(0), latLong1.get(1), latLong2.get(0), latLong2.get(1));
+            // Format to two decimal places
+            DecimalFormat df = new DecimalFormat("#.##");
+            distance = Double.parseDouble(df.format(distance));
+        }
+
+        else {
+            distance = getDistanceWithGraphHopper(latLong1, latLong2);
+        }
+        
 
         if(distance >= 1){
             return distance;
@@ -120,7 +135,7 @@ public class CalculateDistance {
 
 
     public static String printDistance(String p1, String p2) throws IOException {
-        double distance = getDistance(p1, p2);
+        double distance = getDistance(p1, p2, true);
         if (distance >= 1) {
              return distance + " Kilometers";
         } else {
@@ -132,5 +147,43 @@ public class CalculateDistance {
         System.out.println(printDistance("6222CN", "6213HD"));
     }
 
+    public static double getDistanceWithGraphHopper(ArrayList<Double> latLong1, ArrayList<Double> latLong2) throws MalformedURLException, IOException {
+        double distance = 0;
+        // String lat1 = "50.86635198292194";
+        // String long1 = "5.704404406327205";
+        // String lat2 = "50.8339399220579";
+        // String long2 = "5.6609128633869";
+
+        @SuppressWarnings("deprecation")
+        URL obj = new URL("http://localhost:8989/route?point=" + latLong1.get(0) + "%2C" + latLong1.get(1) +"&point=" + latLong2.get(0) + "%2C" + latLong2.get(1) + "&profile=car");
+        System.out.println(obj);
+        URLConnection yc = obj.openConnection();
+        BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
+        StringBuilder stringBuilder = new StringBuilder();
+        String inputLine;
+
+        while ((inputLine = in.readLine()) != null) {
+            stringBuilder.append(inputLine);
+        }
+        
+        in.close();
+        String jsonString = stringBuilder.toString();
+
+        try {
+            JSONObject jsonObject = new JSONObject(jsonString);
+            JSONArray paths = jsonObject.getJSONArray("paths");
+            JSONObject firstPath = paths.getJSONObject(0);
+            distance = firstPath.getDouble("distance");
+        }
+
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String distanceString = Double.toString(distance);
+        distanceString = distanceString.replaceAll(",", ".");
+        distance = Double.parseDouble(distanceString);
+        return distance / 1000;
+}
 
 }

@@ -8,7 +8,7 @@ public class TimeCalculator {
     private static int MinutesInHours = 60;
 
     public double calculateAverageTimeTaken(String zipCode1, String zipCode2, TransportMode mode) throws IOException {
-        double distance = CalculateDistance.getDistance(zipCode1, zipCode2);
+        double distance = CalculateDistance.getDistance(zipCode1, zipCode2, false);
         double averageVelocity = mode.getVelocity();
         
         if (averageVelocity == 0) {
