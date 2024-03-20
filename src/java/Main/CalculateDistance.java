@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import src.java.GUI.Data;
+import src.java.GUI.Place;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -78,6 +79,43 @@ public class CalculateDistance {
                         Math.pow(Math.sin(deltaLon / 2), 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return EARTH_RADIUS * c;
+    }
+
+    /**
+     * Calculates the midpoint between two points on the earth.
+     *
+     * @param p1 the first point
+     * @param p2 the second point
+     * @return the midpoint between the two points as an ArrayList of two Doubles, where the first element is the latitude and the second element is the longitude
+     * @throws IOException if there is an error retrieving the coordinates from the data file or making an API call
+     */
+    public static ArrayList<Double> findMidpoint(Place p1, Place p2) throws IOException {
+        ArrayList<Double> midpoint = new ArrayList<>();
+
+        double lat1 = p1.getLatitude();
+        double lon1 = p1.getLongitude();
+        double lat2 = p2.getLatitude();
+        double lon2 = p2.getLongitude();
+
+        double dLon = Math.toRadians(lon2 - lon1);
+
+        // Convert to radians
+        lat1 = Math.toRadians(lat1);
+        lat2 = Math.toRadians(lat2);
+        lon1 = Math.toRadians(lon1);
+
+        // Intermediate point
+        double Bx = Math.cos(lat2) * Math.cos(dLon);
+        double By = Math.cos(lat2) * Math.sin(dLon);
+        double lat3 = Math.atan2(Math.sin(lat1) + Math.sin(lat2),
+                Math.sqrt((Math.cos(lat1) + Bx) * (Math.cos(lat1) + Bx) + By * By));
+        double lon3 = lon1 + Math.atan2(By, Math.cos(lat1) + Bx);
+
+        // Convert back to degrees
+        midpoint.add(Math.toDegrees(lat3));
+        midpoint.add(Math.toDegrees(lon3));
+
+        return midpoint;
     }
 
 
