@@ -89,7 +89,8 @@ public class CalculateDistance {
         //If either of the zip codes are not present we make an API call and find the latitude and longitude from there
         else {
             //API call
-            ArrayList<Double> latLong = RetrievePostalWithAPI.getPCode(p1);
+            RetrievePostalWithAPI api = new RetrievePostalWithAPI();
+            ArrayList<Double> latLong = api.getPCode(p1);
             if (latLong.size() > 0) {
                 distance = distanceBetween(latLong.get(0), latLong.get(1), latLong.get(2), latLong.get(3));
             }
