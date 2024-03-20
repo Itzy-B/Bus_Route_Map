@@ -91,8 +91,9 @@ public class CalculateDistance {
             //API call
             RetrievePostalWithAPI api = new RetrievePostalWithAPI();
             ArrayList<Double> latLong = api.getPCode(p1);
-            if (latLong.size() > 0) {
-                distance = distanceBetween(latLong.get(0), latLong.get(1), latLong.get(2), latLong.get(3));
+            ArrayList<Double> latLong2 = api.getPCode(p2);
+            if (latLong.size() > 0 && latLong.size() > 0) {
+                distance = distanceBetween(latLong.get(0), latLong.get(1), latLong2.get(0), latLong2.get(1));
             }
 
             else {

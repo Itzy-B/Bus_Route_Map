@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 
-public class MaastrichtMap extends Application{
+public class MaastrichtMap extends Application {
 
     private static final double MAP_WIDTH = 1200.0;
     private static final double MAP_HEIGHT = 1000.0;

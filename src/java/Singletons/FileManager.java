@@ -17,13 +17,13 @@ import java.util.List;
 public class FileManager {
     private static FileManager instance;
 
-    static {
-        instance = new FileManager();
-    }
-
     public static FileManager getInstance() {
+        if (instance == null) {
+            instance = new FileManager();
+        }
         return instance;
     }
+
 
     public List<String> getFile(String pathToRead) {
         List<String> lines;
