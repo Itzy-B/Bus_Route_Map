@@ -7,6 +7,9 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import src.java.GUI.Data;
+import src.java.GUI.Place;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,54 +20,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 public class CalculateDistance {
-    private static ArrayList<String> zipCodes = new ArrayList<String>();
-    private static ArrayList<Double> latitude = new ArrayList<Double>();
-    private static ArrayList<Double> longitude = new ArrayList<Double>();
     private static final int EARTH_RADIUS = 6371;
-
-    /**
-     * Reads the data from the Excel file and stores it in the zipCodes and latitude arrays.
-     */
-    public static void getData() {
-        boolean isFirstRow = true; // Flag to indicate the first row
-        try (FileInputStream fis = new FileInputStream("src/java/Resources/MassZipLatLon.xlsx");
-             XSSFWorkbook wb = new XSSFWorkbook(fis)) {
-
-            XSSFSheet sheet = wb.getSheetAt(0);
-            for (Row row : sheet) {
-                if (isFirstRow) {
-                    isFirstRow = false;
-                    continue; // Skip processing the first row
-                }
-                for (Cell cell : row) {
-                    switch (cell.getColumnIndex()) {
-                        case 0: // Zip Code Column
-                            zipCodes.add(cell.getStringCellValue());
-                            break;
-                        case 1: // Latitude Column
-                            if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-                                latitude.add(cell.getNumericCellValue());
-                            } else {
-                                throw new IllegalArgumentException("Latitude column must be numeric");
-                            }
-                            break;
-                        case 2: // Longitude Column
-                            if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-                                longitude.add(cell.getNumericCellValue());
-                            } else {
-                                throw new IllegalArgumentException("Longitude column must be numeric");
-                            }
-                            break;
-                        default:
-                            // Handle other columns if needed
-                    }
-                }
-            }
-        } catch (IOException e) {
-            // Handle file IO error
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Calculates the distance between two zip codes using the Haversine formula.
@@ -74,30 +30,16 @@ public class CalculateDistance {
      * @return the distance between the two zip codes in kilometers or meters, depending on the distance
      */
     public static double getDistance(String p1, String p2) throws IOException {
-        getData(); // Initialize the data arrays
+        //Initialize data
+        Data data = new Data();
+        data.getData();
+
         double distance = 0;
-
-        Collections.sort(zipCodes); // Sort the zip codes
-
-        int indexP1 = Collections.binarySearch(zipCodes, p1); //Finding the index of the zip code with a binary search
-        int indexP2 = Collections.binarySearch(zipCodes, p2);
-
-        //If both zip codes are present in the data array we calculate the distance between them
-        if (indexP1 >= 0 && indexP2 >= 0) {
-            distance = distanceBetween(latitude.get(indexP1), longitude.get(indexP1), latitude.get(indexP2), longitude.get(indexP2));
-        }
-        //If either of the zip codes are not present we make an API call and find the latitude and longitude from there
-        else {
-            //API call
-            ArrayList<Double> latLong = RetrievePostalWithAPI.getPCode(p1);
-            if (latLong.size() > 0) {
-                distance = distanceBetween(latLong.get(0), latLong.get(1), latLong.get(2), latLong.get(3));
-            }
-
-            else {
-                throw new IllegalArgumentException("Invalid postal code or postal code in not in database");
-            }
-        }
+        //Get LatLong Arrays from data class
+        ArrayList<Double> latLong1 = data.getLatLong(p1);
+        ArrayList<Double> latLong2 = data.getLatLong(p2);
+        //Calculate distance between
+        distance = distanceBetween(latLong1.get(0), latLong1.get(1), latLong2.get(0), latLong2.get(1));
         // Format to two decimal places
         DecimalFormat df = new DecimalFormat("#.##");
         distance = Double.parseDouble(df.format(distance));
@@ -139,14 +81,55 @@ public class CalculateDistance {
         return EARTH_RADIUS * c;
     }
 
+    /**
+     * Calculates the midpoint between two points on the earth.
+     *
+     * @param p1 the first point
+     * @param p2 the second point
+     * @return the midpoint between the two points as an ArrayList of two Doubles, where the first element is the latitude and the second element is the longitude
+     * @throws IOException if there is an error retrieving the coordinates from the data file or making an API call
+     */
+    public static ArrayList<Double> findMidpoint(Place p1, Place p2) throws IOException {
+        ArrayList<Double> midpoint = new ArrayList<>();
+
+        double lat1 = p1.getLatitude();
+        double lon1 = p1.getLongitude();
+        double lat2 = p2.getLatitude();
+        double lon2 = p2.getLongitude();
+
+        double dLon = Math.toRadians(lon2 - lon1);
+
+        // Convert to radians
+        lat1 = Math.toRadians(lat1);
+        lat2 = Math.toRadians(lat2);
+        lon1 = Math.toRadians(lon1);
+
+        // Intermediate point
+        double Bx = Math.cos(lat2) * Math.cos(dLon);
+        double By = Math.cos(lat2) * Math.sin(dLon);
+        double lat3 = Math.atan2(Math.sin(lat1) + Math.sin(lat2),
+                Math.sqrt((Math.cos(lat1) + Bx) * (Math.cos(lat1) + Bx) + By * By));
+        double lon3 = lon1 + Math.atan2(By, Math.cos(lat1) + Bx);
+
+        // Convert back to degrees
+        midpoint.add(Math.toDegrees(lat3));
+        midpoint.add(Math.toDegrees(lon3));
+
+        return midpoint;
+    }
+
 
     public static String printDistance(String p1, String p2) throws IOException {
         double distance = getDistance(p1, p2);
         if (distance >= 1) {
-            return distance + " Kilometers";
+             return distance + " Kilometers";
         } else {
-            return distance + " Meters";
+             return distance + " Meters";
         }
+    }
+
+    public static void main(String[] args) throws IOException {
+        System.out.println(printDistance("6222CN", "6213HD"));
     }
 
 
