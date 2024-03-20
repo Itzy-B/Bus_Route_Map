@@ -17,10 +17,10 @@ import java.util.ArrayList;
 
 public class MaastrichtMap extends Application{
 
-    private static final double MAP_WIDTH = 1200.0;
-    private static final double MAP_HEIGHT = 1000.0;
-    private static final double WINDOW_WIDTH = 1600.0;
-    private static final double WINDOW_HEIGHT = 1000.0;
+    private static final double MAP_WIDTH =900.0;
+    private static final double MAP_HEIGHT = 00.0;
+    private static final double WINDOW_WIDTH = 1540;
+    private static final double WINDOW_HEIGHT = 780.0;
 
     // Google Map static API key
     private static final String API_KEY = "AIzaSyDnJH0pu5NzqH0b6GjiPyTDfdkBDugYw6w";
@@ -106,9 +106,11 @@ public class MaastrichtMap extends Application{
     }
 
     private void zoomOut() {
-        zoomLevel -= 1;
-        scale /= 2;
-        Platform.runLater(this::updateMap);
+        if (zoomLevel>=1) {
+            zoomLevel -= 1;
+            scale /= 2;
+            Platform.runLater(this::updateMap);    
+        }
     }
 
     private String constructMapUrl() {
