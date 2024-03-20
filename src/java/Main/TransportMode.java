@@ -25,7 +25,7 @@ class Walk extends TransportMode {
 // Concrete class for car
 class Car extends TransportMode {
     public Car() {
-        super(60);
+        super(50);
     }
 }
 

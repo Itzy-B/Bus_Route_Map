@@ -1,40 +1,40 @@
 package src.java.Main;
 
+import static src.java.Main.CalculateDistance.getDistance;
+import java.io.IOException;
+
 public class TimeCalculator {
     
     private static int MinutesInHours = 60;
 
-
-    public double calculateAverageTimeTaken(double distance, TransportMode mode) {
+    public double calculateAverageTimeTaken(String zipCode1, String zipCode2, TransportMode mode) throws IOException {
+        double distance = CalculateDistance.getDistance(zipCode1, zipCode2);
         double averageVelocity = mode.getVelocity();
         
-        // Ensure that the average velocity is not zero to avoid division by zero, useful if we implement user input velocity
-        // Also helps if you have any mistakes in the abstract class
-
         if (averageVelocity == 0) {
             throw new IllegalArgumentException("Average velocity cannot be zero.");
         }
-
+        
         return (distance / averageVelocity) * MinutesInHours;
-
     }
     
-    public static void main(String[] args) {
-        TimeCalculator calculator = new TimeCalculator();
+    // public static void main(String[] args) {
+    //     TimeCalculator calculator = new TimeCalculator();
         
+    //     TransportMode mode = new Car();
+    //     // Change this to new Walk() or new Bike() to calculate for different modes
+        
+         
+        // try {
+                    
 
-        double distance = 100;
-        // In kilometers
-        // Change this for a call to a getter method
-
-        TransportMode mode = new Car();
-        // Change this to new Walk() or new Bike() to calculate for different modes
-        
-        
-        double averageTimeTaken = calculator.calculateAverageTimeTaken(distance, mode);
-        
-
-        System.out.println("Average Time Taken: " + averageTimeTaken + " minutes");
+        //     double averageTimeTaken = calculator.calculateAverageTimeTaken(zipCode1, zipCode2, mode);
+            
+        //     System.out.println("Average Time Taken: " + averageTimeTaken + " minutes");
+        // } catch (IOException e) {
+        //     System.err.println("An error occurred while calculating the distance: " + e.getMessage());
+        //     e.printStackTrace();
+        // }
     }
-}
+
 
