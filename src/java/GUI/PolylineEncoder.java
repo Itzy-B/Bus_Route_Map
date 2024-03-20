@@ -2,9 +2,19 @@ package src.java.GUI;
 
 import java.util.List;
 
+/**
+ * This class provides methods for encoding a sequence of LatLng coordinates into an encoded polyline string.
+ * The algorithm for encoding the polyline is adapted from Google Maps Services Java library:
+ * https://github.com/googlemaps/google-maps-services-java/blob/master/src/main/java/com/google/maps/internal/PolylineEncoding.java
+ */
 public class PolylineEncoder {
 
-    // Encodes a sequence of LatLng coordinates into an encoded polyline string
+    /**
+     * Encodes a sequence of Place coordinates into an encoded polyline string.
+     *
+     * @param path A list of Place objects representing the coordinates of the polyline path.
+     * @return The encoded polyline string.
+     */
     public static String encode(List<Place> path) {
         long lastLat = 0;
         long lastLng = 0;
@@ -27,7 +37,12 @@ public class PolylineEncoder {
         return result.toString();
     }
 
-    // Encodes a single coordinate value into an encoded polyline
+    /**
+     * Encodes a single coordinate value into an encoded polyline.
+     *
+     * @param value  The coordinate value to be encoded.
+     * @param result The StringBuilder to which the encoded value will be appended.
+     */
     private static void encodeValue(long value, StringBuilder result) {
         // Shift the value left by 1 and if it's negative, invert it
         value = value < 0 ? ~(value << 1) : value << 1;

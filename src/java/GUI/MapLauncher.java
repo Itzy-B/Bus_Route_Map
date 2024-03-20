@@ -18,22 +18,31 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class represents the graphical user interface (GUI) for launching a map application.
+ */
 public class MapLauncher extends Application{
 
+    // Constants for defining dimensions of the map window
     private static final double MAP_WIDTH =900.0;
-    private static final double MAP_HEIGHT = 00.0;
+    private static final double MAP_HEIGHT = 780.0;
     private static final double WINDOW_WIDTH = 1540;
     private static final double WINDOW_HEIGHT = 780.0;
 
     // Google Map static API key
     private static final String API_KEY = "AIzaSyDnJH0pu5NzqH0b6GjiPyTDfdkBDugYw6w";
 
-    private double CENTER_LATITUDE = 50.851368; // Latitude of Maastricht
-    private double CENTER_LONGITUDE = 5.690973; // Longitude of Maastricht
+    // Coordinates of Maastricht
+    private double CENTER_LATITUDE = 50.851368;
+    private double CENTER_LONGITUDE = 5.690973;
+
+    // Initial scale for the map
+    private static int scale = 1;
+
+    // Initial zoom level for the map
+    private static int zoomLevel = 13;
 
     private ImageView mapView;
-    private static int scale = 1;
-    private static int zoomLevel = 13;
 
     private TextField zipCodeField1;
     private TextField zipCodeField2;
@@ -45,9 +54,15 @@ public class MapLauncher extends Application{
     private Place place1;
     private Place place2;
 
-
+    /**
+     * Entry point of the JavaFX application.
+     *
+     * @param primaryStage The primary stage for displaying the map window.
+     * @throws IOException If there is an error while initializing the map.
+     */
     @Override
     public void start(Stage primaryStage) throws IOException {
+        // Initialize data
         Data.getData();
 
         // Initialize places to null
@@ -59,7 +74,6 @@ public class MapLauncher extends Application{
 
         // Load the map image from the URL
         Image mapImage = new Image(mapUrl);
-
 
         // Create an ImageView to display the map image
         mapView = new ImageView(mapImage);
@@ -104,7 +118,6 @@ public class MapLauncher extends Application{
         walkTimeTextField = new TextField();
         bikeTimeTextField = new TextField();
         carTimeTextField = new TextField();
-
 
         // Set preferred widths for TextFields
         distanceTextField.setPrefWidth(100);
@@ -170,30 +183,32 @@ public class MapLauncher extends Application{
         }
     }
 
+    // Method for searching places and updating information
     private void searchPlaces() throws IOException {
         String zipCode1 = zipCodeField1.getText();
         String zipCode2 = zipCodeField2.getText();
 
         // Check if both zip code fields are filled
         if (!zipCode1.isEmpty() && !zipCode2.isEmpty()) {
-            // Retrieve latitude and longitude for the given zip codes
             place1 = new Place(zipCode1);
             place2 = new Place(zipCode2);
 
-//            double distance = CalculateDistance.getDistance(zipCode1, zipCode2);
-//            double walkTime = TimeCalculator.calculateAverageTimeTaken(distance, new Walk());
-//            double bikeTime = TimeCalculator.calculateAverageTimeTaken(distance, new Bike());
-//            double carTime = TimeCalculator.calculateAverageTimeTaken(distance, new Car());
+            // Calculate distance and average times
+            double distance = CalculateDistance.getDistance(zipCode1, zipCode2, false);
+            double walkTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Walk());
+            double bikeTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Bike());
+            double carTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Car());
 
             // Update map and information
             updateMap();
-            //updateInformation(distance, walkTime, bikeTime, carTime);
+            updateInformation(distance, walkTime, bikeTime, carTime);
         } else {
             // Show an error message if either of the zip code fields is empty
             System.out.println("Please enter both zip codes.");
         }
     }
 
+    // Method for updating information in the TextFields
     private void updateInformation(double distance, double walkTime, double bikeTime, double carTime) {
         distanceTextField.setText(String.valueOf(distance));
         walkTimeTextField.setText(String.valueOf(walkTime));
@@ -201,7 +216,7 @@ public class MapLauncher extends Application{
         carTimeTextField.setText(String.valueOf(carTime));
     }
 
-
+    // Method for constructing the URL for the map image
     private String constructMapUrl() {
         StringBuilder mapUrlBuilder = new StringBuilder("https://maps.googleapis.com/maps/api/staticmap");
         mapUrlBuilder.append("?center=Maastricht");
