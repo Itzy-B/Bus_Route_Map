@@ -51,7 +51,6 @@ public class RetrievePostalWithAPI {
         try {
         @SuppressWarnings("deprecation")
         
-        URL obj = new URL("https://computerscience.dacs.unimaas.nl/get_coordinates?");
         String requestBody = "{\"postcode\": \"" + pCode + "\"}";
 
         HttpRequest request = HttpRequest.newBuilder()

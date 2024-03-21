@@ -51,8 +51,8 @@ public class CalculateDistance {
             //Calculate distance between
             distance = distanceBetween(latLong1.get(0), latLong1.get(1), latLong2.get(0), latLong2.get(1));
             // Format to two decimal places
-            DecimalFormat df = new DecimalFormat("#.#");
-            distance = Double.parseDouble(df.format(distance));
+            // DecimalFormat df = new DecimalFormat("#.#");
+            // distance = Double.parseDouble(df.format(distance));
         }
 
         else {
@@ -142,26 +142,36 @@ public class CalculateDistance {
     }
 
     public static void main(String[] args) throws IOException {
-        System.out.println(printDistance("6222CN", "6213HD", false));
-        System.out.println(printDistance("6222CN", "6213HD", false));
-        System.out.println(printDistance("6222CN", "6213HD", false));
-        System.out.println(printDistance("6222CN", "6213HD", false));
+        // System.out.println(printDistance("6222CN", "6213HD", false));
+        // System.out.println(printDistance("6222CN", "6213HD", false));
+        // System.out.println(printDistance("6222CN", "6213HD", false));
+        // System.out.println(printDistance("6222CN", "6213HD", false));
 
     }
 
     public static Process launchGraphHopper() throws IOException {
         Process process = null;
-        try {
-            // For Windows, using cmd.exe
-            String someCommand = "java -Xms1g -Xmx1g -server -Ddw.graphhopper.datareader.file=src/java/graphhopper/Maastricht.osm.pbf -cp src/java/graphhopper/graphhopper.jar com.graphhopper.application.GraphHopperApplication server src\\java\\graphhopper\\config.yml";
-            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", "start cmd.exe /k cmd /c " + someCommand);
-            process = processBuilder.start();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            try {
+                // cmd for windows
+                String someCommand = "java -Xms1g -Xmx1g -server -Ddw.graphhopper.datareader.file=src/java/graphhopper/Maastricht.osm.pbf -cp src/java/graphhopper/graphhopper.jar com.graphhopper.application.GraphHopperApplication server src\\java\\graphhopper\\config.yml";
+                ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", "start cmd.exe /k cmd /c " + someCommand);
+                process = processBuilder.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } 
+        else {
+            try {
+                //MacOS
+                String someCommand = "java -Xms1g -Xmx1g -server -Ddw.graphhopper.datareader.file=src/java/graphhopper/Maastricht.osm.pbf -cp src/java/graphhopper/graphhopper.jar com.graphhopper.application.GraphHopperApplication server src/java/graphhopper/config.yml";
+                ProcessBuilder processBuilder = new ProcessBuilder("/bin/sh", "-c", someCommand);
+                process = processBuilder.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return process;
-            // Optionally, you can read the output of the process
-            // process.getInputStream().read();
     }
  
     public static double getDistanceWithGraphHopper(ArrayList<Double> latLong1, ArrayList<Double> latLong2) throws MalformedURLException, IOException {
