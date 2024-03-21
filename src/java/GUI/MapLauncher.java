@@ -14,7 +14,6 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
 import src.java.Main.*;
-import java.text.DecimalFormat;
 
 import static src.java.Main.CalculateDistance.launchGraphHopper;
 

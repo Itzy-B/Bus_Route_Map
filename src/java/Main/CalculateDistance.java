@@ -51,8 +51,8 @@ public class CalculateDistance {
             //Calculate distance between
             distance = distanceBetween(latLong1.get(0), latLong1.get(1), latLong2.get(0), latLong2.get(1));
             // Format to two decimal places
-            // DecimalFormat df = new DecimalFormat("#.#");
-            // distance = Double.parseDouble(df.format(distance));
+            DecimalFormat df = new DecimalFormat("#.#");
+            distance = Double.parseDouble(df.format(distance));
         }
 
         else {
@@ -164,7 +164,7 @@ public class CalculateDistance {
         else {
             try {
                 //MacOS
-                String command = "java -Xms1g -Xmx1g -server -Ddw.graphhopper.datareader.file=src/java/graphhopper/Maastricht.osm.pbf -cp src/java/graphhopper/graphhopper.jar com.graphhopper.application.GraphHopperApplication server src\\java\\graphhopper\\config.yml";
+                String command = "java -Xms1g -Xmx1g -server -Ddw.graphhopper.datareader.file=src/java/graphhopper/Maastricht.osm.pbf -cp src/java/graphhopper/graphhopper.jar com.graphhopper.application.GraphHopperApplication server src/java/graphhopper/config.yml";
                 ProcessBuilder processBuilder = new ProcessBuilder("osascript", "-e",
                         "'tell application \"Terminal\" to do script \"" + command + "\"'");
                 processBuilder.inheritIO(); // This makes the terminal inherit the IO of the parent process
@@ -212,8 +212,10 @@ public class CalculateDistance {
 
         String distanceString = Double.toString(distance);
         distanceString = distanceString.replaceAll(",", ".");
-        distance = Double.parseDouble(distanceString);
-        return distance / 1000;
+        distance = Double.parseDouble(distanceString) / 1000;
+        DecimalFormat df = new DecimalFormat("#.#");
+        distance = Double.parseDouble(df.format(distance));
+        return distance;
 }
 
 }
