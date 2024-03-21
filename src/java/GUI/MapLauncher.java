@@ -259,6 +259,11 @@ public class MapLauncher extends Application{
 
     // Method for updating information in the TextFields
     private void updateInformation(double acDistance, double distance, long walkTime, long bikeTime, long carTime) {
+        if (getCheckBoxState()) {
+            walkTime = -1;
+            bikeTime = -1;
+            carTime = -1;
+        }
         acDistanceLabel.setText("Actual distance: " + acDistance + " kilometers");
         distanceLabel.setText("Distance: " + distance + " kilometers");
         walkTimeLabel.setText("Average time by walk: " + walkTime + " minutes");
@@ -310,7 +315,7 @@ public class MapLauncher extends Application{
         try {
             //Not an elegant solutions, fix later
             launchGraphHopper().waitFor(1, TimeUnit.MINUTES);
-            Thread.sleep(8000);
+            Thread.sleep(6000);
         }
         catch (Exception e) {
             e.printStackTrace();
