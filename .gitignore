@@ -4,3 +4,4 @@ src/java/Resources/currentIP.txt
 .vscode/settings.json
 userObject.ser
 /lib/javafx-sdk-21.0.2/
+logs/graphhopper.log

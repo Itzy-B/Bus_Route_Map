@@ -4,11 +4,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+
+import org.json.JSONObject;
 
 import src.java.Singletons.FileManager;
 
@@ -41,37 +47,32 @@ public class RetrievePostalWithAPI {
     }
 
     public ArrayList<Double> sentPostRequest(String pCode) {
-        ArrayList<Double> LatLong = null;
-        //TODO: Uncomment this when connected to WiFi from UM
+        ArrayList<Double> LatLong = new ArrayList<Double>();
         try {
-        // @SuppressWarnings("deprecation")
+        @SuppressWarnings("deprecation")
         
-        // // URL obj = new URL("https://www.computerscience.dacs.unimaas.nl/get_coordinates");
-        // URL obj = new URL("https://postal-code-api-phi.vercel.app/latlng/6217HG");
-        // URLConnection yc = obj.openConnection();
-        // BufferedReader in = new BufferedReader(
-        //                         new InputStreamReader(
-        //                         yc.getInputStream()));
-        // String inputLine;
+        URL obj = new URL("https://computerscience.dacs.unimaas.nl/get_coordinates?");
+        String requestBody = "{\"postcode\": \"" + pCode + "\"}";
 
-        // while ((inputLine = in.readLine()) != null) 
-        //     System.out.println(inputLine);
-        // in.close();
+        HttpRequest request = HttpRequest.newBuilder()
+        .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+        .uri(URI.create("https://computerscience.dacs.unimaas.nl/get_coordinates?"))
+        .header("Content-Type", "application/json")
+        .build();
 
-        // HttpURLConnection httpURLConnection = (HttpURLConnection) obj.openConnection();
-        // httpURLConnection.setRequestMethod("POST");
-        // httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0");
-        // String POST_PARAMS = "{\"postcode\": \"6229EN\"}";
-        // httpURLConnection.setDoOutput(true);
-        // OutputStream os = httpURLConnection.getOutputStream();
-        // int responseCode = httpURLConnection.getResponseCode();
-        // System.out.println(responseCode);
-        // os.write(POST_PARAMS.getBytes());
-        // os.flush();
-        // os.close(); 
-        // System.out.println(httpURLConnection.getInputStream());
-        // LatLong = new ArrayList<Double>();
+        HttpResponse<String> response = HttpClient.newHttpClient()
+        .send(request, HttpResponse.BodyHandlers.ofString());
 
+        System.out.println(response.statusCode());
+        System.out.println(response.body());
+
+        JSONObject jsonObject = new JSONObject(response.body());
+        
+        // Extract latitude and longitude
+        String latitude = jsonObject.getString("latitude");
+        String longitude = jsonObject.getString("longitude");
+        LatLong.add(Double.parseDouble((latitude)));
+        LatLong.add(Double.parseDouble((longitude)));
         }
         catch (Exception e){
             e.printStackTrace();
