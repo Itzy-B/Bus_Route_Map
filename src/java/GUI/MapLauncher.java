@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -51,6 +52,8 @@ public class MapLauncher extends Application{
     private TextField zipCodeField1;
     private TextField zipCodeField2;
 
+    private CheckBox checkBox = null;
+
     private Label distanceLabel;
     private Label acDistanceLabel;
     private Label walkTimeLabel;
@@ -95,6 +98,8 @@ public class MapLauncher extends Application{
         Button zoomOutButton = new Button("-");
         zoomOutButton.setOnAction(event -> zoomOut());
         zoomOutButton.setPrefSize(50, 50);
+        checkBox = new CheckBox("Toggle graphhopper");
+
 
         // Create a Search button
         Button searchButton = new Button("Search");
@@ -179,13 +184,17 @@ public class MapLauncher extends Application{
         zoomButtons.setAlignment(Pos.TOP_LEFT);
         zoomButtons.setPadding(new Insets(10));
 
+        HBox checkBoxs = new HBox(10, checkBox);
+        checkBoxs.setAlignment(Pos.TOP_LEFT);
+        checkBoxs.setPadding(new Insets(10));
+
         // Create a VBox for labels
         VBox labelsVBox = new VBox(10, acDistanceLabel, distanceLabel, walkTimeLabel, bikeTimeLabel, carTimeLabel);
         labelsVBox.setAlignment(Pos.TOP_LEFT);
         labelsVBox.setPadding(new Insets(10));
 
         // Create a VBox for the right side content
-        VBox rightContentVBox = new VBox(10, textFieldAndSearch, zoomButtons, labelsVBox);
+        VBox rightContentVBox = new VBox(10, textFieldAndSearch, zoomButtons, checkBoxs, labelsVBox);
         rightContentVBox.setAlignment(Pos.TOP_LEFT);
         rightContentVBox.setPadding(new Insets(10));
 
@@ -208,6 +217,10 @@ public class MapLauncher extends Application{
         Platform.runLater(this::updateMap);
     }
 
+    private boolean getCheckBoxState() {
+        return checkBox.isSelected();
+    }
+
     private void zoomOut() {
         if (zoomLevel >= 1) {
             zoomLevel -= 1;
@@ -227,8 +240,8 @@ public class MapLauncher extends Application{
             place2 = new Place(zipCode2);
 
             // Calculate distance and average times
-            double acDistance = CalculateDistance.getDistance(zipCode1, zipCode2, false);
-            double distance = CalculateDistance.getDistance(zipCode1, zipCode2, false);
+            double acDistance = CalculateDistance.getDistance(zipCode1, zipCode2, getCheckBoxState());
+            double distance = CalculateDistance.getDistance(zipCode1, zipCode2, getCheckBoxState());
             long walkTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Walk());
             long bikeTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Bike());
             long carTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Car());
