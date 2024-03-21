@@ -12,7 +12,7 @@ You might also need to set up the VM options in your run configurations as:
 
 ***** HOW TO RUN *****
 
-Launch the application by running the MapLaungher.java file. This will start up the aplication and the GUI will pop up on screen.
+Launch the application by running the MapLauncher.java file. This will start up the aplication and the GUI will pop up on screen.
 
 Now, there are multiple things you can do:
 1) The '+' and '-' buttons

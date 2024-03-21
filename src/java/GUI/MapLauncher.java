@@ -15,9 +15,12 @@ import javafx.scene.control.Label;
 import src.java.Main.*;
 import java.text.DecimalFormat;
 
+import static src.java.Main.CalculateDistance.launchGraphHopper;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class represents the graphical user interface (GUI) for launching a map application.
@@ -292,6 +295,14 @@ public class MapLauncher extends Application{
     }
 
     public static void main(String[] args) {
+        try {
+            //Not an elegant solutions, fix later
+            launchGraphHopper().waitFor(1, TimeUnit.MINUTES);
+            Thread.sleep(8000);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         launch(args);
     }
 
