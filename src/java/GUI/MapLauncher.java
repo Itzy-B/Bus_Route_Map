@@ -13,7 +13,6 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
 import src.java.Main.*;
-import java.text.DecimalFormat;
 
 import static src.java.Main.CalculateDistance.launchGraphHopper;
 
@@ -227,7 +226,7 @@ public class MapLauncher extends Application{
             place2 = new Place(zipCode2);
 
             // Calculate distance and average times
-            double acDistance = CalculateDistance.getDistance(zipCode1, zipCode2, false);
+            double acDistance = CalculateDistance.getDistance(zipCode1, zipCode2, true);
             double distance = CalculateDistance.getDistance(zipCode1, zipCode2, false);
             long walkTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Walk());
             long bikeTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Bike());
