@@ -101,14 +101,22 @@ public class MapLauncher extends Application{
                 throw new RuntimeException(e);
             }
         });
-        searchButton.setPrefSize(100, 40);
+        searchButton.setPrefSize(150, 50);
 
         // Create text fields for location names
         zipCodeField1 = new TextField();
         zipCodeField1.setPromptText("Enter Zip Code 1");
+        zipCodeField1.setPrefWidth(150);
+        zipCodeField1.setStyle("-fx-font-size: 18px;");
+        zipCodeField1.setPrefHeight(50);
+
+
 
         zipCodeField2 = new TextField();
         zipCodeField2.setPromptText("Enter Zip Code 2");
+        zipCodeField2.setPrefWidth(150);
+        zipCodeField2.setStyle("-fx-font-size: 18px;");
+        zipCodeField2.setPrefHeight(50);
 
         // Create Labels for displaying the titles
         distanceLabel = new Label();
@@ -116,11 +124,24 @@ public class MapLauncher extends Application{
         bikeTimeLabel = new Label();
         carTimeLabel = new Label();
 
-        // Set preferred widths for TextFields
-        distanceLabel.setPrefWidth(200);
-        walkTimeLabel.setPrefWidth(200);
-        bikeTimeLabel.setPrefWidth(200);
-        carTimeLabel.setPrefWidth(200);
+        // Set preferred widths and heights for TextFields
+        distanceLabel.setPrefWidth(300);
+        distanceLabel.setPrefHeight(50);
+
+        walkTimeLabel.setPrefWidth(300);
+        walkTimeLabel.setPrefHeight(50);
+
+        bikeTimeLabel.setPrefWidth(300);
+        bikeTimeLabel.setPrefHeight(50);
+
+        carTimeLabel.setPrefWidth(300);
+        carTimeLabel.setPrefHeight(50);
+
+        // Set font size of labels
+        distanceLabel.setStyle("-fx-font-size: 20px;");
+        walkTimeLabel.setStyle("-fx-font-size: 20px;");
+        bikeTimeLabel.setStyle("-fx-font-size: 20px;");
+        carTimeLabel.setStyle("-fx-font-size: 20px;");
 
         // Create HBoxes to hold the labels and text fields
         HBox distanceBox = new HBox(10, distanceLabel);
@@ -138,25 +159,28 @@ public class MapLauncher extends Application{
         bikeTimeBox.setPadding(new Insets(10));
         carTimeBox.setPadding(new Insets(10));
 
-        // Create HBox for control buttons
-        HBox controlButtons = new HBox(10, zoomInButton, zoomOutButton, searchButton);
-        controlButtons.setPrefSize((WINDOW_WIDTH - MAP_WIDTH) / 2, WINDOW_HEIGHT);
-        controlButtons.setPadding(new Insets(10));
+        // Create VBox for text fields and Search button
+        VBox textFieldAndSearch = new VBox(10, zipCodeField1, zipCodeField2, searchButton);
+        textFieldAndSearch.setAlignment(Pos.TOP_LEFT);
+        textFieldAndSearch.setPadding(new Insets(10));
 
-        // Create a VBox for text fields and control buttons
-        VBox controlsVBox = new VBox(10, zipCodeField1, zipCodeField2, controlButtons);
-        controlsVBox.setAlignment(Pos.CENTER);
-        controlsVBox.setPrefSize((WINDOW_WIDTH - MAP_WIDTH) / 2, WINDOW_HEIGHT);
-        controlsVBox.setPadding(new Insets(10));
+        // Create an HBox for zoom buttons
+        HBox zoomButtons = new HBox(10, zoomInButton, zoomOutButton);
+        zoomButtons.setAlignment(Pos.TOP_LEFT);
+        zoomButtons.setPadding(new Insets(10));
 
-        // Create a VBox for displaying information
-        VBox infoVBox = new VBox(10, distanceBox, walkTimeBox, bikeTimeBox, carTimeBox);
-        infoVBox.setAlignment(Pos.CENTER_LEFT);
-        infoVBox.setPrefSize((WINDOW_WIDTH - MAP_WIDTH) / 2, WINDOW_HEIGHT);
-        infoVBox.setPadding(new Insets(10));
+        // Create a VBox for labels
+        VBox labelsVBox = new VBox(10, distanceLabel, walkTimeLabel, bikeTimeLabel, carTimeLabel);
+        labelsVBox.setAlignment(Pos.TOP_LEFT);
+        labelsVBox.setPadding(new Insets(10));
 
-        // Create a HBox to hold the map and controls
-        HBox hbox = new HBox(mapView, controlsVBox, infoVBox);
+        // Create a VBox for the right side content
+        VBox rightContentVBox = new VBox(10, textFieldAndSearch, zoomButtons, labelsVBox);
+        rightContentVBox.setAlignment(Pos.TOP_LEFT);
+        rightContentVBox.setPadding(new Insets(10));
+
+        // Create a HBox to hold the map and right side content
+        HBox hbox = new HBox(mapView, rightContentVBox);
         hbox.setSpacing(20);
         hbox.setPadding(new Insets(20));
 
