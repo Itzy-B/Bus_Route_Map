@@ -25,7 +25,7 @@ import java.util.List;
 public class MapLauncher extends Application{
 
     // Constants for defining dimensions of the map window
-    private static final double MAP_WIDTH =900.0;
+    private static final double MAP_WIDTH = 900.0;
     private static final double MAP_HEIGHT = 780.0;
     private static final double WINDOW_WIDTH = 1540;
     private static final double WINDOW_HEIGHT = 780.0;
@@ -49,6 +49,7 @@ public class MapLauncher extends Application{
     private TextField zipCodeField2;
 
     private Label distanceLabel;
+    private Label acDistanceLabel;
     private Label walkTimeLabel;
     private Label bikeTimeLabel;
     private Label carTimeLabel;
@@ -110,8 +111,6 @@ public class MapLauncher extends Application{
         zipCodeField1.setStyle("-fx-font-size: 18px;");
         zipCodeField1.setPrefHeight(50);
 
-
-
         zipCodeField2 = new TextField();
         zipCodeField2.setPromptText("Enter Zip Code 2");
         zipCodeField2.setPrefWidth(150);
@@ -119,12 +118,16 @@ public class MapLauncher extends Application{
         zipCodeField2.setPrefHeight(50);
 
         // Create Labels for displaying the titles
+        acDistanceLabel = new Label();
         distanceLabel = new Label();
         walkTimeLabel = new Label();
         bikeTimeLabel = new Label();
         carTimeLabel = new Label();
 
         // Set preferred widths and heights for TextFields
+        acDistanceLabel.setPrefWidth(300);
+        acDistanceLabel.setPrefHeight(50);
+
         distanceLabel.setPrefWidth(300);
         distanceLabel.setPrefHeight(50);
 
@@ -138,22 +141,26 @@ public class MapLauncher extends Application{
         carTimeLabel.setPrefHeight(50);
 
         // Set font size of labels
+        acDistanceLabel.setStyle("-fx-font-size: 20px;");
         distanceLabel.setStyle("-fx-font-size: 20px;");
         walkTimeLabel.setStyle("-fx-font-size: 20px;");
         bikeTimeLabel.setStyle("-fx-font-size: 20px;");
         carTimeLabel.setStyle("-fx-font-size: 20px;");
 
         // Create HBoxes to hold the labels and text fields
+        HBox acDistanceBox = new HBox(10, acDistanceLabel);
         HBox distanceBox = new HBox(10, distanceLabel);
         HBox walkTimeBox = new HBox(10, walkTimeLabel);
         HBox bikeTimeBox = new HBox(10, bikeTimeLabel);
         HBox carTimeBox = new HBox(10, carTimeLabel);
 
         // Set alignment and padding for HBoxes
+        acDistanceBox.setAlignment(Pos.CENTER_LEFT);
         distanceBox.setAlignment(Pos.CENTER_LEFT);
         walkTimeBox.setAlignment(Pos.CENTER_LEFT);
         bikeTimeBox.setAlignment(Pos.CENTER_LEFT);
         carTimeBox.setAlignment(Pos.CENTER_LEFT);
+        acDistanceBox.setPadding(new Insets(10));
         distanceBox.setPadding(new Insets(10));
         walkTimeBox.setPadding(new Insets(10));
         bikeTimeBox.setPadding(new Insets(10));
@@ -170,7 +177,7 @@ public class MapLauncher extends Application{
         zoomButtons.setPadding(new Insets(10));
 
         // Create a VBox for labels
-        VBox labelsVBox = new VBox(10, distanceLabel, walkTimeLabel, bikeTimeLabel, carTimeLabel);
+        VBox labelsVBox = new VBox(10, acDistanceLabel, distanceLabel, walkTimeLabel, bikeTimeLabel, carTimeLabel);
         labelsVBox.setAlignment(Pos.TOP_LEFT);
         labelsVBox.setPadding(new Insets(10));
 
@@ -199,7 +206,7 @@ public class MapLauncher extends Application{
     }
 
     private void zoomOut() {
-        if (zoomLevel>=1) {
+        if (zoomLevel >= 1) {
             zoomLevel -= 1;
             scale /= 2;
             Platform.runLater(this::updateMap);
@@ -217,6 +224,7 @@ public class MapLauncher extends Application{
             place2 = new Place(zipCode2);
 
             // Calculate distance and average times
+            double acDistance = CalculateDistance.getDistance(zipCode1, zipCode2, false);
             double distance = CalculateDistance.getDistance(zipCode1, zipCode2, false);
             long walkTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Walk());
             long bikeTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Bike());
@@ -227,7 +235,7 @@ public class MapLauncher extends Application{
             CENTER_LATITUDE = midPoint.get(0);
             CENTER_LONGITUDE = midPoint.get(1);
             updateMap();
-            updateInformation(distance, walkTime, bikeTime, carTime);
+            updateInformation(acDistance, distance, walkTime, bikeTime, carTime);
         } else {
             // Show an error message if either of the zip code fields is empty
             System.out.println("Please enter both zip codes.");
@@ -235,7 +243,8 @@ public class MapLauncher extends Application{
     }
 
     // Method for updating information in the TextFields
-    private void updateInformation(double distance, long walkTime, long bikeTime, long carTime) {
+    private void updateInformation(double acDistance, double distance, long walkTime, long bikeTime, long carTime) {
+        acDistanceLabel.setText("Actual distance: " + acDistance + " kilometers");
         distanceLabel.setText("Distance: " + distance + " kilometers");
         walkTimeLabel.setText("Average time by walk: " + walkTime + " minutes");
         bikeTimeLabel.setText("Average time by bike: " + bikeTime + " minutes");
