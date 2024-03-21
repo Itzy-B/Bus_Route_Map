@@ -18,6 +18,9 @@ public class TimeCalculator {
 
         return Math.round(averageTime);
     }
+
+
+    // ------------------TEST
     
     /*  Main test code
     public static void main(String[] args) {
