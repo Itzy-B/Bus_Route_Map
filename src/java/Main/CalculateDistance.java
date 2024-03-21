@@ -7,6 +7,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.eclipse.jetty.util.IO;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 public class CalculateDistance {
     private static final int EARTH_RADIUS = 6371;
@@ -147,7 +149,23 @@ public class CalculateDistance {
         System.out.println(printDistance("6222CN", "6213HD"));
     }
 
+    public static Process launchGraphHopper() throws IOException {
+        Process process = null;
+        try {
+            // For Windows, using cmd.exe
+            String someCommand = "java -Xms1g -Xmx1g -server -Ddw.graphhopper.datareader.file=src/java/graphhopper/Maastricht.osm.pbf -cp src/java/graphhopper/graphhopper.jar com.graphhopper.application.GraphHopperApplication server src\\java\\graphhopper\\config.yml";
+            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", "start cmd.exe /k cmd /c " + someCommand);
+            process = processBuilder.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return process;
+            // Optionally, you can read the output of the process
+            // process.getInputStream().read();
+    }
+ 
     public static double getDistanceWithGraphHopper(ArrayList<Double> latLong1, ArrayList<Double> latLong2) throws MalformedURLException, IOException {
+ 
         double distance = 0;
         // String lat1 = "50.86635198292194";
         // String long1 = "5.704404406327205";
