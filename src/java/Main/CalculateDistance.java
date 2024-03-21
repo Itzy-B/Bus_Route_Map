@@ -50,7 +50,7 @@ public class CalculateDistance {
             //Calculate distance between
             distance = distanceBetween(latLong1.get(0), latLong1.get(1), latLong2.get(0), latLong2.get(1));
             // Format to two decimal places
-            DecimalFormat df = new DecimalFormat("#.##");
+            DecimalFormat df = new DecimalFormat("#.#");
             distance = Double.parseDouble(df.format(distance));
         }
 

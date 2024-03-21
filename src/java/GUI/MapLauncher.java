@@ -13,6 +13,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
 import src.java.Main.*;
+import java.text.DecimalFormat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,10 +48,11 @@ public class MapLauncher extends Application{
     private TextField zipCodeField1;
     private TextField zipCodeField2;
 
-    private TextField distanceTextField;
-    private TextField walkTimeTextField;
-    private TextField bikeTimeTextField;
-    private TextField carTimeTextField;
+    private Label distanceLabel;
+    private Label walkTimeLabel;
+    private Label bikeTimeLabel;
+    private Label carTimeLabel;
+
     private Place place1;
     private Place place2;
 
@@ -71,6 +73,7 @@ public class MapLauncher extends Application{
 
         // Construct the URL for the map image of Maastricht
         String mapUrl = constructMapUrl();
+        System.out.println(mapUrl);
 
         // Load the map image from the URL
         Image mapImage = new Image(mapUrl);
@@ -82,12 +85,12 @@ public class MapLauncher extends Application{
         mapView.setPreserveRatio(true);
 
         // Create zoom buttons
-        Button zoomInButton = new Button("Zoom In");
+        Button zoomInButton = new Button("+");
         zoomInButton.setOnAction(event -> zoomIn());
-        zoomInButton.setPrefSize(100, 40);
-        Button zoomOutButton = new Button("Zoom Out");
+        zoomInButton.setPrefSize(50, 50);
+        Button zoomOutButton = new Button("-");
         zoomOutButton.setOnAction(event -> zoomOut());
-        zoomOutButton.setPrefSize(100, 40);
+        zoomOutButton.setPrefSize(50, 50);
 
         // Create a Search button
         Button searchButton = new Button("Search");
@@ -108,34 +111,28 @@ public class MapLauncher extends Application{
         zipCodeField2.setPromptText("Enter Zip Code 2");
 
         // Create Labels for displaying the titles
-        Label distanceLabel = new Label("Distance: ");
-        Label walkTimeLabel = new Label("Average time by walk: ");
-        Label bikeTimeLabel = new Label("Average time by bike: ");
-        Label carTimeLabel = new Label("Average time by car: ");
-
-        // Create TextFields for displaying/updating the values
-        distanceTextField = new TextField();
-        walkTimeTextField = new TextField();
-        bikeTimeTextField = new TextField();
-        carTimeTextField = new TextField();
+        distanceLabel = new Label();
+        walkTimeLabel = new Label();
+        bikeTimeLabel = new Label();
+        carTimeLabel = new Label();
 
         // Set preferred widths for TextFields
-        distanceTextField.setPrefWidth(100);
-        walkTimeTextField.setPrefWidth(100);
-        bikeTimeTextField.setPrefWidth(100);
-        carTimeTextField.setPrefWidth(100);
+        distanceLabel.setPrefWidth(200);
+        walkTimeLabel.setPrefWidth(200);
+        bikeTimeLabel.setPrefWidth(200);
+        carTimeLabel.setPrefWidth(200);
 
         // Create HBoxes to hold the labels and text fields
-        HBox distanceBox = new HBox(10, distanceLabel, distanceTextField);
-        HBox walkTimeBox = new HBox(10, walkTimeLabel, walkTimeTextField);
-        HBox bikeTimeBox = new HBox(10, bikeTimeLabel, bikeTimeTextField);
-        HBox carTimeBox = new HBox(10, carTimeLabel, carTimeTextField);
+        HBox distanceBox = new HBox(10, distanceLabel);
+        HBox walkTimeBox = new HBox(10, walkTimeLabel);
+        HBox bikeTimeBox = new HBox(10, bikeTimeLabel);
+        HBox carTimeBox = new HBox(10, carTimeLabel);
 
         // Set alignment and padding for HBoxes
-        distanceBox.setAlignment(Pos.CENTER);
-        walkTimeBox.setAlignment(Pos.CENTER);
-        bikeTimeBox.setAlignment(Pos.CENTER);
-        carTimeBox.setAlignment(Pos.CENTER);
+        distanceBox.setAlignment(Pos.CENTER_LEFT);
+        walkTimeBox.setAlignment(Pos.CENTER_LEFT);
+        bikeTimeBox.setAlignment(Pos.CENTER_LEFT);
+        carTimeBox.setAlignment(Pos.CENTER_LEFT);
         distanceBox.setPadding(new Insets(10));
         walkTimeBox.setPadding(new Insets(10));
         bikeTimeBox.setPadding(new Insets(10));
@@ -154,12 +151,14 @@ public class MapLauncher extends Application{
 
         // Create a VBox for displaying information
         VBox infoVBox = new VBox(10, distanceBox, walkTimeBox, bikeTimeBox, carTimeBox);
-        infoVBox.setAlignment(Pos.CENTER);
+        infoVBox.setAlignment(Pos.CENTER_LEFT);
         infoVBox.setPrefSize((WINDOW_WIDTH - MAP_WIDTH) / 2, WINDOW_HEIGHT);
         infoVBox.setPadding(new Insets(10));
 
         // Create a HBox to hold the map and controls
         HBox hbox = new HBox(mapView, controlsVBox, infoVBox);
+        hbox.setSpacing(20);
+        hbox.setPadding(new Insets(20));
 
         // Create a Scene and set it on the Stage
         Scene scene = new Scene(hbox, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -195,11 +194,14 @@ public class MapLauncher extends Application{
 
             // Calculate distance and average times
             double distance = CalculateDistance.getDistance(zipCode1, zipCode2, false);
-            double walkTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Walk());
-            double bikeTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Bike());
-            double carTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Car());
+            long walkTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Walk());
+            long bikeTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Bike());
+            long carTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Car());
 
-            // Update map and information
+            // Update map with midpoint and information with vehicles
+            ArrayList<Double> midPoint = CalculateDistance.findMidpoint(place1, place2);
+            CENTER_LATITUDE = midPoint.get(0);
+            CENTER_LONGITUDE = midPoint.get(1);
             updateMap();
             updateInformation(distance, walkTime, bikeTime, carTime);
         } else {
@@ -209,18 +211,23 @@ public class MapLauncher extends Application{
     }
 
     // Method for updating information in the TextFields
-    private void updateInformation(double distance, double walkTime, double bikeTime, double carTime) {
-        distanceTextField.setText(String.valueOf(distance));
-        walkTimeTextField.setText(String.valueOf(walkTime));
-        bikeTimeTextField.setText(String.valueOf(bikeTime));
-        carTimeTextField.setText(String.valueOf(carTime));
+    private void updateInformation(double distance, long walkTime, long bikeTime, long carTime) {
+        distanceLabel.setText("Distance: " + distance + " kilometers");
+        walkTimeLabel.setText("Average time by walk: " + walkTime + " minutes");
+        bikeTimeLabel.setText("Average time by bike: " + bikeTime + " minutes");
+        carTimeLabel.setText("Average time by car: " + carTime + " minutes");
     }
 
     // Method for constructing the URL for the map image
     private String constructMapUrl() {
+
         StringBuilder mapUrlBuilder = new StringBuilder("https://maps.googleapis.com/maps/api/staticmap");
-        mapUrlBuilder.append("?center=Maastricht");
-        //mapUrlBuilder.append("?center=").append(CENTER_LATITUDE).append(",").append(CENTER_LONGITUDE);
+
+        if (place1 == null || place2 == null) {
+            mapUrlBuilder.append("?center=Maastricht");
+        }
+
+        mapUrlBuilder.append("?center=").append(CENTER_LATITUDE).append(",").append(CENTER_LONGITUDE);
         mapUrlBuilder.append("&zoom=").append(zoomLevel);
         mapUrlBuilder.append("&size=600x500");
         mapUrlBuilder.append("&scale=").append(scale);

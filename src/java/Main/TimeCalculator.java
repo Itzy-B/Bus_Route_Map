@@ -1,21 +1,22 @@
 package src.java.Main;
 
-import static src.java.Main.CalculateDistance.getDistance;
 import java.io.IOException;
 
 public class TimeCalculator {
     
     private static int MinutesInHours = 60;
 
-    public static double calculateAverageTimeTaken(String zipCode1, String zipCode2, TransportMode mode) throws IOException {
+    public static long calculateAverageTimeTaken(String zipCode1, String zipCode2, TransportMode mode) throws IOException {
         double distance = CalculateDistance.getDistance(zipCode1, zipCode2, false);
         double averageVelocity = mode.getVelocity();
         
         if (averageVelocity == 0) {
             throw new IllegalArgumentException("Average velocity cannot be zero.");
         }
-        
-        return (distance / averageVelocity) * MinutesInHours;
+
+        double averageTime = (distance / averageVelocity) * MinutesInHours;
+
+        return Math.round(averageTime);
     }
     
     /*  Main test code
