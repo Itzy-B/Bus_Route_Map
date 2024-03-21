@@ -29,7 +29,7 @@ Now, there are multiple things you can do:
     calculate the distance betwen the two points in the map and shows a visual represenation of the distance between the two points.
 
 4) 'Toggle graphhopper' Button
-    Toggle to enabled to calculate the actual distance by car, press the search button again to refresh te screen after toggling.
+    Toggle to enabled to calculate the actual distance by car, press the search button again to refresh the screen after toggling.
 
 4) Information on Screen
     After the 'Search' button is clicked, the user is presented with different pieces of information on screen:
