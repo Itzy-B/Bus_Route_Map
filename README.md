@@ -28,6 +28,9 @@ Now, there are multiple things you can do:
     Once the two desired Zip Codes have been inserted, the user is able to press the 'Search' button. This runs the algorithm to 
     calculate the distance betwen the two points in the map and shows a visual represenation of the distance between the two points.
 
+4) 'Toggle graphhopper' Button
+    Toggle to enabled to calculate the actual distance by car, press the search button again to refresh te screen after toggling.
+
 4) Information on Screen
     After the 'Search' button is clicked, the user is presented with different pieces of information on screen:
         - There is a clear red line shows between the two points, giving a visual representation of the 'straight line distance' between 
