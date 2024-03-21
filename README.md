@@ -15,6 +15,9 @@ You might also need to set up the VM options in your run configurations as:
 Launch the application by running the MapLauncher.java file. This will start up the aplication, a terminal will pop up that starts
 the local graphhopper server, then the GUI will pop up on screen.
 
+If the terminal does not pop up, please run the following command from the source folder to start the local graphhopper server: 
+java -Xms1g -Xmx1g -server -Ddw.graphhopper.datareader.file=src/java/graphhopper/Maastricht.osm.pbf -cp src/java/graphhopper/graphhopper.jar com.graphhopper.application.GraphHopperApplication server src\\java\\graphhopper\\config.yml
+
 Now, there are multiple things you can do:
 1) The '+' and '-' buttons
     These buttons are used for zooming the map in and out, if the user desires to have a closer or farther away view of the map, 
@@ -29,7 +32,7 @@ Now, there are multiple things you can do:
     calculate the distance betwen the two points in the map and shows a visual represenation of the distance between the two points.
 
 4) 'Toggle graphhopper' Button
-    Toggle to enabled to calculate the actual distance by car, press the search button again to refresh the screen after toggling.
+    Toggle to enable the calculation of the actual distance by car, press the search button again to refresh the screen after toggling.
 
 4) Information on Screen
     After the 'Search' button is clicked, the user is presented with different pieces of information on screen:
