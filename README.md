@@ -1,18 +1,43 @@
-# BCS25-Project-1-2
+# BCS25-Project-1-2: Phase 1 DISTANCE AND TIME CALCULATORS
 
-# Editing this README
+Group 25 Team Members: Tristan Dormans, Mehmet Levent Koca, Alen Quiroz Engel, Vlad Creciun, Xuhan Zhuang, Joel Kumi, Bruno Torrijo
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## IMPORTANT TO BE ABLE TO RUN THE APPLICATION
+Set up a JavaFX environment on your IDE to be able to run the application GUI.
 
-## Suggestions for a good README
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+***** HOW TO RUN *****
 
-## Name
-Choose a self-explaining name for your project.
+Launch the application by running the MapLaungher.java file. This will start up the aplication and the GUI will pop up on screen.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+Now, there are multiple things you can do:
+1) The '+' and '-' buttons
+    These buttons are used for zooming the map in and out, if the user desires to have a closer or farther away view of the map, 
+    they will be able to control the zoom in amount with these buttons
+
+2) Zip Code text fields
+    There are two text fields labeled "Enter Zip Code 1" and "Enter Zip Code 2", these are for the user to insert their desired points 
+    in the map. By inserting 2 Zip Codes, the user will be able to clculate the distance between the two points in the map.
+
+3) 'Search' Button
+    Once the two desired Zip Codes have been inserted, the user is able to press the 'Search' button. This runs the algorithm to 
+    calculate the distance betwen the two points in the map and shows a visual represenation of the distance between the two points.
+
+4) Information on Screen
+    After the 'Search' button is clicked, the user is presented with different pieces of information on screen:
+        - There is a clear red line shows between the two points, giving a visual representation of the 'staright line distance' between 
+        the two points.
+        - To the very right of the GUI, some text is also displayed, giving the user information on the exact distance in Kilometers 
+        or Meters, the 'Average time by walk', 'Average time by bike', and 'Average time by car'. All of these time markers are calculated 
+        based on average speed of the different traveling times and the straight line distance calculated.
+
+5) To exit the game simply press the cross on the top right of the GUI, or alternatively press 'ALT' + 'F4'
+
+Thank you,
+Group 25.
+
+21st of March, 2024.
+
 
 ## Badges
 On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
