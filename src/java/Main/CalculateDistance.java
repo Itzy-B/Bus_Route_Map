@@ -164,7 +164,7 @@ public class CalculateDistance {
         else {
             try {
                 //MacOS
-                String command = "java -Xms1g -Xmx1g -server -Ddw.graphhopper.datareader.file=src/java/graphhopper/Maastricht.osm.pbf -cp path/to/your/classpath com.graphhopper.application.GraphHopperApplication server config.yml";
+                String command = "java -Xms1g -Xmx1g -server -Ddw.graphhopper.datareader.file=src/java/graphhopper/Maastricht.osm.pbf -cp src/java/graphhopper/graphhopper.jar com.graphhopper.application.GraphHopperApplication server src\\java\\graphhopper\\config.yml";
                 ProcessBuilder processBuilder = new ProcessBuilder("osascript", "-e",
                         "'tell application \"Terminal\" to do script \"" + command + "\"'");
                 processBuilder.inheritIO(); // This makes the terminal inherit the IO of the parent process
