@@ -7,7 +7,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.eclipse.jetty.util.IO;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -136,8 +135,8 @@ public class CalculateDistance {
     }
 
 
-    public static String printDistance(String p1, String p2) throws IOException {
-        double distance = getDistance(p1, p2, true);
+    public static String printDistance(String p1, String p2, Boolean graphHopperEnabled) throws IOException {
+        double distance = getDistance(p1, p2, graphHopperEnabled);
         if (distance >= 1) {
              return distance + " Kilometers";
         } else {
@@ -146,7 +145,7 @@ public class CalculateDistance {
     }
 
     public static void main(String[] args) throws IOException {
-        System.out.println(printDistance("6222CN", "6213HD"));
+        System.out.println(printDistance("6222CN", "6213HD", false));
     }
 
     public static Process launchGraphHopper() throws IOException {

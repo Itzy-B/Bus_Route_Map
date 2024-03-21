@@ -15,6 +15,6 @@ public class Main {
         catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(printDistance("6217HG", "6213HD")); 
+        System.out.println(printDistance("6217HG", "6213HD", false));
     }
 }
