@@ -241,9 +241,9 @@ public class MapLauncher extends Application{
             // Calculate distance and average times
             double acDistance = CalculateDistance.getDistance(zipCode1, zipCode2, getCheckBoxState());
             double distance = CalculateDistance.getDistance(zipCode1, zipCode2, getCheckBoxState());
-            long walkTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Walk());
-            long bikeTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Bike());
-            long carTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Car());
+            long walkTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Walk(), getCheckBoxState());
+            long bikeTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Bike(), getCheckBoxState());
+            long carTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Car(), getCheckBoxState());
 
             // Update map with midpoint and information with vehicles
             ArrayList<Double> midPoint = CalculateDistance.findMidpoint(place1, place2);
@@ -259,11 +259,11 @@ public class MapLauncher extends Application{
 
     // Method for updating information in the TextFields
     private void updateInformation(double acDistance, double distance, long walkTime, long bikeTime, long carTime) {
-        if (getCheckBoxState()) {
-            walkTime = -1;
-            bikeTime = -1;
-            carTime = -1;
-        }
+        // if (getCheckBoxState()) {
+        //     walkTime = -1;
+        //     bikeTime = -1;
+        //     carTime = -1;
+        // }
         acDistanceLabel.setText("Actual distance: " + acDistance + " kilometers");
         distanceLabel.setText("Distance: " + distance + " kilometers");
         walkTimeLabel.setText("Average time by walk: " + walkTime + " minutes");
