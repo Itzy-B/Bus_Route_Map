@@ -5,6 +5,10 @@ Group 25 Team Members: Tristan Dormans, Mehmet Levent Koca, Alen Quiroz Engel, V
 ## IMPORTANT TO BE ABLE TO RUN THE APPLICATION
 Set up a JavaFX environment on your IDE to be able to run the application GUI.
 
+You might also need to set up the VM options in your run configurations as: 
+--module-path "your physical path to JavaFX lib" --add-modules javafx.controls,javafx.fxml
+     
+
 
 ***** HOW TO RUN *****
 
