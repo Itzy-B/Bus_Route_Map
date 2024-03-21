@@ -60,12 +60,9 @@ public class CalculateDistance {
         }
         
 
-        if(distance >= 1){
-            return distance;
-        }
-        else{
-            return distance * 100;
-        }
+
+        return distance;
+
 
     }
 
@@ -140,12 +137,16 @@ public class CalculateDistance {
         if (distance >= 1) {
              return distance + " Kilometers";
         } else {
-             return distance + " Meters";
+             return distance * 1000 + " Meters";
         }
     }
 
     public static void main(String[] args) throws IOException {
         System.out.println(printDistance("6222CN", "6213HD", false));
+        System.out.println(printDistance("6222CN", "6213HD", false));
+        System.out.println(printDistance("6222CN", "6213HD", false));
+        System.out.println(printDistance("6222CN", "6213HD", false));
+
     }
 
     public static Process launchGraphHopper() throws IOException {

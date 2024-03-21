@@ -13,9 +13,9 @@ import java.util.Collections;
 
 public class Data {
 
-    private static final ArrayList<String> zipCodes = new ArrayList<String>();
-    private static final ArrayList<Double> latitudes = new ArrayList<Double>();
-    private static final ArrayList<Double> longitudes = new ArrayList<Double>();
+    private static ArrayList<String> zipCodes = new ArrayList<String>();
+    private static ArrayList<Double> latitudes = new ArrayList<Double>();
+    private static ArrayList<Double> longitudes = new ArrayList<Double>();
 
     /**
      * Reads the data from the Excel file and stores it in the zipCodes and latitude arrays.
@@ -70,7 +70,6 @@ public class Data {
     }
 
     public static ArrayList<Double> getLatLong(String zipCode) throws IOException {
-        Collections.sort(zipCodes);
         int index = Collections.binarySearch(zipCodes, zipCode);
         ArrayList<Double> latLong = new ArrayList<Double>();
         if(index >= 0){
