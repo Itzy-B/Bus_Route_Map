@@ -149,6 +149,12 @@ public class CalculateDistance {
 
     }
 
+    /**
+     * Launches the GraphHopper server using a subprocess.
+     *
+     * @return the subprocess that was launched
+     * @throws IOException if there is an error launching the subprocess
+     */
     public static Process launchGraphHopper() throws IOException {
         Process process = null;
         if (System.getProperty("os.name").startsWith("Windows")) {
@@ -164,11 +170,20 @@ public class CalculateDistance {
         else {
             try {
                 //MacOS
-                String command = "java -Xms1g -Xmx1g -server -Ddw.graphhopper.datareader.file=src/java/graphhopper/Maastricht.osm.pbf -cp src/java/graphhopper/graphhopper.jar com.graphhopper.application.GraphHopperApplication server src/java/graphhopper/config.yml";
+                // Get the current directory path
+                String currentDirectory = System.getProperty("user.dir");
+
+                // Construct the command to change directory and then execute your Java command
+                String command = "cd " + currentDirectory + " && java -Xms1g -Xmx1g -server -Ddw.graphhopper.datareader.file=src/java/graphhopper/Maastricht.osm.pbf -cp src/java/graphhopper/graphhopper.jar com.graphhopper.application.GraphHopperApplication server src/java/graphhopper/config.yml";
+
+                // Use ProcessBuilder to execute the command
                 ProcessBuilder processBuilder = new ProcessBuilder("osascript", "-e",
-                        "'tell application \"Terminal\" to do script \"" + command + "\"'");
+                        "tell application \"Terminal\" to do script \"" + command + "\"");
                 processBuilder.inheritIO(); // This makes the terminal inherit the IO of the parent process
                 process = processBuilder.start();
+
+
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
