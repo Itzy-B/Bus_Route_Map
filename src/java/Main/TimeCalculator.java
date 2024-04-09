@@ -22,24 +22,24 @@ public class TimeCalculator {
 
     // ------------------TEST
     
-    /*  Main test code
-    public static void main(String[] args) {
-         TimeCalculator calculator = new TimeCalculator();
+    // /*  Main test code*/
+    // public static void main(String[] args) {
+    //      TimeCalculator calculator = new TimeCalculator();
         
-         TransportMode mode = new Car();
-         // Change this to new Walk() or new Bike() to calculate for different modes
-         String zipCode1 = "6211AL";
-         String zipCode2 = "6211PK";
-         try {
-             double averageTimeTaken = calculator.calculateAverageTimeTaken(zipCode1, zipCode2, mode);
+    //      TransportMode mode = new Walk();
+    //      // Change this to new Walk() or new Bike() to calculate for different modes
+    //      String zipCode1 = "62";
+    //      String zipCode2 = "6229EN";
+    //      try {
+    //          double averageTimeTaken = calculator.calculateAverageTimeTaken(zipCode1, zipCode2, mode);
             
-             System.out.println("Average Time Taken: " + averageTimeTaken + " minutes");
-         } catch (IOException e) {
-             System.err.println("An error occurred while calculating the distance: " + e.getMessage());
-             e.printStackTrace();
-         }
+    //          System.out.println("Average Time Taken: " + averageTimeTaken + " minutes");
+    //      } catch (IOException e) {
+    //          System.err.println("An error occurred while calculating the distance: " + e.getMessage());
+    //          e.printStackTrace();
+    //      }
 
-     */
+     /**/
     }
 
 
