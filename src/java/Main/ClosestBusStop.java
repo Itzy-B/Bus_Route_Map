@@ -1,77 +1,32 @@
 package src.java.Main;
 
-import static src.java.Main.CalculateDistance.getDistance;
+import static src.java.Main.CalculateDistance.findMidpoint;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
-import com.mysql.cj.jdbc.Driver;
+
+import src.java.Database.DatabaseController;
 
 public class ClosestBusStop {
-        public String findClosestBus(ArrayList<Double> latLong) throws ClassNotFoundException  {
-            connectToDatabase();
-            return "";
-        }
+    public static void main(String[] args) throws SQLException{
+        ArrayList<Double> list = new ArrayList<>();
+        list.add(4.854370);
+        list.add(52.453042);
+        ClosestBusStop finder = new ClosestBusStop();
+        finder.findClosestBusStop(list);
+    }
 
-        //Sucks very much, we need to create a Database manager, not do it in the class itself.
-        public void connectToDatabase() {
-            String host, port, databaseName, userName, password;
-            host = port = databaseName = userName = password = null;
-                try {
-                        // Replace "credentials.txt" with your actual text file name
-                        List<String> lines = Files.readAllLines(Paths.get("src/java/Database/credentials.txt"));
-                        if (lines.size() > 0) {
-                            String[] config = lines.get(0).split(", ");
-                            host = config[0];
-                            port = config[1];
-                            databaseName = config[2];
-                            userName = config[3];
-                            password = config[4];
-                        }
-                    } catch (Exception e) {
-                        System.out.println("Failed to read configuration from file.");
-                        e.printStackTrace();
-                        return;
-                    }
-            
-                    if (host == null || port == null || databaseName == null) {
-                        System.out.println("Host, port, and database information are required");
-                        return;
-                    }
-            
-                    // Manually registering the JDBC driver
-                    try {
-                        DriverManager.registerDriver(new Driver());
-                    } catch (SQLException e) {
-                        System.out.println("Failed to register MySQL JDBC driver");
-                        e.printStackTrace();
-                        return;
-                    }
-            
-                    try (Connection connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + databaseName, userName, password);
-                         Statement statement = connection.createStatement();
-                         ResultSet resultSet = statement.executeQuery("SELECT * FROM shapes LIMIT 10")) {
-            
-                        while (resultSet.next()) {
-                            String shapeId = resultSet.getString("shape_id");
-                            int shapePtSequence = resultSet.getInt("shape_pt_sequence");
-                            double shapePtLat = resultSet.getDouble("shape_pt_lat");
-                            double shapePtLon = resultSet.getDouble("shape_pt_lon");
-                            double shapeDistTraveled = resultSet.getDouble("shape_dist_traveled");
-            
-                            System.out.println("Shape ID: " + shapeId + ", Sequence: " + shapePtSequence +
-                                    ", Latitude: " + shapePtLat + ", Longitude: " + shapePtLon +
-                                    ", Distance Traveled: " + shapeDistTraveled);
-                        }
-                    } catch (SQLException e) {
-                        System.out.println("Connection failure.");
-                        e.printStackTrace();
-                    }
-                }
-            }
+    public String findClosestBusStop(ArrayList<Double> latLong) throws SQLException  {
+        DatabaseController databaseController = new DatabaseController();
+        Double lat = latLong.get(0);
+        Double lon = latLong.get(1);
+        ArrayList<String> list = databaseController.executeFetchQuery(
+            "SELECT stop_id, stop_lon, stop_lat FROM stops WHERE stop_lon BETWEEN " + (lat - 0.01000) + " AND " + (lat + 0.01000) +
+            " AND stop_lat BETWEEN " + (lon - 0.01000) + " AND " + (lon + 0.01000)
+        );
+        for (String string: list) {
+            System.out.println(string);
+        }
+        return "";
+    }
+    }
