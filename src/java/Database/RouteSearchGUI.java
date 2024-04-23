@@ -68,7 +68,7 @@ public class RouteSearchGUI extends JFrame {
 
     private void initializeDatabaseConnection() {
         try {
-            List<String> lines = Files.readAllLines(Paths.get("src/java/Database/credentials.txt"));
+            List<String> lines = Files.readAllLines(Paths.get("src/java/Database/local-credentials.txt"));
             if (!lines.isEmpty()) {
                 String[] credentials = lines.get(0).split(", ");
                 String host = credentials[0];
