@@ -20,13 +20,31 @@ public class ClosestBusStop {
         DatabaseController databaseController = new DatabaseController();
         Double lat = latLong.get(0);
         Double lon = latLong.get(1);
-        ArrayList<String> list = databaseController.executeFetchQuery(
-            "SELECT stop_id, stop_lon, stop_lat FROM stops WHERE stop_lon BETWEEN " + (lat - 0.01000) + " AND " + (lat + 0.01000) +
-            " AND stop_lat BETWEEN " + (lon - 0.01000) + " AND " + (lon + 0.01000)
-        );
-        for (String string: list) {
+        Double searchFactor = 1.0;
+        ArrayList<String> list = null;
+        //TODO: add function that increases the search radius depending on if it returns any results
+        for (int i = 0; i < 1000; i++) {
+            list = databaseController.executeFetchQuery(
+            "SELECT stop_id, stop_lon, stop_lat FROM stops WHERE stop_lon BETWEEN " + (lat - 0.01000 * searchFactor) + " AND " + (lat + 0.01000 * searchFactor) +
+            " AND stop_lat BETWEEN " + (lon - 0.01000 * searchFactor) + " AND " + (lon + 0.01000 * searchFactor)
+            );
+            if (list.size() > 1);
+                searchFactor -= 0.1;
+            
+            if (list.size() == 1) {
+                break;
+            }
+
+            else {
+                searchFactor += 0.1;
+            }
+        }
+
+        for (String string : list) {
             System.out.println(string);
         }
-        return "";
+        String[] parts = list.get(0).split(";");
+        System.out.println(parts[0]);
+        return parts[0];
     }
-    }
+}
