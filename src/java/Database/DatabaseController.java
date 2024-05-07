@@ -9,24 +9,32 @@ import java.util.List;
 public class DatabaseController {
     private Connection connection;
 
+    private String path;
+
     public DatabaseController() {
         initializeDatabaseConnection();
     }
 
     private void initializeDatabaseConnection() {
+        if (System.getProperty("os.name").startsWith("Mac")) {
+            path = "src/java/Database/credentials.txt";
+        }
+        else {
+            path = "src\\java\\Database\\credentials.txt";
+        }
         try {
-            List<String> lines = Files.readAllLines(Paths.get("src/java/Database/credentials.txt"));
-            if (!lines.isEmpty()) {
-                String[] credentials = lines.get(0).split(", ");
-                String host = credentials[0];
-                String port = credentials[1];
-                String databaseName = credentials[2];
-                String user = credentials[3];
-                String password = credentials[4];
+        List<String> lines = Files.readAllLines(Paths.get(path));
+        if (!lines.isEmpty()) {
+            String[] credentials = lines.get(0).split(", ");
+            String host = credentials[0];
+            String port = credentials[1];
+            String databaseName = credentials[2];
+            String user = credentials[3];
+            String password = credentials[4];
 
-                String url = "jdbc:mysql://" + host + ":" + port + "/" + databaseName;
-                connection = DriverManager.getConnection(url, user, password);
-            }
+            String url = "jdbc:mysql://" + host + ":" + port + "/" + databaseName;
+            connection = DriverManager.getConnection(url, user, password);
+        }
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to initialize database connection: " + e.getMessage());
@@ -56,5 +64,9 @@ public class DatabaseController {
             e.printStackTrace();
             throw new SQLException("Error executing query: " + e.getMessage(), e);
         }
+    }
+
+    public Connection getConnection(){
+        return connection;
     }
 }

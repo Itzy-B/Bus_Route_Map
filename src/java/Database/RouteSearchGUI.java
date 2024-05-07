@@ -17,7 +17,8 @@ public class RouteSearchGUI extends JFrame {
     private ButtonGroup buttonGroup;
 
     public RouteSearchGUI() {
-        initializeDatabaseConnection();
+        DatabaseController db = new DatabaseController();
+        connection = db.getConnection();
 
         // Frame settings
         setTitle("Route Search");
@@ -66,25 +67,6 @@ public class RouteSearchGUI extends JFrame {
         setVisible(true);
     }
 
-    private void initializeDatabaseConnection() {
-        try {
-            List<String> lines = Files.readAllLines(Paths.get("src/java/Database/local-credentials.txt"));
-            if (!lines.isEmpty()) {
-                String[] credentials = lines.get(0).split(", ");
-                String host = credentials[0];
-                String port = credentials[1];
-                String databaseName = credentials[2];
-                String user = credentials[3];
-                String password = credentials[4];
-
-                String url = "jdbc:mysql://" + host + ":" + port + "/" + databaseName;
-                connection = DriverManager.getConnection(url, user, password);
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Failed to initialize database connection: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        }
-    }
 
     private void searchRoutes(String destination) {
         String columnToSearch = longNameButton.isSelected() ? "route_long_name" : "route_short_name";
