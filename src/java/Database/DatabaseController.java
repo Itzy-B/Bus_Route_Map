@@ -8,7 +8,7 @@ import java.util.List;
 
 public class DatabaseController {
     private Connection connection;
-
+    LogController lg;
     private String path;
 
     public DatabaseController() throws Exception {
@@ -16,8 +16,9 @@ public class DatabaseController {
     }
 
     private void initializeDatabaseConnection() throws Exception {
+        lg = new LogController();
         CredentialsController cd = new CredentialsController();
-        System.out.println("Credentials Decrypted");
+        lg.logCredentials(false);
 
 
         if (System.getProperty("os.name").startsWith("Mac")) {
@@ -39,10 +40,12 @@ public class DatabaseController {
             String url = "jdbc:mysql://" + host + ":" + port + "/" + databaseName;
             connection = DriverManager.getConnection(url, user, password);
             cd.encryptCredentials();
-            System.out.println("Credentials Encrypted");
+            lg.logConnection(true);
+            lg.logCredentials(true);
         }
         } catch (Exception e) {
             e.printStackTrace();
+            lg.logError(e.getMessage());
             throw new RuntimeException("Failed to initialize database connection: " + e.getMessage());
         }
     }
@@ -51,7 +54,7 @@ public class DatabaseController {
         if (!query.trim().toLowerCase().startsWith("select")) {
             throw new IllegalArgumentException("Only SELECT queries are allowed.");
         }
-
+        lg.logQuery(query);
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             ArrayList<String> results = new ArrayList<>();
@@ -70,6 +73,10 @@ public class DatabaseController {
             e.printStackTrace();
             throw new SQLException("Error executing query: " + e.getMessage(), e);
         }
+    }
+
+    public LogController getLogController() {
+        return lg;
     }
 
     public Connection getConnection(){

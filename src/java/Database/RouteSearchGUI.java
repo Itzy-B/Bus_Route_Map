@@ -16,15 +16,18 @@ public class RouteSearchGUI extends JFrame {
     private JCheckBox exactMatchCheckBox;
     private ButtonGroup buttonGroup;
 
+    private LogController lg;
+
     public RouteSearchGUI() throws Exception {
         DatabaseController db = new DatabaseController();
+        lg = db.getLogController();
         connection = db.getConnection();
 
         // Frame settings
         setTitle("Route Search");
         setSize(400, 400);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);  // Change this to manage window closing manually
 
         // Text field for input
         textField = new JTextField(20);
@@ -64,6 +67,16 @@ public class RouteSearchGUI extends JFrame {
             }
         });
 
+        //Handle window closing
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                lg.logConnection(false);
+                lg.addToLog("Window closed at: " + lg.getCurrentDateTime());
+                dispose();
+            }
+        });
+
         setVisible(true);
     }
 
@@ -76,6 +89,7 @@ public class RouteSearchGUI extends JFrame {
         } else {
             query = "SELECT route_id, route_short_name, route_long_name FROM routes WHERE " + columnToSearch + " LIKE ?";
         }
+        lg.logQuery(query);
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             if (exactMatchCheckBox.isSelected()) {
@@ -88,15 +102,20 @@ public class RouteSearchGUI extends JFrame {
                 while (rs.next()) {
                     results.append("ID: ").append(rs.getString("route_id"))
                             .append(", Short Name: ").append(rs.getString("route_short_name"))
-                            .append(", Long Name: ").append(rs.getString("route_long_name"))
-                            .append("\n");
+                            .append(", Long Name: ").append(rs.getString("route_long_name"));
+                    if (!rs.isLast()) {
+                        results.append("\n");
+                    }
                 }
                 textArea.setText(results.toString());
+                lg.logResult();
                 if (results.toString().isEmpty()) {
+                    lg.addToLog("No results found at: " + lg.getCurrentDateTime());
                     textArea.setText("No routes found.");
                 }
             }
         } catch (SQLException ex) {
+            lg.logError(ex.getMessage());
             ex.printStackTrace();
             textArea.setText("Database error.");
         }
