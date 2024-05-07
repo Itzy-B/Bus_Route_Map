@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import src.java.Database.DatabaseController;
 
 public class ClosestBusStop {
-    public static void main(String[] args) throws SQLException{
+    public static void main(String[] args) throws Exception {
         ArrayList<Double> list = new ArrayList<>();
         list.add(4.854370);
         list.add(52.453042);
@@ -16,7 +16,7 @@ public class ClosestBusStop {
         finder.findClosestBusStop(list);
     }
 
-    public String findClosestBusStop(ArrayList<Double> latLong) throws SQLException  {
+    public String findClosestBusStop(ArrayList<Double> latLong) throws Exception {
         DatabaseController databaseController = new DatabaseController();
         Double lat = latLong.get(0);
         Double lon = latLong.get(1);

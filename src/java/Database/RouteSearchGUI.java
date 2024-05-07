@@ -16,7 +16,7 @@ public class RouteSearchGUI extends JFrame {
     private JCheckBox exactMatchCheckBox;
     private ButtonGroup buttonGroup;
 
-    public RouteSearchGUI() {
+    public RouteSearchGUI() throws Exception {
         DatabaseController db = new DatabaseController();
         connection = db.getConnection();
 
@@ -103,6 +103,12 @@ public class RouteSearchGUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new RouteSearchGUI());
+        SwingUtilities.invokeLater(() -> {
+            try {
+                new RouteSearchGUI();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }
