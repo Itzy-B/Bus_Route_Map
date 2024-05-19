@@ -1,9 +1,8 @@
 package src.java.Main;
 
-import static src.java.Main.CalculateDistance.findMidpoint;
-
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import src.java.Database.DatabaseController;
 
@@ -16,35 +15,65 @@ public class ClosestBusStop {
         finder.findClosestBusStop(list);
     }
 
+    //Reference the method that is already in the code instead of this one
+    public double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        final int R = 6371; // Radius of the earth in kilometers
+        return R * c * 1000; // Convert to meters
+    }
+
     public String findClosestBusStop(ArrayList<Double> latLong) throws Exception {
         DatabaseController databaseController = new DatabaseController();
         Double lat = latLong.get(0);
         Double lon = latLong.get(1);
-        Double searchFactor = 1.0;
-        ArrayList<String> list = null;
-        //TODO: add function that increases the search radius depending on if it returns any results
-        for (int i = 0; i < 1000; i++) {
-            list = databaseController.executeFetchQuery(
-            "SELECT stop_id, stop_lon, stop_lat FROM stops WHERE stop_lon BETWEEN " + (lat - 0.01000 * searchFactor) + " AND " + (lat + 0.01000 * searchFactor) +
-            " AND stop_lat BETWEEN " + (lon - 0.01000 * searchFactor) + " AND " + (lon + 0.01000 * searchFactor)
-            );
-            if (list.size() > 1);
-                searchFactor -= 0.1;
-            
-            if (list.size() == 1) {
-                break;
-            }
+        double broaderRange = 0.01; //Search range for initial query;
 
-            else {
-                searchFactor += 0.1;
-            }
+        ArrayList<String> list = databaseController.executeFetchQuery(
+                "SELECT stop_id, stop_lon, stop_lat FROM stops WHERE stop_lon BETWEEN " + (lat - broaderRange) + " AND " + (lat + broaderRange) +
+                        " AND stop_lat BETWEEN " + (lon - broaderRange) + " AND " + (lon + broaderRange)
+        );
+
+        ArrayList<BusStop> busStops = new ArrayList<>();
+        for (String row : list) {
+            String[] parts = row.split(";");
+            String stopId = parts[0];
+            double stopLon = Double.parseDouble(parts[1].split(":")[1]);
+            double stopLat = Double.parseDouble(parts[2].split(":")[1]);
+            double distance = calculateDistance(lat, lon, stopLat, stopLon);
+            busStops.add(new BusStop(stopId, stopLat, stopLon, distance));
         }
 
-        for (String string : list) {
-            System.out.println(string);
+        //Change this function later to make it more readable
+        Collections.sort(busStops, Comparator.comparingDouble(BusStop::getDistance));
+
+        // Return the ID of the closest bus stop
+        return busStops.get(0).getStopId();
+    }
+
+    class BusStop {
+        private String stopId;
+        private double lat;
+        private double lon;
+        private double distance;
+
+        public BusStop(String stopId, double lat, double lon, double distance) {
+            this.stopId = stopId;
+            this.lat = lat;
+            this.lon = lon;
+            this.distance = distance;
         }
-        String[] parts = list.get(0).split(";");
-        System.out.println(parts[0]);
-        return parts[0];
+
+        public String getStopId() {
+            return stopId;
+        }
+
+        public double getDistance() {
+            return distance;
+        }
     }
 }
