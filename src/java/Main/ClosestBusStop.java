@@ -27,7 +27,7 @@ public class ClosestBusStop {
         return R * c * 1000; // Convert to meters
     }
 
-    public String findClosestBusStop(ArrayList<Double> latLong) throws Exception {
+    public ArrayList<BusStop> findClosestBusStop(ArrayList<Double> latLong) throws Exception {
         DatabaseController databaseController = new DatabaseController();
         Double lat = latLong.get(0);
         Double lon = latLong.get(1);
@@ -52,7 +52,7 @@ public class ClosestBusStop {
         Collections.sort(busStops, Comparator.comparingDouble(BusStop::getDistance));
 
         // Return the ID of the closest bus stop
-        return busStops.get(0).getStopId();
+        return busStops;
     }
 
     class BusStop {
