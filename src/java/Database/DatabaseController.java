@@ -17,11 +17,11 @@ public class DatabaseController {
 
     private void initializeDatabaseConnection() throws Exception {
         lg = new LogController();
-        CredentialsController cd = new CredentialsController();
+        // CredentialsController cd = new CredentialsController();
         lg.logCredentials(false);
 
 
-        if (System.getProperty("os.name").startsWith("Mac")) {
+        if (System.getProperty("os.name").startsWith("Mac") || System.getProperty("os.name").startsWith("Linux")) {
             path = "src/java/Database/credentials.txt";
         }
         else {
@@ -39,7 +39,7 @@ public class DatabaseController {
 
             String url = "jdbc:mysql://" + host + ":" + port + "/" + databaseName;
             connection = DriverManager.getConnection(url, user, password);
-            cd.encryptCredentials();
+            // cd.encryptCredentials();
             lg.logConnection(true);
             lg.logCredentials(true);
         }

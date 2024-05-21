@@ -21,13 +21,14 @@ public class CredentialsController {
     }
 
     private void initializePath(){
-        if (System.getProperty("os.name").startsWith("Mac")) {
+        if (System.getProperty("os.name").startsWith("Mac") || System.getProperty("os.name").startsWith("Linux")) {
             EncryptedPath = "src/java/Database/credentials-encrypted.txt";
             path = "src/java/Database/credentials.txt";
         }
         else {
             EncryptedPath = "src\\java\\Database\\credentials-encrypted.txt";
             path = "src\\java\\Database\\credentials.txt";
+
         }
     }
 
@@ -78,10 +79,12 @@ public class CredentialsController {
                 }
             }
 
-            // Delete the file
-            if (!file.delete()) {
-                throw new IOException("Failed to delete the file securely");
-            }
+            // // Delete the file
+            // if (file.exists()) {
+            //     if (!file.delete()) {
+            //         throw new IOException("Failed to delete the file securely");
+            //     }
+            // }
         }
     }
 
