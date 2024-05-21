@@ -28,6 +28,11 @@ public class Place {
 
     }
 
+    public Place(double longitude, double latitude) {
+        this.latitude = longitude;
+        this.longitude = latitude;
+    }
+
     public double getLatitude() {
         return latitude;
     }
