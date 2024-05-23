@@ -28,9 +28,9 @@ public class Place {
 
     }
 
-    public Place(double longitude, double latitude) {
-        this.latitude = longitude;
-        this.longitude = latitude;
+    public Place(double latitude, double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public double getLatitude() {

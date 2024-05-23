@@ -13,6 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
+import src.java.Database.DatabaseController;
 import src.java.Main.*;
 
 import static src.java.Main.CalculateDistance.launchGraphHopper;
@@ -78,9 +79,12 @@ public class MapLauncher extends Application{
         place2 = null;
 
         // Construct the URL for the map image of Maastricht
-        String mapUrl = constructMapUrl();
-        System.out.println(mapUrl);
-
+        String mapUrl;
+        try {
+            mapUrl = constructMapUrl();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         // Load the map image from the URL
         Image mapImage = new Image(mapUrl);
 
@@ -272,7 +276,7 @@ public class MapLauncher extends Application{
     }
 
     // Method for constructing the URL for the map image
-    private String constructMapUrl() {
+    private String constructMapUrl() throws Exception {
 
         StringBuilder mapUrlBuilder = new StringBuilder("https://maps.googleapis.com/maps/api/staticmap");
 
@@ -287,9 +291,18 @@ public class MapLauncher extends Application{
 
         // show the path between two points if places are not null
         if (place1 != null && place2 != null) {
-            List<Place> placeList = new ArrayList<>();
-            placeList.add(place1);
-            placeList.add(place2);
+            ArrayList<Double> departureCoords = new ArrayList<>();
+            ArrayList<Double> destinationCoords = new ArrayList<>();
+            departureCoords.add(place1.getLongitude());
+            departureCoords.add(place1.getLatitude());
+            destinationCoords.add(place2.getLongitude());
+            destinationCoords.add(place2.getLatitude());
+
+            BusRouteFinder finder = new BusRouteFinder();
+            DatabaseController databaseController = new DatabaseController();
+
+            List<Place> placeList = finder.getShapes(departureCoords,destinationCoords, databaseController);
+
             mapUrlBuilder.append("&path=color:0xff0000ff%7Cweight:5%7Cenc:");
             mapUrlBuilder.append(PolylineEncoder.encode(placeList));
         }
@@ -301,8 +314,8 @@ public class MapLauncher extends Application{
 
     private void updateMap() {
         Platform.runLater(() -> {
-            String mapUrl = constructMapUrl();
             try {
+                String mapUrl = constructMapUrl();
                 Image mapImage = new Image(mapUrl);
                 mapView.setImage(mapImage);
             } catch (Exception e) {
@@ -312,14 +325,14 @@ public class MapLauncher extends Application{
     }
 
     public static void main(String[] args) {
-        try {
+        /*try {
             //Not an elegant solutions, fix later
             launchGraphHopper().waitFor(1, TimeUnit.MINUTES);
             Thread.sleep(6000);
         }
         catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
         launch(args);
     }
 

@@ -12,7 +12,7 @@ public class ClosestBusStop {
         list.add(4.854370);
         list.add(52.453042);
         ClosestBusStop finder = new ClosestBusStop();
-        finder.findClosestBusStop(list);
+        //finder.findClosestBusStop(list);
     }
 
     //Reference the method that is already in the code instead of this one
@@ -27,8 +27,7 @@ public class ClosestBusStop {
         return R * c * 1000; // Convert to meters
     }
 
-    public ArrayList<BusStop> findClosestBusStop(ArrayList<Double> latLong) throws Exception {
-        DatabaseController databaseController = new DatabaseController();
+    public ArrayList<BusStop> findClosestBusStop(ArrayList<Double> latLong, DatabaseController databaseController) throws Exception {
         Double lat = latLong.get(0);
         Double lon = latLong.get(1);
         double broaderRange = 0.01; //Search range for initial query;
