@@ -250,7 +250,7 @@ public class MapLauncher extends Application{
             path = aStar.findShortestPath(departure, destination);
             updateMap();
         } else {
-            // Show an error message if either of the zip code fields is empty
+            ExceptionManager.showError("Invalid input", "", "Please fill in both zip codes", AlertType.WARNING);
             System.out.println("Please enter both zip codes.");
         }
     }

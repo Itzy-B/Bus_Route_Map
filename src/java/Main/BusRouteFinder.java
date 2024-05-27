@@ -1,11 +1,15 @@
 package src.java.Main;
 
 import java.util.List;
+
+import javafx.scene.control.Alert.AlertType;
+
 import java.util.ArrayList;
 
 import src.java.GUI.Place;
 import src.java.Database.DatabaseController;
 import src.java.Main.ClosestBusStop.BusStop;
+import src.java.Singletons.ExceptionManager;
 
 public class BusRouteFinder {
     public List<Place> getShapes(ArrayList<Double> depCoords, ArrayList<Double> desCoords, DatabaseController databaseController) throws Exception {
@@ -28,6 +32,7 @@ public class BusRouteFinder {
         }
 
         if (tripId == -1) {
+            ExceptionManager.showError("TripId error", "Problem", "Cannot find valid tripId, just walk", AlertType.ERROR);
             throw new IllegalArgumentException("tripId is null");
         }
 
@@ -72,17 +77,25 @@ public class BusRouteFinder {
     }
 
     public int getTripId(ArrayList<BusStop> busStopDep, ArrayList<BusStop> busStopDes,  DatabaseController databaseController) throws Exception {
-        String stopId = busStopDes.get(0).getStopId().split(":")[1];
         String stopId2 = busStopDep.get(0).getStopId().split(":")[1];
-
+        ArrayList<String> list = null;
         //Get trip_ids from overlapping stopId's if they exist
-        //TODO: increase performance of this, wait too slow
-        ArrayList<String> list = databaseController.executeFetchQuery ( 
-            "SELECT DISTINCT s1.trip_id " +
-            "FROM stop_times s1 " +
-            "JOIN stop_times s2 ON s1.trip_id = s2.trip_id " +
-            "WHERE s1.stop_id = " + stopId +" AND s2.stop_id = " + stopId2
-        );
+        //TODO: increase performance of this, way too slow
+        for (int x = 0; x < busStopDes.size(); x++) {
+            list = databaseController.executeFetchQuery ( 
+                "SELECT DISTINCT s1.trip_id " +
+                "FROM stop_times s1 " +
+                "JOIN stop_times s2 ON s1.trip_id = s2.trip_id " +
+                "WHERE s1.stop_id = " + busStopDes.get(x).getStopId().split(":")[1] +" AND s2.stop_id = " + stopId2
+            );
+            /* cast trip_id and stop_id to int and not to varchar, so that indexes actually make sense
+             * Sort on trip_ids, then find the sortest one. Create function to calculate the length of it. Etc..
+             */
+
+            if (!list.isEmpty()) {
+                break;
+            }
+        }
 
         return Integer.parseInt(list.get(0).split(":")[1].split(";")[0].split(" ")[1]);
     }
