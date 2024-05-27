@@ -256,7 +256,7 @@ public class MapLauncher extends Application{
             updateMap();
             updateInformation(acDistance, distance, walkTime, bikeTime, carTime);
         } else {
-            // Show an error message if either of the zip code fields is empty
+            ExceptionManager.showError("Invalid input", "", "Please fill in both zip codes", AlertType.WARNING);
             System.out.println("Please enter both zip codes.");
         }
     }

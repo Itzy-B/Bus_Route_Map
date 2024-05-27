@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -38,8 +37,18 @@ public class RetrievePostalWithAPI {
             fileManager.serializeObject(userObject, "userObject.ser");
             LatLong = sentPostRequest(pCode);
         }
-
+        
         else {
+            //Very cheap fix, fix later
+            try {
+                Thread.sleep(6000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            userObject.addInteraction(getCurrentTime());
+            fileManager.serializeObject(userObject, "userObject.ser");
+            LatLong = sentPostRequest(pCode);
+            
             System.out.println("Too many requests, try again later");
         }
         
@@ -55,7 +64,8 @@ public class RetrievePostalWithAPI {
 
         HttpRequest request = HttpRequest.newBuilder()
         .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-        .uri(URI.create("https://computerscience.dacs.unimaas.nl/get_coordinates?"))
+        // .uri(URI.create("https://computerscience.dacs.unimaas.nl/get_coordinates?"))
+        .uri(URI.create("https://project12.ashish.nl/get_coordinates?"))
         .header("Content-Type", "application/json")
         .build();
 

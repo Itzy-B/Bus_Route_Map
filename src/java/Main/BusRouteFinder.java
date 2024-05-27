@@ -2,8 +2,6 @@ package src.java.Main;
 
 import java.util.List;
 
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
 import java.util.ArrayList;
@@ -34,7 +32,7 @@ public class BusRouteFinder {
         }
 
         if (tripId == -1) {
-            ExceptionManager.showError("TripId error", "Problem", "Cannot find valid tripId, just walkx     ");
+            ExceptionManager.showError("TripId error", "Problem", "Cannot find valid tripId, just walk", AlertType.ERROR);
             throw new IllegalArgumentException("tripId is null");
         }
 
@@ -79,11 +77,10 @@ public class BusRouteFinder {
     }
 
     public int getTripId(ArrayList<BusStop> busStopDep, ArrayList<BusStop> busStopDes,  DatabaseController databaseController) throws Exception {
-        String stopId = busStopDes.get(0).getStopId().split(":")[1];
         String stopId2 = busStopDep.get(0).getStopId().split(":")[1];
         ArrayList<String> list = null;
         //Get trip_ids from overlapping stopId's if they exist
-        //TODO: increase performance of this, wait too slow
+        //TODO: increase performance of this, way too slow
         for (int x = 0; x < busStopDes.size(); x++) {
             list = databaseController.executeFetchQuery ( 
                 "SELECT DISTINCT s1.trip_id " +
@@ -91,6 +88,9 @@ public class BusRouteFinder {
                 "JOIN stop_times s2 ON s1.trip_id = s2.trip_id " +
                 "WHERE s1.stop_id = " + busStopDes.get(x).getStopId().split(":")[1] +" AND s2.stop_id = " + stopId2
             );
+            /* cast trip_id and stop_id to int and not to varchar, so that indexes actually make sense
+             * Sort on trip_ids, then find the sortest one. Create function to calculate the length of it. Etc..
+             */
 
             if (!list.isEmpty()) {
                 break;
