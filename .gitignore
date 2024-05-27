@@ -5,3 +5,5 @@ src/java/Resources/currentIP.txt
 userObject.ser
 /lib/javafx-sdk-21.0.2/
 logs/graphhopper.log
+.DS_Store
+.idea/
