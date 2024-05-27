@@ -1,6 +1,11 @@
 package src.java.Main;
 
 import java.util.List;
+
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
 import java.util.ArrayList;
 
 import src.java.GUI.Place;
@@ -28,6 +33,13 @@ public class BusRouteFinder {
         }
 
         if (tripId == -1) {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Invalid Trip ID");
+                alert.setHeaderText("Error:");
+                alert.setContentText("No trip-id was found, just walk");
+                alert.showAndWait();
+            });
             throw new IllegalArgumentException("tripId is null");
         }
 
