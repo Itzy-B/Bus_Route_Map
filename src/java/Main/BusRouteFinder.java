@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import src.java.GUI.Place;
 import src.java.Database.DatabaseController;
 import src.java.Main.ClosestBusStop.BusStop;
+import src.java.Singletons.ExceptionManager;
 
 public class BusRouteFinder {
     public List<Place> getShapes(ArrayList<Double> depCoords, ArrayList<Double> desCoords, DatabaseController databaseController) throws Exception {
@@ -33,13 +34,7 @@ public class BusRouteFinder {
         }
 
         if (tripId == -1) {
-            Platform.runLater(() -> {
-                Alert alert = new Alert(AlertType.ERROR);
-                alert.setTitle("Invalid Trip ID");
-                alert.setHeaderText("Error:");
-                alert.setContentText("No trip-id was found, just walk");
-                alert.showAndWait();
-            });
+            ExceptionManager.showError("TripId error", "Problem", "Cannot find valid tripId, just walkx     ");
             throw new IllegalArgumentException("tripId is null");
         }
 
@@ -86,15 +81,21 @@ public class BusRouteFinder {
     public int getTripId(ArrayList<BusStop> busStopDep, ArrayList<BusStop> busStopDes,  DatabaseController databaseController) throws Exception {
         String stopId = busStopDes.get(0).getStopId().split(":")[1];
         String stopId2 = busStopDep.get(0).getStopId().split(":")[1];
-
+        ArrayList<String> list = null;
         //Get trip_ids from overlapping stopId's if they exist
         //TODO: increase performance of this, wait too slow
-        ArrayList<String> list = databaseController.executeFetchQuery ( 
-            "SELECT DISTINCT s1.trip_id " +
-            "FROM stop_times s1 " +
-            "JOIN stop_times s2 ON s1.trip_id = s2.trip_id " +
-            "WHERE s1.stop_id = " + stopId +" AND s2.stop_id = " + stopId2
-        );
+        for (int x = 0; x < busStopDes.size(); x++) {
+            list = databaseController.executeFetchQuery ( 
+                "SELECT DISTINCT s1.trip_id " +
+                "FROM stop_times s1 " +
+                "JOIN stop_times s2 ON s1.trip_id = s2.trip_id " +
+                "WHERE s1.stop_id = " + busStopDes.get(x).getStopId().split(":")[1] +" AND s2.stop_id = " + stopId2
+            );
+
+            if (!list.isEmpty()) {
+                break;
+            }
+        }
 
         return Integer.parseInt(list.get(0).split(":")[1].split(";")[0].split(" ")[1]);
     }
