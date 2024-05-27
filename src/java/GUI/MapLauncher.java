@@ -16,12 +16,10 @@ import javafx.scene.control.Label;
 import src.java.Database.DatabaseController;
 import src.java.Main.*;
 
-import static src.java.Main.CalculateDistance.launchGraphHopper;
-
 import java.io.IOException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * This class represents the graphical user interface (GUI) for launching a map application.
@@ -60,9 +58,10 @@ public class MapLauncher extends Application{
     private Label bikeTimeLabel;
     private Label carTimeLabel;
 
-    private Place place1;
-    private Place place2;
+    private Place departure;
+    private Place destination;
 
+    private List<Place> path;
     /**
      * Entry point of the JavaFX application.
      *
@@ -70,21 +69,17 @@ public class MapLauncher extends Application{
      * @throws IOException If there is an error while initializing the map.
      */
     @Override
-    public void start(Stage primaryStage) throws IOException {
+    public void start(Stage primaryStage) {
         // Initialize data
         Data.getData();
 
         // Initialize places to null
-        place1 = null;
-        place2 = null;
+        departure = null;
+        destination = null;
 
         // Construct the URL for the map image of Maastricht
-        String mapUrl;
-        try {
-            mapUrl = constructMapUrl();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        String mapUrl = constructMapUrl();
+
         // Load the map image from the URL
         Image mapImage = new Image(mapUrl);
 
@@ -109,7 +104,7 @@ public class MapLauncher extends Application{
         searchButton.setOnAction(event -> {
             try {
                 searchPlaces();
-            } catch (IOException e) {
+            } catch (IOException | SQLException e) {
                 throw new RuntimeException(e);
             }
         });
@@ -233,28 +228,27 @@ public class MapLauncher extends Application{
     }
 
     // Method for searching places and updating information
-    private void searchPlaces() throws IOException {
+    private void searchPlaces() throws SQLException, IOException {
         String zipCode1 = zipCodeField1.getText();
         String zipCode2 = zipCodeField2.getText();
 
         // Check if both zip code fields are filled
         if (!zipCode1.isEmpty() && !zipCode2.isEmpty()) {
-            place1 = new Place(zipCode1);
-            place2 = new Place(zipCode2);
+            // Fetch place from zipcode
+            departure = new Place(zipCode1);
+            destination = new Place(zipCode2);
 
-            // Calculate distance and average times
-            double acDistance = CalculateDistance.getDistance(zipCode1, zipCode2, getCheckBoxState());
-            double distance = CalculateDistance.getDistance(zipCode1, zipCode2, getCheckBoxState());
-            long walkTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Walk(), getCheckBoxState());
-            long bikeTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Bike(), getCheckBoxState());
-            long carTime = TimeCalculator.calculateAverageTimeTaken(zipCode1, zipCode2, new Car(), getCheckBoxState());
-
-            // Update map with midpoint and information with vehicles
-            ArrayList<Double> midPoint = CalculateDistance.findMidpoint(place1, place2);
+            ArrayList<Double> midPoint = CalculateDistance.findMidpoint(departure, destination);
             CENTER_LATITUDE = midPoint.get(0);
             CENTER_LONGITUDE = midPoint.get(1);
+
+            Graph graph = new Graph();
+            GraphBuilder graphBuilder = new GraphBuilder(graph);
+            graphBuilder.getBusStops();
+
+            AStar aStar = new AStar(graph);
+            path = aStar.findShortestPath(departure, destination);
             updateMap();
-            updateInformation(acDistance, distance, walkTime, bikeTime, carTime);
         } else {
             // Show an error message if either of the zip code fields is empty
             System.out.println("Please enter both zip codes.");
@@ -276,11 +270,11 @@ public class MapLauncher extends Application{
     }
 
     // Method for constructing the URL for the map image
-    private String constructMapUrl() throws Exception {
+    private String constructMapUrl() {
 
         StringBuilder mapUrlBuilder = new StringBuilder("https://maps.googleapis.com/maps/api/staticmap");
 
-        if (place1 == null || place2 == null) {
+        if (departure == null || destination == null) {
             mapUrlBuilder.append("?center=Maastricht");
         }
 
@@ -290,21 +284,9 @@ public class MapLauncher extends Application{
         mapUrlBuilder.append("&scale=").append(scale);
 
         // show the path between two points if places are not null
-        if (place1 != null && place2 != null) {
-            ArrayList<Double> departureCoords = new ArrayList<>();
-            ArrayList<Double> destinationCoords = new ArrayList<>();
-            departureCoords.add(place1.getLongitude());
-            departureCoords.add(place1.getLatitude());
-            destinationCoords.add(place2.getLongitude());
-            destinationCoords.add(place2.getLatitude());
-
-            BusRouteFinder finder = new BusRouteFinder();
-            DatabaseController databaseController = new DatabaseController();
-
-            List<Place> placeList = finder.getShapes(departureCoords,destinationCoords, databaseController);
-
+        if (departure != null && destination != null) {
             mapUrlBuilder.append("&path=color:0xff0000ff%7Cweight:5%7Cenc:");
-            mapUrlBuilder.append(PolylineEncoder.encode(placeList));
+            mapUrlBuilder.append(PolylineEncoder.encode(path));
         }
         // Add API Key
         mapUrlBuilder.append("&key=").append(API_KEY);
@@ -325,15 +307,14 @@ public class MapLauncher extends Application{
     }
 
     public static void main(String[] args) {
-        /*try {
+        /* try {
             //Not an elegant solutions, fix later
             launchGraphHopper().waitFor(1, TimeUnit.MINUTES);
             Thread.sleep(6000);
         }
         catch (Exception e) {
             e.printStackTrace();
-        }*/
+        } */
         launch(args);
     }
-
 }

@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 public class CalculateDistance {
-    private static final int EARTH_RADIUS = 6371;
+    private static final int EARTH_RADIUS = 6371000; // meters
 
     /**
      * Calculates the distance between two zip codes using the Haversine formula.
@@ -142,10 +142,7 @@ public class CalculateDistance {
     }
 
     public static void main(String[] args) throws IOException {
-        // System.out.println(printDistance("6222CN", "6213HD", false));
-        // System.out.println(printDistance("6222CN", "6213HD", false));
-        // System.out.println(printDistance("6222CN", "6213HD", false));
-        // System.out.println(printDistance("6222CN", "6213HD", false));
+        System.out.println(distanceBetween(50.835239, 5.713166, 50.837101, 5.712526));
 
     }
 
