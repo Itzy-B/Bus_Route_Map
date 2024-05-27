@@ -1,0 +1,37 @@
+Log file created at: 2024-05-27 20:26:36
+Credentials decrypted at: 2024-05-27 20:26:36
+Connected at: 2024-05-27 20:26:36
+Credentials encrypted at: 2024-05-27 20:26:36
+Query: SELECT stop_id, stop_lon, stop_lat FROM stops WHERE stop_lon BETWEEN 5.66025268823529 AND 5.6802526882352895 AND stop_lat BETWEEN 50.844918652941104 AND 50.8649186529411 at: 2024-05-27 20:26:36
+Query: SELECT stop_id, stop_lon, stop_lat FROM stops WHERE stop_lon BETWEEN 5.697437199999991 AND 5.71743719999999 AND stop_lat BETWEEN 50.833179372222205 AND 50.8531793722222 at: 2024-05-27 20:26:36
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578160 at: 2024-05-27 20:26:36
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578159 at: 2024-05-27 20:26:36
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578130 at: 2024-05-27 20:26:36
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578095 at: 2024-05-27 20:26:36
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578094 at: 2024-05-27 20:26:36
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578129 at: 2024-05-27 20:26:36
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578132 at: 2024-05-27 20:26:36
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578133 at: 2024-05-27 20:26:36
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578131 at: 2024-05-27 20:26:36
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578134 at: 2024-05-27 20:26:36
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578113 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578112 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578147 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578148 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578135 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578136 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578102 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578103 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578382 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578374 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578383 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578375 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578115 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578114 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578227 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578228 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578362 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2578363 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2511610 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  2511612 at: 2024-05-27 20:26:37
+Query: SELECT DISTINCT s1.trip_id FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id =  2485741 AND s2.stop_id =  stoparea at: 2024-05-27 20:26:37
