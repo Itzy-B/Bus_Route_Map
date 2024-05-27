@@ -13,12 +13,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
-import src.java.Database.DatabaseController;
 import src.java.Main.*;
 
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -249,8 +249,13 @@ public class MapLauncher extends Application{
             AStar aStar = new AStar(graph);
             path = aStar.findShortestPath(departure, destination);
             updateMap();
+
+            Iterator<String> directions = aStar.directions.iterator();
+            while (directions.hasNext()) {
+                System.out.println(directions.next());
+            }
+
         } else {
-            ExceptionManager.showError("Invalid input", "", "Please fill in both zip codes", AlertType.WARNING);
             System.out.println("Please enter both zip codes.");
         }
     }
@@ -285,7 +290,7 @@ public class MapLauncher extends Application{
 
         // show the path between two points if places are not null
         if (departure != null && destination != null) {
-            mapUrlBuilder.append("&path=color:0xff0000ff%7Cweight:5%7Cenc:");
+            mapUrlBuilder.append("&path=color:0xff0000ff%7Cweight:3%7Cenc:");
             mapUrlBuilder.append(PolylineEncoder.encode(path));
         }
         // Add API Key

@@ -18,7 +18,7 @@ public class Node {
         this.cameFrom = cameFrom;
         this.tripHeadsign = tripHeadsign;
     }
-
+    public double getG() {return g;}
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

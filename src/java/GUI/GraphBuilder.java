@@ -80,23 +80,20 @@ public class GraphBuilder {
         graphBuilder.getBusStops();
 
         // Print the graph to verify
-        BusStop busStop1 = new BusStop(2578366, "Maastricht, Boschstraat/Markt", 50.852614, 5.69);
+        /*BusStop busStop1 = new BusStop(2578367, "Maastricht, Calvariestraat", 50.847532, 5.680894);
         for (Edge edge : g.getEdges(busStop1)) {
             System.out.println(edge);
-        }
+        }*/
 
         /*BusStop busStop2 = new BusStop(2578389, "Maastricht, Mosae Forum/Centrum", 50.852559, 5.693933);
         for (Edge edge : g.getEdges(busStop2)) {
             System.out.println(edge);
-        }
-*/
-    }
-
-
-        /*for (BusStop s: g.findNearestBusStops(50.864782, 5.66643)) {
-            System.out.println(s);
         }*/
 
+        for (BusStop busStop : g.findNearestBusStops(50.8481233263157, 5.68969885999999)) {
+            System.out.println(busStop);
+        }
+    }
 
 }
 

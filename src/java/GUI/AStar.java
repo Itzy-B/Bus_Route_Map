@@ -2,14 +2,19 @@ package src.java.GUI;
 
 import src.java.Main.CalculateDistance;
 
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.*;
 
 public class AStar {
-    private final Graph graph;
+    protected final double AVGWALKINGTIME = 78.0; // meters/min
+    protected final double AVGBUSTIME = 333.333;
+    protected final Graph graph;
+    protected List<String> directions;
 
     public AStar(Graph graph) {
         this.graph = graph;
+        directions = new ArrayList<>();
     }
 
     public List<Place> findShortestPath(Place startPlace, Place endPlace) {
@@ -31,24 +36,26 @@ public class AStar {
 
     private List<Place> aStarSearch(Place start, Place goal) {
         PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingDouble(node -> node.f));
-        //Map<Place, Node> allNodes = new HashMap<>();
+        Map<Place, Map<String, Boolean>> isMarked = new HashMap<>();
 
         Node startNode = new Node(start, 0, heuristic(start, goal), null, "walk");
         openSet.add(startNode);
-        //allNodes.put(start, startNode);
 
         while (!openSet.isEmpty()) {
             Node currentNode = openSet.poll();
+            isMarked.putIfAbsent(currentNode.place, new HashMap<>());
+            isMarked.get(currentNode.place).put(currentNode.tripHeadsign, true);
 
             if (currentNode.place.equals(goal)) {
+                constructDirections(currentNode);
                 return reconstructPath(currentNode);
             }
 
-            //System.out.println("Current Node: " + currentNode.place);
+            // System.out.println("Current Node: " + currentNode.place + "with g = " + currentNode.g + ", h = " + currentNode.h + ", f = " + currentNode.f + ", headsign: " + currentNode.tripHeadsign);
 
             for (Edge edge : graph.getEdges(currentNode.place)) {
-                if (currentNode.cameFrom != null && edge.getTo().equals(currentNode.cameFrom.place)) {
-                    continue; // Skip already visited nodes
+                if (isMarked.containsKey(edge.getTo()) && isMarked.get(edge.getTo()).getOrDefault(edge.getTripHeadsign(), false)) {
+                    continue;
                 }
 
                 // Handle start node and nodes with headsign
@@ -58,9 +65,9 @@ public class AStar {
                     continue;
                 }
 
-                //System.out.println("Considering edge to: " + edge.getTo() + " with weight: " + edge.getWeight() + " and tripHeadsign: " + edge.getTripHeadsign());
+                // System.out.println("Considering edge to: " + edge.getTo() + " with weight: " + edge.getWeight() + " and tripHeadsign: " + edge.getTripHeadsign());
                 double cost = currentNode.g + edge.getWeight();
-                Node node = new Node(edge.getTo(), cost, heuristic(edge.getTo(), goal), currentNode, currHeadSign);
+                Node node = new Node(edge.getTo(), cost, heuristic(edge.getTo(), goal), currentNode, edgeHeadSign);
                 openSet.add(node);
             }
         }
@@ -83,13 +90,71 @@ public class AStar {
         return path;
     }
 
-    public static void main(String[] args) throws SQLException {
+    private void constructDirections(Node currentNode) {
+        List<Node> pathNodes = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+
+        double totalTime = 0.0;
+        double totalDistance = 0.0;
+
+        while (currentNode != null) {
+            pathNodes.add(currentNode);
+            currentNode = currentNode.cameFrom;
+        }
+        Collections.reverse(pathNodes);
+
+        for (int i = 0; i < pathNodes.size() - 1; i += 1) {
+            sb = new StringBuilder();
+            Node next = pathNodes.get(i + 1);
+            Node curr = next.cameFrom;
+            long dist = Math.round(next.g - curr.g);
+
+            if (i == 0) {
+                totalDistance += dist;
+                totalTime += (dist / AVGWALKINGTIME);
+                sb.append("Walk from your current location around ")
+                        .append(dist)
+                        .append(" meters to ")
+                        .append(next.place.toString());
+                directions.add(sb.toString());
+            } else if (i == pathNodes.size() - 2) {
+                totalDistance += dist;
+                totalTime += (dist / AVGWALKINGTIME);
+                sb.append("Walk around ")
+                        .append(dist)
+                        .append(" meters to your destination");
+                directions.add(sb.toString());
+            } else {
+                totalDistance += dist;
+                totalTime += (dist / AVGBUSTIME);
+                sb.append("Take bus from ")
+                        .append(curr.place.toString())
+                        .append(" to ")
+                        .append(next.place.toString())
+                        .append(", headsign: ")
+                        .append(curr.tripHeadsign)
+                        .append(", distance: ")
+                        .append(dist);
+                directions.add(sb.toString());
+            }
+        }
+
+        sb = new StringBuilder();
+        sb.append("Total distance: ")
+                .append(Math.round(totalDistance))
+                .append(" meters , total time: ")
+                .append(Math.round(totalTime))
+                .append("minutes");
+        directions.add(sb.toString());
+    }
+
+    public static void main(String[] args) throws SQLException, FileNotFoundException {
         Graph graph = new Graph();
         GraphBuilder graphBuilder = new GraphBuilder(graph);
         graphBuilder.getBusStops();
 
-        Place startPlace = new Place(50.85253504,  5.68969885999999);
-        Place endPlace = new Place(50.8380708633987, 5.71570995359477);
+        Place startPlace = new Place(50.8481233263157,  5.68064454736842);
+        Place endPlace = new Place(50.846663665, 5.64802905499999);
 
         /*AStar aStar = new AStar(graph);
         aStar.connectPlaceToGraph(startPlace);
@@ -119,6 +184,10 @@ public class AStar {
             System.out.println("Path found:");
             for (Place place : path) {
                 System.out.println(place);
+            }
+
+            for (String s : aStar.directions) {
+                System.out.println(s);
             }
         }
     }
