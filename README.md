@@ -5,13 +5,13 @@ Group 25 Team Members: Tristan Dormans, Mehmet Levent Koca, Alen Quiroz Engel, V
 ## IMPORTANT TO BE ABLE TO RUN THE APPLICATION
 1. Set up a JavaFX environment on your IDEA to be able to run the application GUI.
 
-2. You might also need to set up the VM options in your run configurations as:\ 
+2. You might also need to set up the VM options in your run configurations as:<br>
 --module-path "your physical path to JavaFX lib" --add-modules javafx.controls,javafx.fxml
 
-3. Create a new mySQL connection with your local database application(or DBeaver).\
-URL = jdbc:mysql://localhost:3306/project1-2\
-USER = DACS2024\
-PASSWORD = DACS2024\
+3. Create a new mySQL connection with your local database application(or DBeaver).<br>
+URL = jdbc:mysql://localhost:3306/project1-2<br>
+USER = DACS2024<br>
+PASSWORD = DACS2024<br>
 
 4. Open SQL console to run script.sql file to import data
 
