@@ -329,15 +329,16 @@ public class MapLauncher extends Application{
             destinationCoords.add(destination.getLatitude());
 
             BusRouteFinder finder = new BusRouteFinder();
-            DatabaseController databaseController;
             List<Place> placeList = new ArrayList<>();
             try {
-                databaseController = new DatabaseController();
+                DatabaseController databaseController = new DatabaseController();
                 placeList = finder.getShapes(departureCoords,destinationCoords, databaseController);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            System.out.println("Controller made, getting shapes");
+            if (placeList.isEmpty()) {
+                ExceptionManager.showError("No route found", "Problem", "No route could be found with given postal codes", AlertType.ERROR);
+            }
 
             mapUrlBuilder.append("&path=color:0xff0000ff%7Cweight:5%7Cenc:");
             mapUrlBuilder.append(PolylineEncoder.encode(placeList));
@@ -345,7 +346,7 @@ public class MapLauncher extends Application{
 
 
         // show the path between two points if places are not null
-        if (departure != null && destination != null) {
+        if (departure != null && destination != null && !toggleQuerySystem.isSelected()) {
             mapUrlBuilder.append("&path=color:0xff0000ff%7Cweight:3%7Cenc:");
             mapUrlBuilder.append(PolylineEncoder.encode(path));
         }
