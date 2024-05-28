@@ -18,14 +18,14 @@ public class AStar {
     }
 
     public List<Place> findShortestPath(Place startPlace, Place endPlace) {
-        connectPlaceToGraph(startPlace);
-        connectPlaceToGraph(endPlace);
+        connectPlaceToGraph(startPlace, 10);
+        connectPlaceToGraph(endPlace, 5);
 
         return aStarSearch(startPlace, endPlace);
     }
 
-    private void connectPlaceToGraph(Place place) {
-        List<BusStop> nearestBusStops = graph.findNearestBusStops(place.getLatitude(), place.getLongitude());
+    private void connectPlaceToGraph(Place place, int stops) {
+        List<BusStop> nearestBusStops = graph.findNearestBusStops(place.getLatitude(), place.getLongitude(), stops);
         graph.addVertex(place);
         for (BusStop busStop : nearestBusStops) {
             double distance = CalculateDistance.distanceBetween(place.getLatitude(), place.getLongitude(), busStop.getLatitude(), busStop.getLongitude());
@@ -91,15 +91,16 @@ public class AStar {
     }
 
     private void constructDirections(Node currentNode) {
+        Node p = currentNode;
         List<Node> pathNodes = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
         double totalTime = 0.0;
         double totalDistance = 0.0;
 
-        while (currentNode != null) {
-            pathNodes.add(currentNode);
-            currentNode = currentNode.cameFrom;
+        while (p != null) {
+            pathNodes.add(p);
+            p = p.cameFrom;
         }
         Collections.reverse(pathNodes);
 
@@ -132,7 +133,7 @@ public class AStar {
                         .append(" to ")
                         .append(next.place.toString())
                         .append(", headsign: ")
-                        .append(curr.tripHeadsign)
+                        .append(next.tripHeadsign)
                         .append(", distance: ")
                         .append(dist);
                 directions.add(sb.toString());
@@ -153,8 +154,8 @@ public class AStar {
         GraphBuilder graphBuilder = new GraphBuilder(graph);
         graphBuilder.getBusStops();
 
-        Place startPlace = new Place(50.8481233263157,  5.68064454736842);
-        Place endPlace = new Place(50.846663665, 5.64802905499999);
+        Place startPlace = new Place(50.8466191301886,  5.70587752641509);
+        Place endPlace = new Place(50.8531907678571, 5.68879784285714);
 
         /*AStar aStar = new AStar(graph);
         aStar.connectPlaceToGraph(startPlace);

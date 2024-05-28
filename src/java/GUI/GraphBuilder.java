@@ -90,7 +90,7 @@ public class GraphBuilder {
             System.out.println(edge);
         }*/
 
-        for (BusStop busStop : g.findNearestBusStops(50.8481233263157, 5.68969885999999)) {
+        for (BusStop busStop : g.findNearestBusStops(50.8481233263157, 5.68969885999999, 5)) {
             System.out.println(busStop);
         }
     }

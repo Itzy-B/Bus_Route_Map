@@ -26,13 +26,13 @@ public class Graph {
     }
 
     // Method to find the 5 nearest bus stops to given coordinates
-    public List<BusStop> findNearestBusStops(double lat, double lon) {
+    public List<BusStop> findNearestBusStops(double lat, double lon, int stops) {
         PriorityQueue<BusStop> nearestStops = new PriorityQueue<>(Comparator.comparingDouble(busStop -> -busStop.distanceTo(lat, lon)));
 
         for (Place place : adjList.keySet()) {
             if (place instanceof BusStop) {
                 nearestStops.offer((BusStop) place);
-                if (nearestStops.size() > 5) {
+                if (nearestStops.size() > stops) {
                     nearestStops.poll(); // Remove the farthest bus stop if we have more than 5
                 }
             }

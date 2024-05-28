@@ -5,19 +5,17 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.scene.control.Label;
 import src.java.Main.*;
 
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -57,6 +55,7 @@ public class MapLauncher extends Application{
     private Label walkTimeLabel;
     private Label bikeTimeLabel;
     private Label carTimeLabel;
+    private ListView<String> listView;
 
     private Place departure;
     private Place destination;
@@ -191,10 +190,17 @@ public class MapLauncher extends Application{
         labelsVBox.setAlignment(Pos.TOP_LEFT);
         labelsVBox.setPadding(new Insets(10));
 
+        // Create a ListView for the list of strings
+        listView = new ListView<>();
+        listView.getItems().addAll(Collections.emptyList());
+        listView.setPrefHeight(1000);
+        listView.setPrefWidth(600);
+
         // Create a VBox for the right side content
-        VBox rightContentVBox = new VBox(10, textFieldAndSearch, zoomButtons, checkBoxs, labelsVBox);
+        VBox rightContentVBox = new VBox(10, textFieldAndSearch, zoomButtons, checkBoxs, labelsVBox, listView);
         rightContentVBox.setAlignment(Pos.TOP_LEFT);
         rightContentVBox.setPadding(new Insets(10));
+        rightContentVBox.setPrefWidth(600);
 
         // Create a HBox to hold the map and right side content
         HBox hbox = new HBox(mapView, rightContentVBox);
@@ -248,12 +254,9 @@ public class MapLauncher extends Application{
 
             AStar aStar = new AStar(graph);
             path = aStar.findShortestPath(departure, destination);
-            updateMap();
 
-            Iterator<String> directions = aStar.directions.iterator();
-            while (directions.hasNext()) {
-                System.out.println(directions.next());
-            }
+            listView.getItems().setAll(aStar.directions);
+            updateMap();
 
         } else {
             System.out.println("Please enter both zip codes.");
