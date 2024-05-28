@@ -8,11 +8,12 @@ Group 25 Team Members: Tristan Dormans, Mehmet Levent Koca, Alen Quiroz Engel, V
 2. You might also need to set up the VM options in your run configurations as:<br>
 --module-path "your physical path to JavaFX lib" --add-modules javafx.controls,javafx.fxml
 
-3. Install mySQL in your computer and create a new local user, run following code in your commandline<br>
-(1) Run `mysql -u root`<br>
-(2) Run `CREATE USER 'DACS2024'@'localhost' IDENTIFIED BY 'DACS2024';`<br>
-(3) Run `GRANT ALL PRIVILEGES ON *.* TO 'DACS2024'@'localhost' WITH GRANT OPTION;`<br>
-(4) Run `FLUSH PRIVILEGES;`<br>
+3. Install mySQL in your computer and create a new local user<br>
+(1) Run `mysql -u root` in your commandline<br>
+(2) When you see a prompt like "mysql>", run following one by one:<br>
+    `CREATE USER 'DACS2024'@'localhost' IDENTIFIED BY 'DACS2024';`
+    `GRANT ALL PRIVILEGES ON *.* TO 'DACS2024'@'localhost' WITH GRANT OPTION;`
+    `FLUSH PRIVILEGES;`
 
 4. Create a new mySQL connection with your local database application(recommending DBeaver).<br>
 URL = jdbc:mysql://localhost:3306/project1-2<br>
