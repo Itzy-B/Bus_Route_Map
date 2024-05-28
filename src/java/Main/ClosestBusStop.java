@@ -41,6 +41,7 @@ public class ClosestBusStop {
         for (String row : list) {
             String[] parts = row.split(";");
             String stopId = parts[0];
+            if (stopId.contains("stoparea")) continue;
             double stopLon = Double.parseDouble(parts[1].split(":")[1]);
             double stopLat = Double.parseDouble(parts[2].split(":")[1]);
             double distance = calculateDistance(lat, lon, stopLat, stopLon);
@@ -52,27 +53,5 @@ public class ClosestBusStop {
 
         // Return the ID of the closest bus stop
         return busStops;
-    }
-
-    class BusStop {
-        private String stopId;
-        private double lat;
-        private double lon;
-        private double distance;
-
-        public BusStop(String stopId, double lat, double lon, double distance) {
-            this.stopId = stopId;
-            this.lat = lat;
-            this.lon = lon;
-            this.distance = distance;
-        }
-
-        public String getStopId() {
-            return stopId;
-        }
-
-        public double getDistance() {
-            return distance;
-        }
     }
 }

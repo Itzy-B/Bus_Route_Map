@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import src.java.Singletons.ExceptionManager;
+
 public class UserInput {
 
     private static final String ZIP_CODE_PATTERN = "\\d{4}\\s[A-Z]{2}";
@@ -31,6 +33,7 @@ public class UserInput {
 
     private static void validateZipCode(String zipCode) throws IllegalArgumentException {
         if (!zipCode.matches(ZIP_CODE_PATTERN)) {
+            // ExceptionManager.showError("zipCode", "Problem", "Invalid zip code format");
             throw new IllegalArgumentException("Invalid zip code format.");
         }
     }

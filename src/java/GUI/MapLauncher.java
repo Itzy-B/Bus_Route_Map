@@ -6,11 +6,16 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import src.java.Main.*;
+import src.java.Singletons.ExceptionManager;
 
 import java.io.IOException;
 import java.sql.*;
@@ -32,6 +37,7 @@ public class MapLauncher extends Application{
 
     // Google Map static API key
     private static final String API_KEY = "AIzaSyDnJH0pu5NzqH0b6GjiPyTDfdkBDugYw6w";
+    // private static final String API_KEY = "0";  
 
     // Coordinates of Maastricht
     private double CENTER_LATITUDE = 50.851368;
@@ -80,6 +86,7 @@ public class MapLauncher extends Application{
         String mapUrl = constructMapUrl();
 
         // Load the map image from the URL
+        // Image mapImage = new Image("/staticmap.png");
         Image mapImage = new Image(mapUrl);
 
         // Create an ImageView to display the map image
