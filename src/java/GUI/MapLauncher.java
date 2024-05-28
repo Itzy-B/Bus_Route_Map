@@ -102,7 +102,7 @@ public class MapLauncher extends Application{
         zoomOutButton.setOnAction(event -> zoomOut());
         zoomOutButton.setPrefSize(50, 50);
         checkBox = new CheckBox("Toggle graphhopper");
-        toggleQuerySystem = new CheckBox("Search outside of Maastricht/Search inefficiently");
+        toggleQuerySystem = new CheckBox("Search outside of Maastricht/Search inefficiently (Don't use this option)");
 
 
 
