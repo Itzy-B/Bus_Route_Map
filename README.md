@@ -1,14 +1,19 @@
-# BCS25-Project-1-2: Phase 1 DISTANCE AND TIME CALCULATORS
+# BCS25-Project-1-2: Phase 2 Public Transport Routing
 
 Group 25 Team Members: Tristan Dormans, Mehmet Levent Koca, Alen Quiroz Engel, Vlad Creciun, Xuhan Zhuang, Joel Kumi, Bruno Torrijo
 
 ## IMPORTANT TO BE ABLE TO RUN THE APPLICATION
-Set up a JavaFX environment on your IDE to be able to run the application GUI.
+1. Set up a JavaFX environment on your IDEA to be able to run the application GUI.
 
-You might also need to set up the VM options in your run configurations as: 
+2. You might also need to set up the VM options in your run configurations as: 
 --module-path "your physical path to JavaFX lib" --add-modules javafx.controls,javafx.fxml
-     
 
+3. Create a new mySQL connection with your local database application(or DBeaver).
+URL = jdbc:mysql://localhost:3306/project1-2
+USER = DACS2024
+PASSWORD = DACS2024
+
+4. Open SQL console to run script.sql file to import data
 
 ***** HOW TO RUN *****
 
