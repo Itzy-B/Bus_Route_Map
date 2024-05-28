@@ -41,6 +41,7 @@ public class ClosestBusStop {
         for (String row : list) {
             String[] parts = row.split(";");
             String stopId = parts[0];
+            if (stopId.contains("stoparea")) continue;
             double stopLon = Double.parseDouble(parts[1].split(":")[1]);
             double stopLat = Double.parseDouble(parts[2].split(":")[1]);
             double distance = calculateDistance(lat, lon, stopLat, stopLon);
