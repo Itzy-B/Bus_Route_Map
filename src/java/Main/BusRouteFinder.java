@@ -4,6 +4,7 @@ import java.util.List;
 
 import javafx.scene.control.Alert.AlertType;
 
+import java.sql.SQLException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
@@ -14,7 +15,6 @@ import java.util.Comparator;
 
 import src.java.GUI.Place;
 import src.java.Database.DatabaseController;
-import src.java.Main.ClosestBusStop.BusStop;
 import src.java.Singletons.ExceptionManager;
 
 public class BusRouteFinder {
@@ -23,13 +23,14 @@ public class BusRouteFinder {
         ArrayList<BusStop> busStopsDep = new ArrayList<>();
         ArrayList<BusStop> busStopsDes = new ArrayList<>();
         BusRouteFinder tripFinder = new BusRouteFinder();
+        ArrayList<Trip> result  =  new ArrayList<>();
         int tripId = -1;
 
         try {
             busStopsDep = stopFinder.findClosestBusStop(depCoords, databaseController);
             busStopsDes = stopFinder.findClosestBusStop(desCoords, databaseController);
             ArrayList<Trip> tripsList = tripFinder.getTripId(busStopsDes, busStopsDep, databaseController);
-            ArrayList<Trip> result = tripFinder.calculateTripLength(tripsList, databaseController);
+            result = tripFinder.calculateTripLength(tripsList, databaseController);
             tripId = result.get(0).tripId();
         } catch (Exception e) {
             e.printStackTrace();
@@ -43,18 +44,56 @@ public class BusRouteFinder {
             ExceptionManager.showError("TripId error", "Problem", "Cannot find valid tripId, just walk", AlertType.ERROR);
             throw new IllegalArgumentException("tripId is null");
         }
+        return getPlacesWithDeviation(tripId, result, databaseController);
 
+        // List<Place> list = new ArrayList<>();
+        // int shapeId = getShapeId(tripId, databaseController);
+        // Trip trip = result.get(0);
+        // ArrayList<String> shapes = getShapes(shapeId, databaseController);
+        // ArrayList<BusStop> stops = getLatLonStop(trip.stopIdDep(), trip.stopIdDes(), databaseController);
+        // for (String string: shapes) {
+        //     double lon = Double.parseDouble(string.split(";")[1].split(":")[1].split(" ")[1]);
+        //     double lat = Double.parseDouble(string.split(";")[2].split(":")[1].split(" ")[1]);
+        //     Place place = new Place(lon, lat);
+        //     list.add(place);
+        // }
+        // return list;
+    }
+
+    public List<Place> getPlacesWithDeviation(int tripId, ArrayList<Trip> result, DatabaseController databaseController) throws Exception {
         int shapeId = getShapeId(tripId, databaseController);
+        Trip trip = result.get(0); // Assuming result is defined elsewhere
         ArrayList<String> shapes = getShapes(shapeId, databaseController);
+        ArrayList<BusStop> stops = getLatLonStop(trip.stopIdDep(), trip.stopIdDes(), databaseController);
+
         List<Place> list = new ArrayList<>();
-        for (String string: shapes) {
-            double lon = Double.parseDouble(string.split(";")[1].split(":")[1].split(" ")[1]);
-            double lat = Double.parseDouble(string.split(";")[2].split(":")[1].split(" ")[1]);
-            Place place = new Place(lon, lat);
-            list.add(place);
+        boolean startCounting = false;
+        double deviationMeters = 0.160; // Deviation in meters
+
+        for (String string : shapes) {
+            double lat = Double.parseDouble(string.split(";")[1].split(":")[1].split(" ")[1]);
+            double lon = Double.parseDouble(string.split(";")[2].split(":")[1].split(" ")[1]);
+
+            // Calculate distance between stop and shape
+            double distance = CalculateDistance.distanceBetween(stops.get(0).getLat(), stops.get(0).getLon(), lat, lon);
+
+            if (distance <= deviationMeters) {
+                startCounting = true;
+            }
+            if (startCounting) {
+                Place place = new Place(lat, lon);
+                list.add(place);
+            }
+
+            distance = CalculateDistance.distanceBetween(stops.get(1).getLat(), stops.get(1).getLon(), lat, lon);
+
+            if (distance <= deviationMeters) {
+                break;
+            }
         }
         return list;
     }
+
     public static void main(String[] args) throws Exception {
         BusRouteFinder finder = new BusRouteFinder();
         // ArrayList<Double> departureCoords = new ArrayList<>();
@@ -72,6 +111,36 @@ public class BusRouteFinder {
         ArrayList<Trip> result = finder.calculateTripLength(trips, databaseController);
         System.out.println("");
 
+    }
+
+    public ArrayList<BusStop> getLatLonStop(int stopDep, int stopDes, DatabaseController databaseController) {
+        String query = "SELECT stop_lat, stop_lon FROM stops WHERE stop_id = " + stopDep;
+        ArrayList<String> list = new ArrayList<>();
+        ArrayList<BusStop> stops = new ArrayList<>();
+        try {
+            list = databaseController.executeFetchQuery(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        String[] split = list.get(0).split(";");
+        double latDep = Double.parseDouble(split[0].split(":")[1].trim());
+        double lonDep = Double.parseDouble(split[1].split(":")[1].trim());
+        BusStop stop = new BusStop("dep", latDep, lonDep, 0.0);
+        stops.add(stop);
+        query = "SELECT stop_lat, stop_lon FROM stops WHERE stop_id = " + stopDes;
+
+        try {
+            list = databaseController.executeFetchQuery(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        split = list.get(0).split(";");
+        Double latDes = Double.parseDouble(split[0].split(":")[1].trim());
+        Double lonDes = Double.parseDouble(split[1].split(":")[1].trim());
+        stop = new BusStop("des", latDes, lonDes, 0.0);
+        stops.add(stop);
+        return stops;
     }
 
     public ArrayList<String> getShapes(int shapeId, DatabaseController databaseController ) throws Exception {
@@ -162,9 +231,9 @@ public class BusRouteFinder {
         int depSize = busStopDep.size();
         int desSize = busStopDes.size();
         //Gets all overlapping trips between the bus stop lists
-        for (int x = 0; x < depSize; x++) {
+        for (int x = 0; x < 11; x++) {
             stopIdDep = Integer.parseInt(busStopDep.get(x).getStopId().split(":")[1].split(" ")[1]);
-            for (int y = 0; y < desSize; y++) {
+            for (int y = 0; y < 11; y++) {
                 stopIdDes = Integer.parseInt(busStopDes.get(y).getStopId().split(":")[1].split(" ")[1]);
                 String query = ( 
                     "SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time " +

@@ -36,8 +36,8 @@ public class MapLauncher extends Application{
     private static final double WINDOW_HEIGHT = 780.0;
 
     // Google Map static API key
-    // private static final String API_KEY = "AIzaSyDnJH0pu5NzqH0b6GjiPyTDfdkBDugYw6w";
-    private static final String API_KEY = "0";
+    private static final String API_KEY = "AIzaSyDnJH0pu5NzqH0b6GjiPyTDfdkBDugYw6w";
+    // private static final String API_KEY = "0";  
 
     // Coordinates of Maastricht
     private double CENTER_LATITUDE = 50.851368;
@@ -88,8 +88,8 @@ public class MapLauncher extends Application{
             throw new RuntimeException(e);
         }
         // Load the map image from the URL
-        Image mapImage = new Image("/staticmap.png");
-        // Image mapImage = new Image(mapUrl);
+        // Image mapImage = new Image("/staticmap.png");
+        Image mapImage = new Image(mapUrl);
 
         // Create an ImageView to display the map image
         mapView = new ImageView(mapImage);
@@ -303,7 +303,7 @@ public class MapLauncher extends Application{
 
             BusRouteFinder finder = new BusRouteFinder();
             DatabaseController databaseController = new DatabaseController();
-            System.out.println("Controller made, getting shapes6");
+            System.out.println("Controller made, getting shapes");
             List<Place> placeList = finder.getShapes(departureCoords,destinationCoords, databaseController);
 
             mapUrlBuilder.append("&path=color:0xff0000ff%7Cweight:5%7Cenc:");

@@ -54,26 +54,4 @@ public class ClosestBusStop {
         // Return the ID of the closest bus stop
         return busStops;
     }
-
-    class BusStop {
-        private String stopId;
-        private double lat;
-        private double lon;
-        private double distance;
-
-        public BusStop(String stopId, double lat, double lon, double distance) {
-            this.stopId = stopId;
-            this.lat = lat;
-            this.lon = lon;
-            this.distance = distance;
-        }
-
-        public String getStopId() {
-            return stopId;
-        }
-
-        public double getDistance() {
-            return distance;
-        }
-    }
 }
