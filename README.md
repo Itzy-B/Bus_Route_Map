@@ -16,7 +16,7 @@ Group 25 Team Members: Tristan Dormans, Mehmet Levent Koca, Alen Quiroz Engel, V
     `FLUSH PRIVILEGES;`<br>
 
 4. Create a new mySQL connection with your local database application(recommending DBeaver).<br>
-URL = jdbc:mysql://localhost:3306/project1-2<br>
+URL = jdbc:mysql://localhost:3306/gtfs<br>
 USER = DACS2024<br>
 PASSWORD = DACS2024<br>
 
@@ -24,11 +24,7 @@ PASSWORD = DACS2024<br>
 
 ***** HOW TO RUN *****
 
-Launch the application by running the MapLauncher.java file. This will start up the aplication, a terminal will pop up that starts
-the local graphhopper server, then the GUI will pop up on screen.
-
-If the terminal does not pop up, please run the following command from the source folder to start the local graphhopper server: 
-java -Xms1g -Xmx1g -server -Ddw.graphhopper.datareader.file=src/java/graphhopper/Maastricht.osm.pbf -cp src/java/graphhopper/graphhopper.jar com.graphhopper.application.GraphHopperApplication server src\\java\\graphhopper\\config.yml
+Launch the application by running the MapLauncher.java file. 
 
 Now, there are multiple things you can do:
 1) The '+' and '-' buttons
