@@ -6,11 +6,14 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import src.java.Database.DatabaseController;
 import src.java.Main.*;
+import src.java.Singletons.ExceptionManager;
 
 import java.io.IOException;
 import java.sql.*;
@@ -32,6 +35,7 @@ public class MapLauncher extends Application{
 
     // Google Map static API key
     private static final String API_KEY = "AIzaSyDnJH0pu5NzqH0b6GjiPyTDfdkBDugYw6w";
+    // private static final String API_KEY = "0";  
 
     // Coordinates of Maastricht
     private double CENTER_LATITUDE = 50.851368;
@@ -49,6 +53,7 @@ public class MapLauncher extends Application{
     private TextField zipCodeField2;
 
     private CheckBox checkBox = null;
+    private CheckBox toggleQuerySystem = null;
 
     private Label distanceLabel;
     private Label acDistanceLabel;
@@ -80,6 +85,7 @@ public class MapLauncher extends Application{
         String mapUrl = constructMapUrl();
 
         // Load the map image from the URL
+        // Image mapImage = new Image("/staticmap.png");
         Image mapImage = new Image(mapUrl);
 
         // Create an ImageView to display the map image
@@ -96,13 +102,20 @@ public class MapLauncher extends Application{
         zoomOutButton.setOnAction(event -> zoomOut());
         zoomOutButton.setPrefSize(50, 50);
         checkBox = new CheckBox("Toggle graphhopper");
+        toggleQuerySystem = new CheckBox("Search outside of Maastricht/Search inefficiently");
+
 
 
         // Create a Search button
         Button searchButton = new Button("Search");
         searchButton.setOnAction(event -> {
             try {
-                searchPlaces();
+                if (getQueryButtonState()) {
+                    constructMapUrl();
+                }
+                else {
+                    searchPlaces();
+                }
             } catch (IOException | SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -181,7 +194,7 @@ public class MapLauncher extends Application{
         zoomButtons.setAlignment(Pos.TOP_LEFT);
         zoomButtons.setPadding(new Insets(10));
 
-        HBox checkBoxs = new HBox(10, checkBox);
+        HBox checkBoxs = new HBox(10, checkBox, toggleQuerySystem);
         checkBoxs.setAlignment(Pos.TOP_LEFT);
         checkBoxs.setPadding(new Insets(10));
 
@@ -223,6 +236,10 @@ public class MapLauncher extends Application{
 
     private boolean getCheckBoxState() {
         return checkBox.isSelected();
+    }
+
+    private boolean getQueryButtonState() {
+        return toggleQuerySystem.isSelected();
     }
 
     private void zoomOut() {
@@ -290,6 +307,42 @@ public class MapLauncher extends Application{
         mapUrlBuilder.append("&zoom=").append(zoomLevel);
         mapUrlBuilder.append("&size=600x500");
         mapUrlBuilder.append("&scale=").append(scale);
+
+        if (zipCodeField1 instanceof TextField && zipCodeField2 instanceof TextField) {
+            String zipCode1 = zipCodeField1.getText();
+            String zipCode2 = zipCodeField2.getText();
+            try {
+                departure = new Place(zipCode1);
+                destination = new Place(zipCode2);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (departure != null && destination != null && toggleQuerySystem.isSelected()) {
+            
+            System.out.println("Using queries");
+            ArrayList<Double> departureCoords = new ArrayList<>();
+            ArrayList<Double> destinationCoords = new ArrayList<>();
+            departureCoords.add(departure.getLongitude());
+            departureCoords.add(departure.getLatitude());
+            destinationCoords.add(destination.getLongitude());
+            destinationCoords.add(destination.getLatitude());
+
+            BusRouteFinder finder = new BusRouteFinder();
+            DatabaseController databaseController;
+            List<Place> placeList = new ArrayList<>();
+            try {
+                databaseController = new DatabaseController();
+                placeList = finder.getShapes(departureCoords,destinationCoords, databaseController);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println("Controller made, getting shapes");
+
+            mapUrlBuilder.append("&path=color:0xff0000ff%7Cweight:5%7Cenc:");
+            mapUrlBuilder.append(PolylineEncoder.encode(placeList));
+        }
+
 
         // show the path between two points if places are not null
         if (departure != null && destination != null) {

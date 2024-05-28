@@ -51,8 +51,11 @@ public class CalculateDistance {
             //Calculate distance between
             distance = distanceBetween(latLong1.get(0), latLong1.get(1), latLong2.get(0), latLong2.get(1));
             // Format to two decimal places
-            DecimalFormat df = new DecimalFormat("#.#");
-            distance = Double.parseDouble(df.format(distance));
+
+            DecimalFormat df = new DecimalFormat("#.#"); // Adjusted to remove comma formatting
+            String formattedDistance = df.format(distance);
+            formattedDistance = formattedDistance.replace(',','.');
+            distance = Double.parseDouble(formattedDistance);
         }
 
         else {

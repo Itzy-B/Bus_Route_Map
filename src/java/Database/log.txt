@@ -1,0 +1,30 @@
+Log file created at: 2024-05-28 18:55:49
+Credentials decrypted at: 2024-05-28 18:55:49
+Connected at: 2024-05-28 18:55:49
+Credentials encrypted at: 2024-05-28 18:55:49
+Query: SELECT stop_id, stop_lon, stop_lat FROM stops WHERE stop_lon BETWEEN 5.66025268823529 AND 5.6802526882352895 AND stop_lat BETWEEN 50.844918652941104 AND 50.8649186529411 at: 2024-05-28 18:55:49
+Query: SELECT stop_id, stop_lon, stop_lat FROM stops WHERE stop_lon BETWEEN 5.697437199999991 AND 5.71743719999999 AND stop_lat BETWEEN 50.833179372222205 AND 50.8531793722222 at: 2024-05-28 18:55:49
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578160 AND s2.stop_id = 2485741 at: 2024-05-28 18:55:49
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578160 AND s2.stop_id = 2578395 at: 2024-05-28 18:56:19
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578160 AND s2.stop_id = 2578380 at: 2024-05-28 18:56:49
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578160 AND s2.stop_id = 2578396 at: 2024-05-28 18:57:19
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578160 AND s2.stop_id = 2398294 at: 2024-05-28 18:57:48
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578160 AND s2.stop_id = 2578420 at: 2024-05-28 18:58:17
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578160 AND s2.stop_id = 2578381 at: 2024-05-28 18:58:45
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578160 AND s2.stop_id = 2578404 at: 2024-05-28 18:59:17
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578160 AND s2.stop_id = 2578397 at: 2024-05-28 18:59:48
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578160 AND s2.stop_id = 2398307 at: 2024-05-28 19:00:27
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578160 AND s2.stop_id = 2578403 at: 2024-05-28 19:00:58
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578159 AND s2.stop_id = 2485741 at: 2024-05-28 19:01:29
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578159 AND s2.stop_id = 2578395 at: 2024-05-28 19:01:57
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578159 AND s2.stop_id = 2578380 at: 2024-05-28 19:02:27
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578159 AND s2.stop_id = 2578396 at: 2024-05-28 19:02:57
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578159 AND s2.stop_id = 2398294 at: 2024-05-28 19:03:30
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578159 AND s2.stop_id = 2578420 at: 2024-05-28 19:04:02
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578159 AND s2.stop_id = 2578381 at: 2024-05-28 19:04:35
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578159 AND s2.stop_id = 2578404 at: 2024-05-28 19:05:10
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578159 AND s2.stop_id = 2578397 at: 2024-05-28 19:05:45
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578159 AND s2.stop_id = 2398307 at: 2024-05-28 19:06:17
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578159 AND s2.stop_id = 2578403 at: 2024-05-28 19:06:48
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578130 AND s2.stop_id = 2485741 at: 2024-05-28 19:07:18
+Query: SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time FROM stop_times s1 JOIN stop_times s2 ON s1.trip_id = s2.trip_id WHERE s1.stop_id = 2578130 AND s2.stop_id = 2578395 at: 2024-05-28 19:07:48

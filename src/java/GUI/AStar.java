@@ -153,9 +153,9 @@ public class AStar {
         Graph graph = new Graph();
         GraphBuilder graphBuilder = new GraphBuilder(graph);
         graphBuilder.getBusStops();
-
-        Place startPlace = new Place(50.8466191301886,  5.70587752641509);
-        Place endPlace = new Place(50.8531907678571, 5.68879784285714);
+        Place startPlace  = new Place(50.85876742605601, 5.8004662006626315);
+        // destination = new Place(zipCode2); 
+        Place endPlace = new Place(50.85481171991298, 5.670372290926584);
 
         /*AStar aStar = new AStar(graph);
         aStar.connectPlaceToGraph(startPlace);
