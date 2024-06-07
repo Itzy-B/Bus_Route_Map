@@ -15,7 +15,9 @@ import java.util.ArrayList;
 
 import org.json.JSONObject;
 
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import src.java.Singletons.ExceptionManager;
 import src.java.Singletons.FileManager;
 
@@ -38,18 +40,24 @@ public class RetrievePostalWithAPI {
         }
         
         else {
-            ExceptionManager.showError("API request limit", "Warning", "Too many API requests, system will send API request once allowed", AlertType.WARNING);
-            //Very cheap fix, fix later
-            try {
-                Thread.sleep(6000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            ExceptionManager.showInstantError("API request limit", "Warning", "Too many API requests, system will send ten requests in five second intervals", AlertType.WARNING);
+            for (int x = 0; x < 10; x++) {
+
+                if (userAllowedToInteract(userObject)) {
+                    userObject.addInteraction(getCurrentTime());
+                    fileManager.serializeObject(userObject, USER_OBJECT_PATH);
+                    latLong = sentPostRequest(pCode);
+                    return latLong;
+                }
+
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                }
             }
-            userObject.addInteraction(getCurrentTime());
-            fileManager.serializeObject(userObject, USER_OBJECT_PATH);
-            latLong = sentPostRequest(pCode);
-            
-            System.out.println("Too many requests, try again later");
+
+            //Implement system that displays how time until next requests is allowed
+            ExceptionManager.showError("API requests failed", "Time-out", "Try again later", AlertType.ERROR);
         }
         
         return latLong;
