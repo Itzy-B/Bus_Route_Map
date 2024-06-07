@@ -64,6 +64,8 @@ public class MapLauncher extends Application{
 
     private Place departure;
     private Place destination;
+    private static Place departure;
+    private static Place destination;
 
     private List<Place> path;
     /**

@@ -15,30 +15,30 @@ import java.util.ArrayList;
 
 import org.json.JSONObject;
 
+import javafx.scene.control.Alert.AlertType;
+import src.java.Singletons.ExceptionManager;
 import src.java.Singletons.FileManager;
 
 public class RetrievePostalWithAPI {
-
-    public RetrievePostalWithAPI() {
-
-    }
+    private static final  String USER_OBJECT_PATH = "userObject.ser";
     static FileManager fileManager = FileManager.getInstance();
 
     public ArrayList<Double> getPCode(String pCode) throws IOException{
-        ArrayList<Double> LatLong = null;
-        UserObject userObject = retrieveUserObject("userObject.ser");
-        if (userObject.getIP().equals(getIP()) == false) {
+        ArrayList<Double> latLong = null;
+        UserObject userObject = retrieveUserObject(USER_OBJECT_PATH);
+        if (!userObject.getIP().equals(getIP())) {
             System.out.println("New UserObject created");
             userObject = new UserObject(getIP());
         }
         
         if (userAllowedToInteract(userObject)) {
             userObject.addInteraction(getCurrentTime());
-            fileManager.serializeObject(userObject, "userObject.ser");
-            LatLong = sentPostRequest(pCode);
+            fileManager.serializeObject(userObject, USER_OBJECT_PATH);
+            latLong = sentPostRequest(pCode);
         }
         
         else {
+            ExceptionManager.showError("API request limit", "Warning", "Too many API requests, system will send API request once allowed", AlertType.WARNING);
             //Very cheap fix, fix later
             try {
                 Thread.sleep(6000);
@@ -46,19 +46,18 @@ public class RetrievePostalWithAPI {
                 e.printStackTrace();
             }
             userObject.addInteraction(getCurrentTime());
-            fileManager.serializeObject(userObject, "userObject.ser");
-            LatLong = sentPostRequest(pCode);
+            fileManager.serializeObject(userObject, USER_OBJECT_PATH);
+            latLong = sentPostRequest(pCode);
             
             System.out.println("Too many requests, try again later");
         }
         
-        return LatLong;
+        return latLong;
     }
 
     public ArrayList<Double> sentPostRequest(String pCode) {
         ArrayList<Double> LatLong = new ArrayList<Double>();
         try {
-        @SuppressWarnings("deprecation")
         
         String requestBody = "{\"postcode\": \"" + pCode + "\"}";
 
@@ -72,6 +71,9 @@ public class RetrievePostalWithAPI {
         HttpResponse<String> response = HttpClient.newHttpClient()
         .send(request, HttpResponse.BodyHandlers.ofString());
 
+        if (response.statusCode() == 500) {
+            ExceptionManager.showError("API error", "Error", "Http error 500, failed to fetch coordinates of postal code " + pCode, AlertType.ERROR);
+        }
         System.out.println(response.statusCode());
         System.out.println(response.body());
 
@@ -96,13 +98,9 @@ public class RetrievePostalWithAPI {
         //1 Day 100 requests per IP
         ArrayList<String> callsList = userObject.getCallsList();
 
-        if (callsList.size() == 0) {
-            return true;
-        }
+        if (callsList.isEmpty()) return true;
 
-        if (determineIfAllowanceExceeded(callsList)) {
-            return true;
-        }
+        if (determineIfAllowanceExceeded(callsList)) return true;
 
         return false;
     }
@@ -174,7 +172,7 @@ public class RetrievePostalWithAPI {
         File file = new File(objectFileName);
         if (file.exists()) {
             try {
-                userObject = (UserObject) fileManager.getObject("userObject.ser");
+                userObject = (UserObject) fileManager.getObject(USER_OBJECT_PATH);
             }
             
             catch (ClassNotFoundException e){
