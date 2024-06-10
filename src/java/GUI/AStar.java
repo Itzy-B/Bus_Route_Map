@@ -17,6 +17,10 @@ public class AStar {
         directions = new ArrayList<>();
     }
 
+    public List<String> getDirections() {
+        return this.directions;
+    }
+
     public List<Place> findShortestPath(Place startPlace, Place endPlace) {
         connectPlaceToGraph(startPlace, 10);
         connectPlaceToGraph(endPlace, 5);

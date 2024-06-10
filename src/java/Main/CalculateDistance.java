@@ -1,21 +1,6 @@
 package src.java.Main;
 
-import com.microsoft.schemas.office.visio.x2012.main.CellType;
-
-import src.java.API.RetrievePostalWithAPI;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import src.java.GUI.Data;
-import src.java.GUI.Place;
-
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -23,49 +8,51 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.concurrent.TimeUnit;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import src.java.GUI.Data;
+import src.java.GUI.Place;
 
 public class CalculateDistance {
     private static final int EARTH_RADIUS = 6371000; // meters
 
     /**
      * Calculates the distance between two zip codes using the Haversine formula.
-     * If the zip codes are not present in the data, an API call is made to retrieve the coordinates.
+     * If the zip codes are not present in the data, an API call is made to retrieve
+     * the coordinates.
+     * 
      * @param p1 the first zip code
      * @param p2 the second zip code
-     * @return the distance between the two zip codes in kilometers or meters, depending on the distance
+     * @return the distance between the two zip codes in kilometers or meters,
+     *         depending on the distance
      */
     public static double getDistance(String p1, String p2, boolean grassHopperEnabled) throws IOException {
-        //Initialize data
+        // Initialize data
         Data data = new Data();
         data.getData();
 
         double distance = 0;
-        //Get LatLong Arrays from data class
+        // Get LatLong Arrays from data class
         ArrayList<Double> latLong1 = data.getLatLong(p1);
         ArrayList<Double> latLong2 = data.getLatLong(p2);
         if (!(grassHopperEnabled)) {
-            //Calculate distance between
+            // Calculate distance between
             distance = distanceBetween(latLong1.get(0), latLong1.get(1), latLong2.get(0), latLong2.get(1));
             // Format to two decimal places
 
             DecimalFormat df = new DecimalFormat("#.#"); // Adjusted to remove comma formatting
             String formattedDistance = df.format(distance);
-            formattedDistance = formattedDistance.replace(',','.');
+            formattedDistance = formattedDistance.replace(',', '.');
             distance = Double.parseDouble(formattedDistance);
         }
 
         else {
             distance = getDistanceWithGraphHopper(latLong1, latLong2);
         }
-        
-
 
         return distance;
-
 
     }
 
@@ -102,8 +89,11 @@ public class CalculateDistance {
      *
      * @param p1 the first point
      * @param p2 the second point
-     * @return the midpoint between the two points as an ArrayList of two Doubles, where the first element is the latitude and the second element is the longitude
-     * @throws IOException if there is an error retrieving the coordinates from the data file or making an API call
+     * @return the midpoint between the two points as an ArrayList of two Doubles,
+     *         where the first element is the latitude and the second element is the
+     *         longitude
+     * @throws IOException if there is an error retrieving the coordinates from the
+     *                     data file or making an API call
      */
     public static ArrayList<Double> findMidpoint(Place p1, Place p2) throws IOException {
         ArrayList<Double> midpoint = new ArrayList<>();
@@ -134,13 +124,12 @@ public class CalculateDistance {
         return midpoint;
     }
 
-
     public static String printDistance(String p1, String p2, Boolean graphHopperEnabled) throws IOException {
         double distance = getDistance(p1, p2, graphHopperEnabled);
         if (distance >= 1) {
-             return distance + " Kilometers";
+            return distance + " Kilometers";
         } else {
-             return distance * 1000 + " Meters";
+            return distance * 1000 + " Meters";
         }
     }
 
@@ -161,20 +150,21 @@ public class CalculateDistance {
             try {
                 // cmd for windows
                 String someCommand = "java -Xms1g -Xmx1g -server -Ddw.graphhopper.datareader.file=src/java/graphhopper/Maastricht.osm.pbf -cp src/java/graphhopper/graphhopper.jar com.graphhopper.application.GraphHopperApplication server src\\java\\graphhopper\\config.yml";
-                ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", "start cmd.exe /k cmd /c " + someCommand);
+                ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c",
+                        "start cmd.exe /k cmd /c " + someCommand);
                 process = processBuilder.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } 
-        else {
+        } else {
             try {
-                //MacOS
+                // MacOS
                 // Get the current directory path
                 String currentDirectory = System.getProperty("user.dir");
 
                 // Construct the command to change directory and then execute your Java command
-                String command = "cd " + currentDirectory + " && java -Xms1g -Xmx1g -server -Ddw.graphhopper.datareader.file=src/java/graphhopper/Maastricht.osm.pbf -cp src/java/graphhopper/graphhopper.jar com.graphhopper.application.GraphHopperApplication server src/java/graphhopper/config.yml";
+                String command = "cd " + currentDirectory
+                        + " && java -Xms1g -Xmx1g -server -Ddw.graphhopper.datareader.file=src/java/graphhopper/Maastricht.osm.pbf -cp src/java/graphhopper/graphhopper.jar com.graphhopper.application.GraphHopperApplication server src/java/graphhopper/config.yml";
 
                 // Use ProcessBuilder to execute the command
                 ProcessBuilder processBuilder = new ProcessBuilder("osascript", "-e",
@@ -182,17 +172,16 @@ public class CalculateDistance {
                 processBuilder.inheritIO(); // This makes the terminal inherit the IO of the parent process
                 process = processBuilder.start();
 
-
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         return process;
     }
- 
-    public static double getDistanceWithGraphHopper(ArrayList<Double> latLong1, ArrayList<Double> latLong2) throws MalformedURLException, IOException {
- 
+
+    public static double getDistanceWithGraphHopper(ArrayList<Double> latLong1, ArrayList<Double> latLong2)
+            throws MalformedURLException, IOException {
+
         double distance = 0;
         // String lat1 = "50.86635198292194";
         // String long1 = "5.704404406327205";
@@ -200,7 +189,8 @@ public class CalculateDistance {
         // String long2 = "5.6609128633869";
 
         @SuppressWarnings("deprecation")
-        URL obj = new URL("http://localhost:8989/route?point=" + latLong1.get(0) + "%2C" + latLong1.get(1) +"&point=" + latLong2.get(0) + "%2C" + latLong2.get(1) + "&profile=car");
+        URL obj = new URL("http://localhost:8989/route?point=" + latLong1.get(0) + "%2C" + latLong1.get(1) + "&point="
+                + latLong2.get(0) + "%2C" + latLong2.get(1) + "&profile=car");
         System.out.println(obj);
         URLConnection yc = obj.openConnection();
         BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
@@ -210,7 +200,7 @@ public class CalculateDistance {
         while ((inputLine = in.readLine()) != null) {
             stringBuilder.append(inputLine);
         }
-        
+
         in.close();
         String jsonString = stringBuilder.toString();
 
@@ -231,6 +221,6 @@ public class CalculateDistance {
         DecimalFormat df = new DecimalFormat("#.#");
         distance = Double.parseDouble(df.format(distance));
         return distance;
-}
+    }
 
 }
