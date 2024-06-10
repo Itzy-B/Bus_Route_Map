@@ -87,5 +87,44 @@ public class Data {
         return null;
     }
 
+    public static String findClosestZipCode(double latitude, double longitude) {
+        double minDistance = Double.MAX_VALUE;
+        String closestZipCode = null;
+        for (int i = 0; i < latitudes.size(); i++) {
+            double lat = latitudes.get(i);
+            double lon = longitudes.get(i);
+            double distance = haversine(latitude, longitude, lat, lon);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestZipCode = zipCodes.get(i);
+            }
+        }
+        return closestZipCode;
+    }
+
+    /**
+     * Calculates the Haversine distance between two points on the Earth specified by latitude and longitude.
+     */
+    public static double haversine(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6371; // Radius of the Earth in kilometers
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // Distance in kilometers
+    }
+
+    public static void main(String[] args) {
+        // Load the data
+        getData();
+        // Test the findClosestZipCode method
+        double testLatitude = 42.3601;
+        double testLongitude = -71.0589;
+        String closestZipCode = findClosestZipCode(testLatitude, testLongitude);
+        System.out.println("Closest Zip Code: " + closestZipCode);
+    }
+
 
 }
