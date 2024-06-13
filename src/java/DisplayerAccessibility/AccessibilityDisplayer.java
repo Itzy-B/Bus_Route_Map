@@ -7,6 +7,9 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -21,7 +24,7 @@ import javax.swing.JPanel;
 
 import src.java.GUI.Data;
 
-public class AccessibilityDisplayer extends JFrame implements ActionListener{
+public class AccessibilityDisplayer extends JFrame implements ActionListener {
     private static final double MAP_WIDTH = 600; // Width of your map image
     private static final double MAP_HEIGHT = 600;
     private double centerLatitude = 50.851368;
@@ -31,10 +34,11 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
     private static JButton zoomInButton = new JButton("+");
     private static JButton zoomOutButton = new JButton("-");
     private static final String API_KEY = "AIzaSyDnJH0pu5NzqH0b6GjiPyTDfdkBDugYw6w";
-    static double offset = 268435456; 
+    static double offset = 268435456;
     static double radius = offset / Math.PI;
     private JFrame frame;
     private static String URL;
+    private int prevX, prevY;
 
     public AccessibilityDisplayer(boolean start) {
         frame = new JFrame();
@@ -54,9 +58,43 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
 
         frame.add(button);
         frame.setVisible(true);
+
     }
 
     public AccessibilityDisplayer() {
+    }
+
+    public void addMouseListenersPanning(JLabel label) {
+        label.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                prevX = e.getX();
+                prevY = e.getY();
+            }
+        });
+
+        label.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                double mouseSensitivity= 10.0;
+                int deltaX = e.getX() - prevX;
+                int deltaY = e.getY() - prevY;
+                prevX = e.getX();
+                prevY = e.getY();
+
+                double lonChange = (double) deltaX / MAP_WIDTH * 360 / Math.pow(2, zoomLevel) * mouseSensitivity;
+                double latChange = (double) deltaY / MAP_HEIGHT * 360 / Math.pow(2, zoomLevel) * mouseSensitivity;
+                centerLongitude -= lonChange;
+                centerLatitude += latChange;
+
+                requestNewImageIcon();
+                try {
+                    getCircle();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
     }
 
     public void getCircle() throws IOException {
@@ -72,7 +110,6 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         URL url = new URL(URL);
         java.awt.Image image = ImageIO.read(url);
         BufferedImage bufferedImage = (BufferedImage) image;
-        // BufferedImage bufferedImage =  ImageIO.read(new File("./staticmap.png"));
         bufferedImage.flush();
         Graphics2D g = (Graphics2D) bufferedImage.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -82,45 +119,44 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         g.setStroke(originalStroke);
         ImageIcon imageIcon = new ImageIcon(bufferedImage);
         JLabel label = new JLabel(imageIcon);
-    
+
         for (int index = 0; index < zipCodes.size(); index++) {
-            if (index > 2770 && index < 2783) {
-                System.out.println("");
-            }
             double zipLat = lats.get(index);
             double zipLon = longs.get(index);
-            int[] Xy = adjust(zipLon, zipLat, centerLongitude,centerLatitude,zoomLevel);
-            g.fillOval((int)(Xy[0] + MAP_WIDTH/2 -5), (int) (Xy[1] + MAP_HEIGHT/2 -5), 10, 10);
+            int[] Xy = adjust(zipLon, zipLat, centerLongitude, centerLatitude, zoomLevel);
+            g.fillOval((int) (Xy[0] + MAP_WIDTH / 2 - 5), (int) (Xy[1] + MAP_HEIGHT / 2 - 5), 10, 10);
         }
-        
+
         imageIcon = new ImageIcon(bufferedImage);
         label.setIcon(imageIcon);
+        addMouseListenersPanning(label);
         panel.add(label);
         frame.setVisible(true);
     }
 
     // X,Y ... location in degrees
-    // xcenter,ycenter ... center of the map in degrees (same value as in 
+    // xcenter,ycenter ... center of the map in degrees (same value as in
     // the google static maps URL)
     // zoomlevel (same value as in the google static maps URL)
-    // xr, yr and the returned Point ... position of X,Y in pixels relative 
+    // xr, yr and the returned Point ... position of X,Y in pixels relative
     // to the center of the bitmap
 
-    //https://stackoverflow.com/questions/23898964/getting-pixel-coordinated-from-google-static-maps
+    // https://stackoverflow.com/questions/23898964/getting-pixel-coordinated-from-google-static-maps
     public int[] adjust(double X, double Y, double xcenter, double ycenter, int zoomlevel) {
         int xr = (lToX(X) - lToX(xcenter)) >> (21 - zoomlevel);
         int yr = (lToY(Y) - lToY(ycenter)) >> (21 - zoomlevel);
-        return new int[]{xr, yr};
+        return new int[] { xr, yr };
     }
 
     public static int lToX(double x) {
-        return (int)(Math.round(offset + radius * x * Math.PI / 180));
+        return (int) (Math.round(offset + radius * x * Math.PI / 180));
     }
 
     public static int lToY(double y) {
-        return (int)(Math.round(offset - radius * Math.log((1 + Math.sin(y * Math.PI / 180)) / (1 - Math.sin(y * Math.PI / 180))) / 2));
+        return (int) (Math.round(
+                offset - radius * Math.log((1 + Math.sin(y * Math.PI / 180)) / (1 - Math.sin(y * Math.PI / 180))) / 2));
     }
-    
+
     public static void main(String[] args) {
         AccessibilityDisplayer displayer = new AccessibilityDisplayer();
         displayer.runAccessibilityDisplayer();
@@ -141,7 +177,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         zoomInButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
-                zoomLevel++; 
+                zoomLevel++;
                 displayer.requestNewImageIcon();
                 try {
                     displayer.getCircle();
@@ -149,8 +185,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                     e1.printStackTrace();
                 }
             }
-
-            });
+        });
 
         button.addActionListener(new ActionListener() {
             @Override
@@ -161,9 +196,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                     e1.printStackTrace();
                 }
             }
-
-            });
-
+        });
 
         zoomOutButton.addActionListener(new ActionListener() {
             @Override
@@ -176,10 +209,9 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                     e1.printStackTrace();
                 }
             }
-
-            });
+        });
     }
-    
+
     public void runAccessibilityDisplayer() {
         Data.getData();
         AccessibilityDisplayer displayer = new AccessibilityDisplayer(true);
@@ -190,9 +222,9 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        }
+    }
 
-        @Override
-        public void actionPerformed(java.awt.event.ActionEvent e) {
+    @Override
+    public void actionPerformed(java.awt.event.ActionEvent e) {
     }
 }
