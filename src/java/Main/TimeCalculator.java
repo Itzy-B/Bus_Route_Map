@@ -2,6 +2,8 @@ package src.java.Main;
 
 import java.io.IOException;
 
+import src.java.Transport.TransportMode;
+
 public class TimeCalculator {
     
     private static int MinutesInHours = 60;

@@ -10,6 +10,7 @@ import java.util.Objects;
  * Represents a geographic place identified by a zip code, latitude, and longitude.
  */
 public class Place {
+    protected String name;
     protected String zipCode;
     protected double lat;
     protected double lon;
@@ -36,6 +37,13 @@ public class Place {
         this.lon = longitude;
     }
 
+    public Place(String name, String zipCode, double latitude, double longitude){
+        this.name = name;
+        this.zipCode = zipCode;
+        this.lat = latitude;
+        this.lon = longitude;
+    }
+
     public double distanceTo(double lat, double lon) {
         return CalculateDistance.distanceBetween(this.lat, this.lon, lat, lon);
     }
@@ -52,7 +60,12 @@ public class Place {
 
     @Override
     public String toString() {
-        return  "place at (" + getLatitude() + ", " + getLongitude() + ")";
+        return "Place{" +
+                "name='" + name + '\'' +
+                ", postcode='" + zipCode + '\'' +
+                ", latitude=" + lat +
+                ", longitude=" + lon +
+                '}';
     }
 
     @Override

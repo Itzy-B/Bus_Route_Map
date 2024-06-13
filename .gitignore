@@ -7,3 +7,6 @@ userObject.ser
 logs/graphhopper.log
 .DS_Store
 .idea/
+src/java/Database/credentials.txt
+src/java/Database/credentialsLocal.txt
+src/java/Database/credentialsOld.txt

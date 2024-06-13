@@ -1,27 +1,31 @@
 package src.java.GUI;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import src.java.Database.DatabaseController;
-import src.java.Main.*;
+import src.java.Main.BusRouteFinder;
+import src.java.Main.CalculateDistance;
 import src.java.Singletons.ExceptionManager;
-
-import java.io.IOException;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * This class represents the graphical user interface (GUI) for launching a map application.
  */
@@ -97,7 +101,9 @@ public class MapLauncher extends Application{
         mapView.setPreserveRatio(true);
 
         // Create zoom buttons
+        Button showAccessibilityZipCodes = new Button("Show accessibility of postal codes");
         Button zoomInButton = new Button("+");
+        showAccessibilityZipCodes.setOnAction(event -> showAccessibilityZipCodes());
         zoomInButton.setOnAction(event -> zoomIn());
         zoomInButton.setPrefSize(50, 50);
         Button zoomOutButton = new Button("-");
@@ -200,6 +206,10 @@ public class MapLauncher extends Application{
         checkBoxs.setAlignment(Pos.TOP_LEFT);
         checkBoxs.setPadding(new Insets(10));
 
+        HBox guiOptions = new HBox(10, showAccessibilityZipCodes);
+        checkBoxs.setAlignment(Pos.TOP_LEFT);
+        checkBoxs.setPadding(new Insets(10));
+
         // Create a VBox for labels
         VBox labelsVBox = new VBox(10, acDistanceLabel, distanceLabel, walkTimeLabel, bikeTimeLabel, carTimeLabel);
         labelsVBox.setAlignment(Pos.TOP_LEFT);
@@ -212,7 +222,7 @@ public class MapLauncher extends Application{
         listView.setPrefWidth(600);
 
         // Create a VBox for the right side content
-        VBox rightContentVBox = new VBox(10, textFieldAndSearch, zoomButtons, checkBoxs, labelsVBox, listView);
+        VBox rightContentVBox = new VBox(10, textFieldAndSearch, zoomButtons, checkBoxs, guiOptions, labelsVBox, listView);
         rightContentVBox.setAlignment(Pos.TOP_LEFT);
         rightContentVBox.setPadding(new Insets(10));
         rightContentVBox.setPrefWidth(600);
@@ -250,6 +260,11 @@ public class MapLauncher extends Application{
             scale /= 2;
             Platform.runLater(this::updateMap);
         }
+    }
+
+    private void showAccessibilityZipCodes() {
+        src.java.DisplayerAccessibility.AccessibilityDisplayer displayer = new src.java.DisplayerAccessibility.AccessibilityDisplayer();
+        displayer.runAccessibilityDisplayer();
     }
 
     // Method for searching places and updating information
