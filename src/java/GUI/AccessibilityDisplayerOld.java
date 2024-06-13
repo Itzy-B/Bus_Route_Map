@@ -135,7 +135,7 @@ public class AccessibilityDisplayerOld extends JFrame implements ActionListener{
     }
 
     public static void main(String[] args) {
-        AccessibilityDisplayer displayer = new AccessibilityDisplayer();
+        AccessibilityDisplayerOld displayer = new AccessibilityDisplayerOld();
         List<ImageIcon> images = displayer.generateMapImages();
         button.addActionListener(new ActionListener() {
 
