@@ -7,17 +7,11 @@ import java.util.Objects;
 public class BusStop extends Place {
     private int stopId;
     private String name;
-    private List<Trip> trips;
 
     public BusStop(int stopId, String name, double lat, double lon) {
         super(lat, lon);
         this.stopId = stopId;
         this.name = name;
-        this.trips = new ArrayList<>();
-    }
-
-    public void addTrip(int tripId, String tripHeadsign, int stopSequence, double shapeDistTraveled) {
-        this.trips.add(new Trip(tripId, tripHeadsign, stopSequence, shapeDistTraveled));
     }
 
     public int getStopId() {
@@ -28,13 +22,10 @@ public class BusStop extends Place {
         return name;
     }
 
-    public List<Trip> getTrips() {
-        return trips;
-    }
 
     @Override
     public String toString() {
-        return name;
+        return "id: " + stopId + ", name: " + name + " in (" + lat + ", " + lon + ")";
     }
 
     @Override

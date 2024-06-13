@@ -1,31 +1,50 @@
 package src.java.GUI;
 
-public class Trip {
+import java.time.LocalTime;
+
+public class Trip implements Comparable<Trip> {
     private int tripId;
-    private String tripHeadsign;
-    private int stopSequence;
-    private double shapeDistTraveled;
+    private String tripHeadSign;
+    private int shapeDistTraveled;
 
-    public Trip(int tripId, String tripHeadsign, int stopSequence, double shapeDistTraveled) {
+    private LocalTime arriveTime;
+    private LocalTime departureTime;
+
+    private int shapeId;
+
+    public Trip(int tripId,  LocalTime arriveTime, LocalTime departureTime, String tripHeadSign, int shapeDistTraveled, int shapeId) {
         this.tripId = tripId;
-        this.tripHeadsign = tripHeadsign;
-        this.stopSequence = stopSequence;
+        this.tripHeadSign = tripHeadSign;
         this.shapeDistTraveled = shapeDistTraveled;
+        this.arriveTime = arriveTime;
+        this.departureTime = departureTime;
+        this.shapeId = shapeId;
     }
 
-    public int getTripId() {
-        return tripId;
+    public int getShapeDistTraveled() {return shapeDistTraveled;}
+
+    public LocalTime getArriveTime() {return arriveTime;}
+
+    public LocalTime getDepartureTime() {return departureTime;}
+
+    public int getShapeId() {return shapeId;}
+
+    public String getTripHeadSign() {return tripHeadSign;}
+
+    @Override
+    public int compareTo(Trip that) {
+        return this.arriveTime.compareTo(that.arriveTime);
     }
 
-    public String getTripHeadsign() {
-        return tripHeadsign;
-    }
-
-    public int getStopSequence() {
-        return stopSequence;
-    }
-
-    public double getShapeDistTraveled() {
-        return shapeDistTraveled;
+    @Override
+    public String toString() {
+        return "Trip{" +
+                "tripId=" + tripId +
+                ", tripHeadSign='" + tripHeadSign + '\'' +
+                ", shapeDistTraveled=" + shapeDistTraveled +
+                ", arriveTime=" + arriveTime +
+                ", departureTime=" + departureTime +
+                ", shapeId=" + shapeId +
+                '}';
     }
 }
