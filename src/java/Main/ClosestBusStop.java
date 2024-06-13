@@ -28,20 +28,22 @@ public class ClosestBusStop {
     }
 
     public ArrayList<BusStop> findClosestBusStop(ArrayList<Double> latLong, DatabaseController databaseController) throws Exception {
-        Double lat = latLong.get(0);
-        Double lon = latLong.get(1);
-        double broaderRange = 0.01; //Search range for initial query;
+        Double lat = latLong.get(1);
+        Double lon = latLong.get(0);
+        // double broaderRange = 0.01//Search range for initial query;
+        double broaderRange = 0.01;
 
-        ArrayList<String> list = databaseController.executeFetchQuery(
-                "SELECT stop_id, stop_lon, stop_lat FROM stops WHERE stop_lon BETWEEN " + (lat - broaderRange) + " AND " + (lat + broaderRange) +
-                        " AND stop_lat BETWEEN " + (lon - broaderRange) + " AND " + (lon + broaderRange)
-        );
+        String query = (
+            "SELECT stop_id, stop_lon, stop_lat FROM stops WHERE stop_lon BETWEEN " + (lon - broaderRange) + " AND " + (lon + broaderRange) +
+                    " AND stop_lat BETWEEN " + (lat - broaderRange) + " AND " + (lat + broaderRange)
+    )   ; 
+        ArrayList<String> list = databaseController.executeFetchQuery(query);
 
         ArrayList<BusStop> busStops = new ArrayList<>();
         for (String row : list) {
             String[] parts = row.split(";");
             String stopId = parts[0];
-            if (stopId.contains("stoparea")) continue;
+            // if (stopId.contains("stoparea")) continue;
             double stopLon = Double.parseDouble(parts[1].split(":")[1]);
             double stopLat = Double.parseDouble(parts[2].split(":")[1]);
             double distance = calculateDistance(lat, lon, stopLat, stopLon);

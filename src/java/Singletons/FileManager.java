@@ -51,10 +51,6 @@ public class FileManager {
         }
     }
 
-    public void writeToDisk(Object object, String path) {
-
-    }
-
     public ObjectOutputStream serializeObject(Object object, String path) {
         ObjectOutputStream out = null;
 

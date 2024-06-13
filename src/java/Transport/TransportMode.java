@@ -1,7 +1,7 @@
-package src.java.Main;
+package src.java.Transport;
 
 // Abstract class for transportation modes
-abstract class TransportMode {
+public abstract class TransportMode {
     protected double velocity;
     // In kilometers per hour
 

@@ -231,9 +231,9 @@ public class BusRouteFinder {
         int depSize = busStopDep.size();
         int desSize = busStopDes.size();
         //Gets all overlapping trips between the bus stop lists
-        for (int x = 0; x < 11; x++) {
+        for (int x = 0; x < depSize; x++) {
             stopIdDep = Integer.parseInt(busStopDep.get(x).getStopId().split(":")[1].split(" ")[1]);
-            for (int y = 0; y < 11; y++) {
+            for (int y = 0; y < desSize; y++) {
                 stopIdDes = Integer.parseInt(busStopDes.get(y).getStopId().split(":")[1].split(" ")[1]);
                 String query = ( 
                     "SELECT DISTINCT s1.trip_id, s1.stop_id, s1.arrival_time, s1.departure_time " +

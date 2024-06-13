@@ -1,4 +1,4 @@
-package src.java.Main;
+package src.java.Transport;
 
 // Concrete class for car
 public class Car extends TransportMode {

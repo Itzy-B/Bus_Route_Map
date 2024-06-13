@@ -62,8 +62,10 @@ public class MapLauncher extends Application{
     private Label carTimeLabel;
     private ListView<String> listView;
 
-    private Place departure;
-    private Place destination;
+    //private Place departure;
+    //private Place destination;
+    private static Place departure;
+    private static Place destination;
 
     private List<Place> path;
     /**
@@ -277,6 +279,7 @@ public class MapLauncher extends Application{
 
         } else {
             System.out.println("Please enter both zip codes.");
+            ExceptionManager.showError("Missing A Postcode!", "Fill All Necessary Textfields", "You are missing a postcode, please enter both the postcodes.", AlertType.ERROR);
         }
     }
 
