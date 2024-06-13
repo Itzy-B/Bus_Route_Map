@@ -57,6 +57,8 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
     public void getCircle() throws IOException {
         Data.getData();
         ArrayList<String> zipCodes = Data.getZipCodes();
+        ArrayList<Double> lats = Data.getLatitudes();
+        ArrayList<Double> longs = Data.getLongitudes();
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         frame.getContentPane().removeAll();
         frame.add(button);
@@ -88,8 +90,9 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                 g.setColor(new Color(255, 0, 0, 64));
                 g.setStroke(originalStroke);
             }
-            Place coordinatesZipCode = new Place(zipCodes.get(index));
-            int[] Xy = adjust(coordinatesZipCode.getLongitude(), coordinatesZipCode.getLatitude(), centerLongitude,centerLatitude,zoomLevel);
+            double zipLat = lats.get(index);
+            double zipLon = longs.get(index);
+            int[] Xy = adjust(zipLon, zipLat, centerLongitude,centerLatitude,zoomLevel);
             // int[] Xy = adjust(50.83702537886311, 5.69366003053462,CENTER_LATITUDE, CENTER_LONGITUDE,zoomLevel);
             g.fillOval((int)(Xy[0] + MAP_WIDTH/2 -5), (int) (Xy[1] + MAP_HEIGHT/2 -5), 10, 10);
         }
