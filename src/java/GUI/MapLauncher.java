@@ -263,7 +263,7 @@ public class MapLauncher extends Application{
     }
 
     private void showAccessibilityZipCodes() {
-        AccessibilityDisplayer displayer = new AccessibilityDisplayer();
+        src.java.DisplayerAccessibility.AccessibilityDisplayer displayer = new src.java.DisplayerAccessibility.AccessibilityDisplayer();
         displayer.runAccessibilityDisplayer();
     }
 

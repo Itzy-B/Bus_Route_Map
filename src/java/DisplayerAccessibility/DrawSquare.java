@@ -1,4 +1,4 @@
-package src.java.Draw;
+package src.java.DisplayerAccessibility;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package src.java.GUI;
+package src.java.DisplayerAccessibility;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -11,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -20,13 +19,14 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import javafx.scene.image.Image;
+import src.java.GUI.Data;
+import src.java.GUI.Place;
 
 public class AccessibilityDisplayer extends JFrame implements ActionListener{
     private static final double MAP_WIDTH = 600; // Width of your map image
     private static final double MAP_HEIGHT = 600;
-    private double CENTER_LATITUDE = 50.851368;
-    private double CENTER_LONGITUDE = 5.690973;
+    private double centerLatitude = 50.851368;
+    private double centerLongitude = 5.690973;
     private static int zoomLevel = 13;
     private static JButton button;
     private JPanel panel;
@@ -89,7 +89,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                 g.setStroke(originalStroke);
             }
             Place coordinatesZipCode = new Place(zipCodes.get(index));
-            int[] Xy = adjust(coordinatesZipCode.getLongitude(), coordinatesZipCode.getLatitude(), CENTER_LONGITUDE,CENTER_LATITUDE,zoomLevel);
+            int[] Xy = adjust(coordinatesZipCode.getLongitude(), coordinatesZipCode.getLatitude(), centerLongitude,centerLatitude,zoomLevel);
             // int[] Xy = adjust(50.83702537886311, 5.69366003053462,CENTER_LATITUDE, CENTER_LONGITUDE,zoomLevel);
             g.fillOval((int)(Xy[0] + MAP_WIDTH/2 -5), (int) (Xy[1] + MAP_HEIGHT/2 -5), 10, 10);
         }
@@ -131,8 +131,6 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         displayer.runAccessibilityDisplayer();
     }
     
-
-
     public void runAccessibilityDisplayer() {
         AccessibilityDisplayer displayer = new AccessibilityDisplayer(true);
         try {

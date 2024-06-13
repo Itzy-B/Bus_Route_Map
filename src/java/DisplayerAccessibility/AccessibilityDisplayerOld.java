@@ -1,4 +1,4 @@
-package src.java.GUI;
+package src.java.DisplayerAccessibility;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
@@ -12,8 +12,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-import src.java.Draw.DrawZipcodes;
 
 public class AccessibilityDisplayerOld extends JFrame implements ActionListener {
     private double CENTER_LATITUDE = 50.866825678462234;
