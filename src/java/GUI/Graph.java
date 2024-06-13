@@ -9,8 +9,23 @@ public class Graph {
         adjList.putIfAbsent(vertex, new HashSet<>());
     }
 
-    public void addEdge(Place from, Place to, double weight, String tripHeadsign) {
-        adjList.get(from).add(new Edge(from, to, weight, tripHeadsign));
+    public void addEdge(Place from, Place to, Trip trip, String tripHeadsign) {
+        Edge newEdge = new Edge(from, to, tripHeadsign);
+
+        for (Edge e : adjList.get(from)) {
+            if (e.equals(newEdge)) {
+                e.addTrip(trip);
+                return;
+            }
+        }
+
+        newEdge.addTrip(trip);
+        adjList.get(from).add(newEdge);
+    }
+
+    public void addEdge(Edge edge) {
+        Place from = edge.getFrom();
+        adjList.get(from).add(edge);
     }
 
     public void removeVertex(Place vertex) {
@@ -25,7 +40,7 @@ public class Graph {
         return adjList.keySet();
     }
 
-    // Method to find the 5 nearest bus stops to given coordinates
+    // Method to find the N nearest bus stops to given coordinates
     public List<BusStop> findNearestBusStops(double lat, double lon, int stops) {
         PriorityQueue<BusStop> nearestStops = new PriorityQueue<>(Comparator.comparingDouble(busStop -> -busStop.distanceTo(lat, lon)));
 
@@ -33,7 +48,7 @@ public class Graph {
             if (place instanceof BusStop) {
                 nearestStops.offer((BusStop) place);
                 if (nearestStops.size() > stops) {
-                    nearestStops.poll(); // Remove the farthest bus stop if we have more than 5
+                    nearestStops.poll(); // Remove the farthest bus stop if we have more than N
                 }
             }
         }
