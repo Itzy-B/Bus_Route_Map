@@ -3,6 +3,7 @@ package src.java.JSON;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import src.java.GUI.Data;
+import src.java.GUI.Place;
 
 
 import java.io.BufferedReader;
@@ -16,36 +17,7 @@ import java.util.List;
 
 public class JSONController {
     private static final String API_URL_TEMPLATE = "https://geocode.maps.co/reverse?lat=%f&lon=%f&api_key=6666d2ba4331d378476246ngzcb1fcc";
-
     private static final String SCHOOL_AMENITY = "school";
-
-    public static class School {
-        public String name;
-        public String city;
-        public String housenumber;
-        public String postcode;
-        public String street;
-        public double latitude;
-        public double longitude;
-
-        public School(String name, String postcode, double latitude, double longitude) {
-            this.name = name;
-            this.postcode = postcode;
-            this.latitude = latitude;
-            this.longitude = longitude;
-        }
-
-        @Override
-        public String toString() {
-            return "School{" +
-                    "name='" + name + '\'' +
-                    ", postcode='" + postcode + '\'' +
-                    ", latitude=" + latitude +
-                    ", longitude=" + longitude +
-                    '}';
-        }
-
-    }
 
     public static String[] getPostalCode(double latitude, double longitude) {
         String[] data = new String[2];
@@ -88,9 +60,9 @@ public class JSONController {
         return null;
     }
 
-    public List<School> getSchoolsFromGeoJSON(String filePath) throws IOException, InterruptedException {
+    public List<Place> getSchoolsFromGeoJSON(String filePath) throws IOException, InterruptedException {
         Data.getData();
-        List<School> schools = new ArrayList<>();
+        List<Place> schools = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.readTree(new File(filePath));
 
@@ -113,7 +85,7 @@ public class JSONController {
                                 if(name.equals("Unnamed School")){
                                     name = data[1];
                                 }
-                                schools.add(new School(name, postcode, latitude, longitude));
+                                schools.add(new Place(name, postcode, latitude, longitude));
                                 Thread.sleep(1000);
                             }
                         }
@@ -124,11 +96,12 @@ public class JSONController {
         return schools;
     }
 
+
     public static void main(String[] args) {
         JSONController controller = new JSONController();
         try {
-            List<School> schools = controller.getSchoolsFromGeoJSON("src/java/JSON/amenity.geojson");
-            for (School school : schools) {
+            List<Place> schools = controller.getSchoolsFromGeoJSON("src/java/JSON/amenity.geojson");
+            for (Place school : schools) {
                 System.out.println(school);
             }
         } catch (IOException e) {
