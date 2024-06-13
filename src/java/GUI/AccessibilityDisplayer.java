@@ -34,10 +34,10 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
     static double radius = offset / Math.PI;
     private JFrame frame;
 
-    public AccessibilityDisplayer() {
+    public AccessibilityDisplayer(boolean start) {
         frame = new JFrame();
         frame.setTitle("Image Display");
-        frame.setSize(400, 300);
+        frame.setSize(600, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         button = new JButton("Update");
@@ -49,6 +49,9 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
 
         frame.add(button);
         frame.setVisible(true);
+    }
+
+    public AccessibilityDisplayer() {
     }
 
     public void getCircle() throws IOException {
@@ -123,10 +126,15 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         return (int)(Math.round(offset - radius * Math.log((1 + Math.sin(y * Math.PI / 180)) / (1 - Math.sin(y * Math.PI / 180))) / 2));
     }
     
-    
-
     public static void main(String[] args) {
         AccessibilityDisplayer displayer = new AccessibilityDisplayer();
+        displayer.runAccessibilityDisplayer();
+    }
+    
+
+
+    public void runAccessibilityDisplayer() {
+        AccessibilityDisplayer displayer = new AccessibilityDisplayer(true);
         try {
             displayer.getCircle();
         } catch (IOException e) {
@@ -134,7 +142,6 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         }
 
         button.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 try {
@@ -144,10 +151,9 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                 }
             }
 
-        });
+            });
+        }
+        @Override
+        public void actionPerformed(java.awt.event.ActionEvent e) {
     }
-    @Override
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-    }
-
 }
