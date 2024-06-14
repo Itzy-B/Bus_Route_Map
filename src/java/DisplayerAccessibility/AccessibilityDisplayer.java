@@ -81,6 +81,21 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener {
             }
         });
 
+        label.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                prevX = e.getX();
+                prevY = e.getY();
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    doubleClickZoom(e.getX(), e.getY());
+                }
+            }
+        });
+
         label.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
@@ -102,7 +117,24 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener {
                     e1.printStackTrace();
                 }
             }
+            
         });
+    }
+
+    public void doubleClickZoom(int x, int y) {
+        double lonPerPixel = 360 / (256 * Math.pow(2, zoomLevel));
+        double latPerPixel = 360 / (256 * Math.pow(2, zoomLevel));
+        
+        centerLongitude += (x - MAP_WIDTH / 2) * lonPerPixel;
+        centerLatitude -= (y - MAP_HEIGHT / 2) * latPerPixel;
+        
+        zoomLevel++;
+        requestNewImageIcon();
+        try {
+            drawScreen();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void drawScreen() throws IOException {
