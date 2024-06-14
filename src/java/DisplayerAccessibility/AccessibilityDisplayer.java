@@ -141,6 +141,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener {
         ArrayList<String> zipCodes = Data.getZipCodes();
         ArrayList<Double> lats = Data.getLatitudes();
         ArrayList<Double> longs = Data.getLongitudes();
+        ArrayList<String> colours = getGradientColors(2500);
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         zipCodeField1.setPreferredSize(new Dimension(150, 30));
         TextPrompt textPrompt = new TextPrompt("Enter a zipcode to center", zipCodeField1);
@@ -166,8 +167,12 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener {
         JLabel label = new JLabel(imageIcon);
 
         for (int index = 0; index < zipCodes.size(); index++) {
-            // Color randomColor = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 64);
-            // g.setColor(randomColor);
+            if (index > 0 && index < 2499) {
+                String[] split = colours.get(index).split(",");
+                Color color = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),Integer.parseInt(split[2]), 64);
+                // Color randomColor = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 64);
+                g.setColor(color);
+            }
             double zipLat = lats.get(index);
             double zipLon = longs.get(index);
             int[] Xy = adjust(zipLon, zipLat, centerLongitude, centerLatitude, zoomLevel);
@@ -207,6 +212,17 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener {
     public static void main(String[] args) {
         AccessibilityDisplayer displayer = new AccessibilityDisplayer();
         displayer.runAccessibilityDisplayer();
+    }
+
+    public  ArrayList<String> getGradientColors(int steps) {
+        ArrayList<String> colors = new ArrayList<>();
+        for (int i = 0; i < steps; i++) {
+            int r = (int) (255 * i / (steps - 1));
+            int g = (int) (255 * (steps - 1 - i) / (steps - 1));
+            int b = 0;
+            colors.add(r + "," + g + "," + b);
+        }
+        return colors;
     }
 
     public String requestNewImageIcon() {
