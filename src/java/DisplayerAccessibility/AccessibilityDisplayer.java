@@ -2,6 +2,7 @@ package src.java.DisplayerAccessibility;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -14,15 +15,21 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.TextField;
 import src.java.GUI.Data;
+import src.java.Singletons.ExceptionManager;
 
 public class AccessibilityDisplayer extends JFrame implements ActionListener {
     private static final double MAP_WIDTH = 600; // Width of your map image
@@ -30,9 +37,10 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener {
     private double centerLatitude = 50.851368;
     private double centerLongitude = 5.690973;
     private static int zoomLevel = 13;
-    private static JButton button;
+    private static JButton updateButton;
     private static JButton zoomInButton = new JButton("+");
     private static JButton zoomOutButton = new JButton("-");
+    private static JTextField zipCodeField1 = new JTextField();
     private static final String API_KEY = "AIzaSyDnJH0pu5NzqH0b6GjiPyTDfdkBDugYw6w";
     static double offset = 268435456;
     static double radius = offset / Math.PI;
@@ -46,7 +54,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener {
         frame.setSize(600, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        button = new JButton("Update");
+        updateButton = new JButton("Update");
         JPanel panel = new JPanel();
         ImageIcon imageIcon = new ImageIcon("./staticmap.png");
         JLabel label = new JLabel(imageIcon);
@@ -56,7 +64,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener {
         panel.add(label);
         frame.add(panel);
 
-        frame.add(button);
+        frame.add(updateButton);
         frame.setVisible(true);
 
     }
@@ -89,7 +97,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener {
 
                 requestNewImageIcon();
                 try {
-                    getCircle();
+                    drawScreen();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -97,15 +105,20 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener {
         });
     }
 
-    public void getCircle() throws IOException {
+    public void drawScreen() throws IOException {
         ArrayList<String> zipCodes = Data.getZipCodes();
         ArrayList<Double> lats = Data.getLatitudes();
         ArrayList<Double> longs = Data.getLongitudes();
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        zipCodeField1.setPreferredSize(new Dimension(150, 30));
+        TextPrompt textPrompt = new TextPrompt("Enter a zipcode to center", zipCodeField1);
+        Random rand = new Random();
         frame.getContentPane().removeAll();
-        frame.add(button);
+        frame.add(updateButton);
         frame.add(zoomInButton);
         frame.add(zoomOutButton);
+        frame.add(zipCodeField1);
+        frame.add(textPrompt);
         frame.add(panel);
         URL url = new URL(URL);
         java.awt.Image image = ImageIO.read(url);
@@ -115,12 +128,14 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         Stroke originalStroke = g.getStroke();
         g.setStroke(new BasicStroke(5));
-        g.setColor(new Color(255, 0, 0, 64));
+        g.setColor(new Color(255,0,0,64));
         g.setStroke(originalStroke);
         ImageIcon imageIcon = new ImageIcon(bufferedImage);
         JLabel label = new JLabel(imageIcon);
 
         for (int index = 0; index < zipCodes.size(); index++) {
+            // Color randomColor = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 64);
+            // g.setColor(randomColor);
             double zipLat = lats.get(index);
             double zipLon = longs.get(index);
             int[] Xy = adjust(zipLon, zipLat, centerLongitude, centerLatitude, zoomLevel);
@@ -173,6 +188,25 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener {
         return mapUrlBuilder.toString();
     }
 
+    public void centerToZipCode(AccessibilityDisplayer displayer) {
+        String zipCode = zipCodeField1.getText();
+        ArrayList<Double> latLong = new ArrayList<>();
+        if (zipCode.length() == 0) {
+            JOptionPane.showMessageDialog(null, "No zipcode has been entered", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            latLong = Data.getLatLong(zipCode);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "No coordinates could be found for zipcode", "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+        zoomLevel = 18;
+        displayer.centerLongitude = latLong.get(1);
+        displayer.centerLatitude = latLong.get(0);
+
+    }
+
     public void createActionListeners(AccessibilityDisplayer displayer) {
         zoomInButton.addActionListener(new ActionListener() {
             @Override
@@ -180,18 +214,20 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener {
                 zoomLevel++;
                 displayer.requestNewImageIcon();
                 try {
-                    displayer.getCircle();
+                    displayer.drawScreen();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
             }
         });
 
-        button.addActionListener(new ActionListener() {
+        updateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
+                centerToZipCode(displayer);
+                displayer.requestNewImageIcon();
                 try {
-                    displayer.getCircle();
+                    displayer.drawScreen();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -204,7 +240,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener {
                 zoomLevel--;
                 displayer.requestNewImageIcon();
                 try {
-                    displayer.getCircle();
+                    displayer.drawScreen();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -218,7 +254,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener {
         URL = requestNewImageIcon();
         createActionListeners(displayer);
         try {
-            displayer.getCircle();
+            displayer.drawScreen();
         } catch (IOException e) {
             e.printStackTrace();
         }
