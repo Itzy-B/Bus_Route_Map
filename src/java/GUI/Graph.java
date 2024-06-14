@@ -28,10 +28,6 @@ public class Graph {
         adjList.get(from).add(edge);
     }
 
-    public void removeVertex(Place vertex) {
-        adjList.remove(vertex);
-    }
-
     public Set<Edge> getEdges(Place vertex) {
         return adjList.get(vertex);
     }
