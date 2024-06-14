@@ -58,12 +58,6 @@ public class MapLauncher extends Application{
 
     private CheckBox checkBox = null;
     private CheckBox toggleQuerySystem = null;
-
-    private Label distanceLabel;
-    private Label acDistanceLabel;
-    private Label walkTimeLabel;
-    private Label bikeTimeLabel;
-    private Label carTimeLabel;
     private ListView<String> listView;
 
     //private Place departure;
@@ -112,8 +106,6 @@ public class MapLauncher extends Application{
         checkBox = new CheckBox("Toggle graphhopper");
         toggleQuerySystem = new CheckBox("(Don't use this option)Search outside of Maastricht");
 
-
-
         // Create a Search button
         Button searchButton = new Button("Search");
         searchButton.setOnAction(event -> {
@@ -124,7 +116,7 @@ public class MapLauncher extends Application{
                 else {
                     searchPlaces();
                 }
-            } catch (IOException | SQLException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
@@ -142,55 +134,6 @@ public class MapLauncher extends Application{
         zipCodeField2.setPrefWidth(150);
         zipCodeField2.setStyle("-fx-font-size: 18px;");
         zipCodeField2.setPrefHeight(50);
-
-        // Create Labels for displaying the titles
-        acDistanceLabel = new Label();
-        distanceLabel = new Label();
-        walkTimeLabel = new Label();
-        bikeTimeLabel = new Label();
-        carTimeLabel = new Label();
-
-        // Set preferred widths and heights for TextFields
-        acDistanceLabel.setPrefWidth(300);
-        acDistanceLabel.setPrefHeight(50);
-
-        distanceLabel.setPrefWidth(300);
-        distanceLabel.setPrefHeight(50);
-
-        walkTimeLabel.setPrefWidth(300);
-        walkTimeLabel.setPrefHeight(50);
-
-        bikeTimeLabel.setPrefWidth(300);
-        bikeTimeLabel.setPrefHeight(50);
-
-        carTimeLabel.setPrefWidth(300);
-        carTimeLabel.setPrefHeight(50);
-
-        // Set font size of labels
-        acDistanceLabel.setStyle("-fx-font-size: 20px;");
-        distanceLabel.setStyle("-fx-font-size: 20px;");
-        walkTimeLabel.setStyle("-fx-font-size: 20px;");
-        bikeTimeLabel.setStyle("-fx-font-size: 20px;");
-        carTimeLabel.setStyle("-fx-font-size: 20px;");
-
-        // Create HBoxes to hold the labels and text fields
-        HBox acDistanceBox = new HBox(10, acDistanceLabel);
-        HBox distanceBox = new HBox(10, distanceLabel);
-        HBox walkTimeBox = new HBox(10, walkTimeLabel);
-        HBox bikeTimeBox = new HBox(10, bikeTimeLabel);
-        HBox carTimeBox = new HBox(10, carTimeLabel);
-
-        // Set alignment and padding for HBoxes
-        acDistanceBox.setAlignment(Pos.CENTER_LEFT);
-        distanceBox.setAlignment(Pos.CENTER_LEFT);
-        walkTimeBox.setAlignment(Pos.CENTER_LEFT);
-        bikeTimeBox.setAlignment(Pos.CENTER_LEFT);
-        carTimeBox.setAlignment(Pos.CENTER_LEFT);
-        acDistanceBox.setPadding(new Insets(10));
-        distanceBox.setPadding(new Insets(10));
-        walkTimeBox.setPadding(new Insets(10));
-        bikeTimeBox.setPadding(new Insets(10));
-        carTimeBox.setPadding(new Insets(10));
 
         // Create VBox for text fields and Search button
         VBox textFieldAndSearch = new VBox(10, zipCodeField1, zipCodeField2, searchButton);
@@ -210,11 +153,6 @@ public class MapLauncher extends Application{
         checkBoxs.setAlignment(Pos.TOP_LEFT);
         checkBoxs.setPadding(new Insets(10));
 
-        // Create a VBox for labels
-        VBox labelsVBox = new VBox(10, acDistanceLabel, distanceLabel, walkTimeLabel, bikeTimeLabel, carTimeLabel);
-        labelsVBox.setAlignment(Pos.TOP_LEFT);
-        labelsVBox.setPadding(new Insets(10));
-
         // Create a ListView for the list of strings
         listView = new ListView<>();
         listView.getItems().addAll(Collections.emptyList());
@@ -222,7 +160,7 @@ public class MapLauncher extends Application{
         listView.setPrefWidth(600);
 
         // Create a VBox for the right side content
-        VBox rightContentVBox = new VBox(10, textFieldAndSearch, zoomButtons, checkBoxs, guiOptions, labelsVBox, listView);
+        VBox rightContentVBox = new VBox(10, textFieldAndSearch, zoomButtons, checkBoxs, guiOptions, listView);
         rightContentVBox.setAlignment(Pos.TOP_LEFT);
         rightContentVBox.setPadding(new Insets(10));
         rightContentVBox.setPrefWidth(600);
@@ -268,7 +206,7 @@ public class MapLauncher extends Application{
     }
 
     // Method for searching places and updating information
-    private void searchPlaces() throws SQLException, IOException {
+    private void searchPlaces() throws Exception {
         String zipCode1 = zipCodeField1.getText();
         String zipCode2 = zipCodeField2.getText();
 
@@ -298,19 +236,6 @@ public class MapLauncher extends Application{
         }
     }
 
-    // Method for updating information in the TextFields
-    private void updateInformation(double acDistance, double distance, long walkTime, long bikeTime, long carTime) {
-        // if (getCheckBoxState()) {
-        //     walkTime = -1;
-        //     bikeTime = -1;
-        //     carTime = -1;
-        // }
-        acDistanceLabel.setText("Actual distance: " + acDistance + " kilometers");
-        distanceLabel.setText("Distance: " + distance + " kilometers");
-        walkTimeLabel.setText("Average time by walk: " + walkTime + " minutes");
-        bikeTimeLabel.setText("Average time by bike: " + bikeTime + " minutes");
-        carTimeLabel.setText("Average time by car: " + carTime + " minutes");
-    }
 
     // Method for constructing the URL for the map image
     private String constructMapUrl() {

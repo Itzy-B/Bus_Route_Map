@@ -79,11 +79,13 @@ public class GraphBuilder {
             System.out.println(edge);
         }*/
 
-        BusStop busStop2 = new BusStop(2578385, "Maastricht, Markt", 50.851553, 5.690106);
+        BusStop busStop2 = new BusStop(2578289, "Maastricht, Aramislaan", 50.83938, 5.673559);
         System.out.println("Edges for " + busStop2 + ":");
         for (Edge edge : g.getEdges(busStop2)) {
             System.out.println(edge);
         }
+
+        System.out.println(g.getVertices().size());
     }
 
 }
