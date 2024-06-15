@@ -42,7 +42,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
     private ArrayList<Double> lats = Data.getLatitudes();
     private ArrayList<Double> longs = Data.getLongitudes();
     private ArrayList<String> colours = getGradientColors();
-    private final String API_KEY = "AIzaSyDnJH0pu5NzqH0b6GjiPyTDfdkBDugYw6w";
+    private final String API_KEY = "AIzaSyAZwfzWK71qIgXSleA-02n-oXfo5OjOhhU";
     private JPanel panel = new JPanel();
     private final double offset = 268435456;
     private final double radius = offset / Math.PI;

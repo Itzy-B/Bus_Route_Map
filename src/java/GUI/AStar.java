@@ -234,7 +234,7 @@ public class AStar {
     }*/
 
     public static int getRealDistance(Place origin, Place destination) throws Exception {
-        String apiKey = "AIzaSyDnJH0pu5NzqH0b6GjiPyTDfdkBDugYw6w";
+        String apiKey = "AIzaSyAZwfzWK71qIgXSleA-02n-oXfo5OjOhhU";
         String originStr = origin.lat + "," + origin.lon;
         String destinationStr = destination.lat + "," + destination.lon;
         String urlString = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + originStr +

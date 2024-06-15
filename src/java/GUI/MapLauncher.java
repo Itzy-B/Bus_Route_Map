@@ -38,7 +38,7 @@ public class MapLauncher extends Application{
     private static final double WINDOW_HEIGHT = 780.0;
 
     // Google Map static API key
-    private static final String API_KEY = "AIzaSyDnJH0pu5NzqH0b6GjiPyTDfdkBDugYw6w";
+    private static final String API_KEY = "AIzaSyAZwfzWK71qIgXSleA-02n-oXfo5OjOhhU";
     // private static final String API_KEY = "0";  
 
     // Coordinates of Maastricht

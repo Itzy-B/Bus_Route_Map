@@ -17,7 +17,7 @@ public class AccessibilityDisplayerOld extends JFrame implements ActionListener 
     private double CENTER_LATITUDE = 50.866825678462234;
     private double CENTER_LONGITUDE = 5.65494508021394;
     final int R = 6371;
-    private static final String API_KEY = "AIzaSyDnJH0pu5NzqH0b6GjiPyTDfdkBDugYw6w";
+    private static final String API_KEY = "AIzaSyAZwfzWK71qIgXSleA-02n-oXfo5OjOhhU";
     private static int scale = 1;
     private static int zoomLevel = 14;
     private static JButton button;
