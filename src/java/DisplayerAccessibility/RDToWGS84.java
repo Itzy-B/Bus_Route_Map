@@ -60,6 +60,37 @@ public class RDToWGS84 {
         // System.out.println("Longitude: " + latLon[1]);
     }
 
+    public static ArrayList<ArrayList<Double[]>> getPolyGon() {
+        ArrayList<ArrayList<Double[]>> polygons = new ArrayList<>();
+        ArrayList<String> lines = readFileLineByLine("./coordinates.csv");
+        
+        for (String line : lines) {
+            ArrayList<Double[]> polygon = new ArrayList<>();
+            String[] parts = line.split("-");
+            
+            if (parts.length != 2) {
+                // Add a single pair of -1 coordinates
+                polygon.add(new Double[]{-1.0, -1.0});
+            } else {
+                String coordinatesString = parts[1];
+                String[] coordinatePairs = coordinatesString.split(";");
+                
+                for (String pair : coordinatePairs) {
+                    String[] latLng = pair.split(",");
+                    if (latLng.length != 2) {
+                        continue;
+                    }
+                    Double latitude = Double.parseDouble(latLng[0]);
+                    Double longitude = Double.parseDouble(latLng[1]);
+                    polygon.add(new Double[]{latitude, longitude});
+                }
+            }
+            polygons.add(polygon);
+        }
+        
+        return polygons;
+    }
+
     public static ArrayList<Double[]> parsePolygon(String polygonString, String postalCode) {
         ArrayList<Double[]> coordinates = new ArrayList<>();
 
