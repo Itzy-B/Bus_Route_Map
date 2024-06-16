@@ -55,9 +55,6 @@ public class RDToWGS84 {
             }
         }
         System.out.println("");
-        // writeCoordinatesToCSV(latLon, new File("polys.csv"));
-        // System.out.println("Latitude: " + latLon[0]);
-        // System.out.println("Longitude: " + latLon[1]);
     }
 
     public static ArrayList<ArrayList<Double[]>> getPolyGon() {
@@ -69,7 +66,6 @@ public class RDToWGS84 {
             String[] parts = line.split("-");
             
             if (parts.length != 2) {
-                // Add a single pair of -1 coordinates
                 polygon.add(new Double[]{-1.0, -1.0});
             } else {
                 String coordinatesString = parts[1];
@@ -94,28 +90,22 @@ public class RDToWGS84 {
     public static ArrayList<Double[]> parsePolygon(String polygonString, String postalCode) {
         ArrayList<Double[]> coordinates = new ArrayList<>();
 
-        // Remove "POLYGON((" prefix and "))" suffix
         polygonString = polygonString.replace("MULTIPOLYGON(((", "").replace("))", "").replace("((","").replace("))","");
         polygonString = polygonString.replace("POLYGON", "").replace(")", "");
         polygonString = polygonString.replace("(","");
 
 
-        // Ensure the string starts with "(" and ends with ")"
-
-        // Split the string into individual coordinate pairs
-        // Using regex to account for variations in spacing and 
         if (polygonString.isEmpty()) {
             System.out.println(postalCode);
         }
         String[] coordinatePairs = polygonString.substring(1, polygonString.length() - 1).split("\\s*,\\s*");
 
-        // Convert each coordinate pair from RD to WGS84 and add to the list
         for (String pair : coordinatePairs) {
             String[] coords = pair.split("\\s+");
             try {
                 double rdX = Double.parseDouble(coords[0]);
                 double rdY = Double.parseDouble(coords[1]);
-                double[] wgs84 = convertRDToWGS84(rdX, rdY); // Assuming this method is correctly implemented elsewhere
+                double[] wgs84 = convertRDToWGS84(rdX, rdY);
                 coordinates.add(new Double[]{wgs84[0], wgs84[1]});
             } catch (NumberFormatException e) {
                 System.err.println("Error parsing coordinate pair: " + pair);
@@ -136,7 +126,6 @@ public class RDToWGS84 {
             }
         }
 
-        // Remove trailing comma and append newline character
         sb.deleteCharAt(sb.length() - 1).append("\n");
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename, true))) {

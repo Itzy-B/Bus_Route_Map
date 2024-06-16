@@ -161,7 +161,6 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         int colorIndex = 0;
         
         RDToWGS84 parser = new RDToWGS84();
-        // ArrayList<Double[]> list = parser.
         double startX = 0;
         double startY = 0;
         ArrayList<Integer> xPoints = new ArrayList<>();
@@ -169,8 +168,8 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         ArrayList<ArrayList<Double[]>> list = RDToWGS84.getPolyGon();
         int iteratorColors = lengthColours / list.size();
         for (ArrayList<Double[]> polygon : list) {
-            xPoints.clear(); // Clear previous points for each new polygon
-            yPoints.clear(); // Clear previous points for each new polygon
+            xPoints.clear();
+            yPoints.clear();
 
             if (polygon.get(0)[0] == -1) {
                 System.out.println("we have a nuller");
@@ -181,14 +180,11 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                 double lat = coordinates[0];
                 double lon = coordinates[1];
                 
-                // Calculate the adjusted coordinates based on the center and zoom level
                 int[] Xy = adjust(lon, lat, centerLongitude, centerLatitude, zoomLevel);
                 
-                // Add the X and Y coordinates to the lists
                 xPoints.add(Xy[0]);
                 yPoints.add(Xy[1]);
                 
-                // Draw a line between the current and previous points
                 if (i > 0) {
                     g.drawLine(
                         (int) (startX + MAP_WIDTH / 2 - 5),
@@ -198,49 +194,29 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                     );
                 }
                 
-                // Update the starting point for the next iteration
                 startX = Xy[0];
                 startY = Xy[1];
             }
         
-            // Close the shape by connecting the last point back to the first point
             xPoints.add(xPoints.get(0));
             yPoints.add(yPoints.get(0));
         
-            // Convert ArrayList<Integer> to int[] using stream()
             int[] xArray = xPoints.stream().mapToInt(i -> i).toArray();
             int[] yArray = yPoints.stream().mapToInt(i -> i).toArray();
         
-            // Fill the polygon with a color
             String[] split = colours.get(colorIndex).split(",");
             colorIndex+= iteratorColors;
             Color color = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 64);
-            g.setColor(color); // Set the color you want to fill with
+            g.setColor(color);
             g.fillPolygon(
                 Arrays.stream(xArray).map(x -> x + (int) MAP_WIDTH / 2 - 5).toArray(),
                 Arrays.stream(yArray).map(y -> y + (int) MAP_HEIGHT / 2 - 5).toArray(),
                 xArray.length
             );
         
-            // Optionally, reset xPoints and yPoints for the next polygon
             xPoints.clear();
             yPoints.clear();
         }
-
-
-
-        
-        // for (int index = 0; index < zipCodes.size(); index++) {
-        //     String[] split = colours.get(colorIndex).split(",");
-        //     colorIndex+= iteratorColors;
-        //     Color color = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 64);
-        //     // Color randomColor = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 64);
-        //     g.setColor(color);
-        //     double zipLat = lats.get(index);
-        //     double zipLon = longs.get(index);
-        //     int[] Xy = adjust(zipLon, zipLat, centerLongitude, centerLatitude, zoomLevel);
-        //     g.fillOval((int) (Xy[0] + MAP_WIDTH / 2 - 5), (int) (Xy[1] + MAP_HEIGHT / 2 - 5), 10, 10);
-        // }
 
         imageIcon = new ImageIcon(bufferedImage);
         label.setIcon(imageIcon);
