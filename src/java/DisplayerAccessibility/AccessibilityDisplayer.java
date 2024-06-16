@@ -165,14 +165,22 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         double startY = 0;
         ArrayList<Integer> xPoints = new ArrayList<>();
         ArrayList<Integer> yPoints = new ArrayList<>();
-        ArrayList<ArrayList<Double[]>> list = RDToWGS84.getPolyGon();
+        ArrayList<ArrayList<Double[]>> list = parser.getPolyGon();
         int iteratorColors = lengthColours / list.size();
         for (ArrayList<Double[]> polygon : list) {
             xPoints.clear();
             yPoints.clear();
 
             if (polygon.get(0)[0] == -1) {
-                System.out.println("we have a nuller");
+                //Postcodes with no polygons in db, so we just draw a circle, give it later a relevant color
+                int index = list.indexOf(polygon);
+                //Cover only the Maastricht postcodes
+                if(index > -1 && index < 2783) {
+                    int[] Xy = adjust(longs.get(index), lats.get(index), centerLongitude, centerLatitude, zoomLevel);
+                    g.setColor(new Color(0,0,0, 50));
+                    g.fillOval((int) (Xy[0] + MAP_WIDTH / 2 - 5), (int) (Xy[1] + MAP_HEIGHT / 2 - 5), 5, 5);
+                    continue;
+                }
             }
             
             for (int i = 0; i < polygon.size(); i++) {

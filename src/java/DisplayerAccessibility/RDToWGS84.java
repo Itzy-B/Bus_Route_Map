@@ -7,12 +7,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 //AI ofcourse, I am not a genius, and somehow this works
 public class RDToWGS84 {
-    public static double[] convertRDToWGS84(double x, double y) {
+    ArrayList<ArrayList<Double[]>> polygons = new ArrayList<>();
+    public double[] convertRDToWGS84(double x, double y) {
         double dX = (x - 155000) * Math.pow(10, -5);
         double dY = (y - 463000) * Math.pow(10, -5);
 
@@ -36,28 +40,33 @@ public class RDToWGS84 {
     }
 
     public static void main(String[] args) {
-        ArrayList<String> file = readFileLineByLine("./polygons.csv");
-        for (String string: file) {
-            if (string.length() < 8) {
-                try {
-                    writeCoordinatesToCSV(string.split(",")[0], null, "coordinates.csv");
-                } catch (IOException e) {
-                    System.out.println("excpetions");
-                    e.printStackTrace();
-                }
-                continue;
-            }
-            ArrayList<Double[]> list = parsePolygon(string.substring(7), string.split(",")[0]);
-            try {
-                writeCoordinatesToCSV(string.split(",")[0], list, "coordinates.csv");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        System.out.println("");
+        RDToWGS84 parser = new RDToWGS84();
+        parser.getPolyGon();
+        // ArrayList<String> file = readFileLineByLine("./polygons.csv");
+        // for (String string: file) {
+        //     if (string.length() < 8) {
+        //         try {
+        //             writeCoordinatesToCSV(string.split(",")[0], null, "coordinates.csv");
+        //         } catch (IOException e) {
+        //             System.out.println("excpetions");
+        //             e.printStackTrace();
+        //         }
+        //         continue;
+        //     }
+        //     ArrayList<Double[]> list = parsePolygon(string.substring(7), string.split(",")[0]);
+        //     try {
+        //         writeCoordinatesToCSV(string.split(",")[0], list, "coordinates.csv");
+        //     } catch (IOException e) {
+        //         e.printStackTrace();
+        //     }
+        // }
+        // System.out.println("");
     }
 
-    public static ArrayList<ArrayList<Double[]>> getPolyGon() {
+    public ArrayList<ArrayList<Double[]>> getPolyGon() {
+        if (!this.polygons.isEmpty()) {
+            return polygons;
+        }
         ArrayList<ArrayList<Double[]>> polygons = new ArrayList<>();
         ArrayList<String> lines = readFileLineByLine("./coordinates.csv");
         
@@ -87,7 +96,7 @@ public class RDToWGS84 {
         return polygons;
     }
 
-    public static ArrayList<Double[]> parsePolygon(String polygonString, String postalCode) {
+    public ArrayList<Double[]> parsePolygon(String polygonString, String postalCode) {
         ArrayList<Double[]> coordinates = new ArrayList<>();
 
         polygonString = polygonString.replace("MULTIPOLYGON(((", "").replace("))", "").replace("((","").replace("))","");
@@ -116,11 +125,11 @@ public class RDToWGS84 {
         return coordinates;
     }
 
-    public static void writeCoordinatesToCSV(String postalCode, ArrayList<Double[]> coordinates, String filename) throws IOException {
+    public void writeCoordinatesToCSV(String postalCode, ArrayList<Double[]> coordinates, String filename) throws IOException {
         StringBuilder sb = new StringBuilder();
         
         sb.append(postalCode).append("-");
-        if (!(coordinates == null)) {
+        if ((coordinates != null)) {
             for (Double[] coord : coordinates) {
                 sb.append(coord[0]).append(",").append(coord[1]).append(";");
             }
@@ -133,7 +142,7 @@ public class RDToWGS84 {
         }
     }
 
-    public static ArrayList<String> readFileLineByLine(String filePath) {
+    public ArrayList<String> readFileLineByLine(String filePath) {
         ArrayList<String> lines = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
