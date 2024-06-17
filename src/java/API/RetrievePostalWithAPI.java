@@ -33,7 +33,7 @@ public class RetrievePostalWithAPI {
         
         if (userAllowedToInteract(userObject)) {
             userObject.addInteraction(getCurrentTime());
-            fileManager.serializeObject(userObject, USER_OBJECT_PATH);
+            fileManager.serializeObject(userObject, USER_OBJECT_PATH, "userObject.ser");
             latLong = sentPostRequest(pCode);
         }
         
@@ -43,7 +43,7 @@ public class RetrievePostalWithAPI {
 
                 if (userAllowedToInteract(userObject)) {
                     userObject.addInteraction(getCurrentTime());
-                    fileManager.serializeObject(userObject, USER_OBJECT_PATH);
+                    fileManager.serializeObject(userObject, USER_OBJECT_PATH, "userObject.ser");
                     latLong = sentPostRequest(pCode);
                     return latLong;
                 }

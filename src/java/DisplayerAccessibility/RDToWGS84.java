@@ -1,21 +1,21 @@
 package src.java.DisplayerAccessibility;
 
-import java.awt.List;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-//AI ofcourse, I am not a genius, and somehow this works
+import src.java.Singletons.FileManager;
+
+//Data for postcode polygons from: https://service.pdok.nl/cbs/postcode6/atom/postcode6_volledige_postcode.xml
+//convertRDTiWGS84 from AI of course, I am not a genius, and somehow AI managed to create this function
 public class RDToWGS84 {
-    ArrayList<ArrayList<Double[]>> polygons = new ArrayList<>();
+    Map<String, List<List<Double[]>>> polygonsMap = new HashMap<>();
     public double[] convertRDToWGS84(double x, double y) {
         double dX = (x - 155000) * Math.pow(10, -5);
         double dY = (y - 463000) * Math.pow(10, -5);
@@ -42,30 +42,16 @@ public class RDToWGS84 {
     public static void main(String[] args) {
         RDToWGS84 parser = new RDToWGS84();
         parser.getPolyGon();
-        // ArrayList<String> file = readFileLineByLine("./polygons.csv");
-        // for (String string: file) {
-        //     if (string.length() < 8) {
-        //         try {
-        //             writeCoordinatesToCSV(string.split(",")[0], null, "coordinates.csv");
-        //         } catch (IOException e) {
-        //             System.out.println("excpetions");
-        //             e.printStackTrace();
-        //         }
-        //         continue;
-        //     }
-        //     ArrayList<Double[]> list = parsePolygon(string.substring(7), string.split(",")[0]);
-        //     try {
-        //         writeCoordinatesToCSV(string.split(",")[0], list, "coordinates.csv");
-        //     } catch (IOException e) {
-        //         e.printStackTrace();
-        //     }
-        // }
-        // System.out.println("");
+        ArrayList<String> file = parser.readFileLineByLine("./polygons.csv");
+        for (String string: file) {
+            parser.parsePolygon(string.substring(7), string.split(",")[0]);
+        }
+        FileManager.getInstance().serializeObject(parser.polygonsMap, "polygonsMap", "polygonsMap.ser");
     }
 
     public ArrayList<ArrayList<Double[]>> getPolyGon() {
-        if (!this.polygons.isEmpty()) {
-            return polygons;
+        if (!this.polygonsMap.isEmpty()) {
+            // return polygons;
         }
         ArrayList<ArrayList<Double[]>> polygons = new ArrayList<>();
         ArrayList<String> lines = readFileLineByLine("./coordinates.csv");
@@ -96,33 +82,38 @@ public class RDToWGS84 {
         return polygons;
     }
 
-    public ArrayList<Double[]> parsePolygon(String polygonString, String postalCode) {
-        ArrayList<Double[]> coordinates = new ArrayList<>();
+    public void parsePolygon(String polygonString, String postalCode) {
+        List<List<Double[]>> polygonsList = new ArrayList<>();
 
-        polygonString = polygonString.replace("MULTIPOLYGON(((", "").replace("))", "").replace("((","").replace("))","");
-        polygonString = polygonString.replace("POLYGON", "").replace(")", "");
-        polygonString = polygonString.replace("(","");
+        polygonString = polygonString.replace("MULTIPOLYGON(((", "").replace(")))", "").replace("POLYGON", "");
+        String[] polygons = polygonString.split("\\)\\s*,\\s*\\(");
+        
+        for (String polygon : polygons) {
+            polygon = polygon.replace("(", "").replace(")", "");
+            String[] coordinatePairs = polygon.split("\\s*,\\s*");
+            List<Double[]> coordinates = new ArrayList<>();
 
-
-        if (polygonString.isEmpty()) {
-            System.out.println(postalCode);
-        }
-        String[] coordinatePairs = polygonString.substring(1, polygonString.length() - 1).split("\\s*,\\s*");
-
-        for (String pair : coordinatePairs) {
-            String[] coords = pair.split("\\s+");
-            try {
-                double rdX = Double.parseDouble(coords[0]);
-                double rdY = Double.parseDouble(coords[1]);
-                double[] wgs84 = convertRDToWGS84(rdX, rdY);
-                coordinates.add(new Double[]{wgs84[0], wgs84[1]});
-            } catch (NumberFormatException e) {
-                System.err.println("Error parsing coordinate pair: " + pair);
-                e.printStackTrace();
+            for (String pair : coordinatePairs) {
+                if (pair.isEmpty()) {
+                    continue;
+                }
+                pair = pair.replaceAll("\"", "");
+                String[] coords = pair.split("\\s+");
+                try {
+                    double rdX = Double.parseDouble(coords[0]);
+                    double rdY = Double.parseDouble(coords[1]);
+                    double[] wgs84 = convertRDToWGS84(rdX, rdY);
+                    coordinates.add(new Double[]{wgs84[0], wgs84[1]});
+                } catch (NumberFormatException e) {
+                    System.err.println("Error parsing coordinate pair: " + pair);
+                    e.printStackTrace();
+                }
             }
+
+            polygonsList.add(coordinates);
         }
 
-        return coordinates;
+        this.polygonsMap.put(postalCode, polygonsList);
     }
 
     public void writeCoordinatesToCSV(String postalCode, ArrayList<Double[]> coordinates, String filename) throws IOException {
