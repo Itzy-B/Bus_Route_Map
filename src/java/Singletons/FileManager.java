@@ -51,16 +51,15 @@ public class FileManager {
         }
     }
 
-    public ObjectOutputStream serializeObject(Object object, String path) {
+    public ObjectOutputStream serializeObject(Object object, String path, String objectName) {
         ObjectOutputStream out = null;
 
         try {
-            FileOutputStream fileOut = new FileOutputStream("userObject.ser");
+            FileOutputStream fileOut = new FileOutputStream(objectName);
             out = new ObjectOutputStream(fileOut);
             out.writeObject(object);
             out.close();
             fileOut.close();
-            System.out.println("Serialized data is saved in userObject.ser");
         } 
         catch (IOException e) {
             e.printStackTrace();

@@ -7,7 +7,7 @@ public class ClosestNodeFinder {
     public static void main(String[] args) {
         try {
             // Read GeoJSON file
-            String geoJsonContent = readGeoJsonFile("C:\\Users\\alenq\\Downloads\\transitorartifact\\sourcecode\\bcs25-project-1-2\\bcs25-project-1-2\\src\\java\\JSON\\amenity.geojson");
+            String geoJsonContent = readGeoJsonFile("./src/java/JSON/amenity.geojson");
 
             // Get user input for latitude and longitude
             Scanner scanner = new Scanner(System.in);
@@ -27,7 +27,7 @@ public class ClosestNodeFinder {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }//50,8544730689126, 5,670415204500935
     }
 
     public static String readGeoJsonFile(String filePath) throws IOException {

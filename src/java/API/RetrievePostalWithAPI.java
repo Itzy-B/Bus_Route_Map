@@ -33,7 +33,7 @@ public class RetrievePostalWithAPI {
         
         if (userAllowedToInteract(userObject)) {
             userObject.addInteraction(getCurrentTime());
-            fileManager.serializeObject(userObject, USER_OBJECT_PATH);
+            fileManager.serializeObject(userObject, USER_OBJECT_PATH, "userObject.ser");
             latLong = sentPostRequest(pCode);
         }
         
@@ -43,7 +43,7 @@ public class RetrievePostalWithAPI {
 
                 if (userAllowedToInteract(userObject)) {
                     userObject.addInteraction(getCurrentTime());
-                    fileManager.serializeObject(userObject, USER_OBJECT_PATH);
+                    fileManager.serializeObject(userObject, USER_OBJECT_PATH, "userObject.ser");
                     latLong = sentPostRequest(pCode);
                     return latLong;
                 }
@@ -78,6 +78,7 @@ public class RetrievePostalWithAPI {
         .send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 500) {
+            System.out.println("API failed");
             ExceptionManager.showError("API error", "Error", "Http error 500, failed to fetch coordinates of postal code " + pCode, AlertType.ERROR);
         }
         System.out.println(response.statusCode());
