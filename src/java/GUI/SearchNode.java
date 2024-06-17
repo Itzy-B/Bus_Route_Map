@@ -17,7 +17,7 @@ public class SearchNode {
         this.place = place;
         this.g = g;
         this.h = h;
-        this.f = g + 2 * h;
+        this.f = g + h;
         this.cameFrom = cameFrom;
         this.trip = trip;
         this.dist = dist;

@@ -25,7 +25,7 @@ public class BusStop extends Place {
 
     @Override
     public String toString() {
-        return "id: " + stopId + ", name: " + name + " in (" + lat + ", " + lon + ")";
+        return  name;
     }
 
     @Override

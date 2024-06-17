@@ -4,6 +4,8 @@ import java.sql.*;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GraphBuilder {
     private final Graph g;
@@ -55,6 +57,34 @@ public class GraphBuilder {
         }
     }
 
+    public static List<BusRouteShape> getBusRouteShapes(int shapeId) throws SQLException {
+        String query = "SELECT shape_id, shape_pt_sequence, shape_pt_lat, shape_pt_lon, shape_dist_traveled " +
+                "FROM shapes " +
+                "WHERE shape_id = ?; ";
+
+        List<BusRouteShape> shapes = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, shapeId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int shapeID = rs.getInt("shape_id");
+                    int shapePtSequence = rs.getInt("shape_pt_sequence");
+                    double shapePtLat = rs.getDouble("shape_pt_lat");
+                    double shapePtLon = rs.getDouble("shape_pt_lon");
+                    double shapeDistTraveled = rs.getDouble("shape_dist_traveled");
+
+                    shapes.add(new BusRouteShape(shapeID, shapePtSequence, shapePtLat, shapePtLon, shapeDistTraveled));
+                }
+            }
+        }
+
+        return shapes;
+    }
+
+
     // convert time string to LocalTime
     public static LocalTime convertToLocalTime(String timeStr) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -72,20 +102,10 @@ public class GraphBuilder {
         GraphBuilder graphBuilder = new GraphBuilder(g);
         graphBuilder.getBusStops();
 
-        // Print the graph to verify
-        /*BusStop busStop1 = new BusStop(2578367, "Maastricht, Calvariestraat", 50.847532, 5.680894);
-        System.out.println("Edges for " + busStop1 + ":");
-        for (Edge edge : g.getEdges(busStop1)) {
-            System.out.println(edge);
-        }*/
-
-        BusStop busStop2 = new BusStop(2578289, "Maastricht, Aramislaan", 50.83938, 5.673559);
-        System.out.println("Edges for " + busStop2 + ":");
-        for (Edge edge : g.getEdges(busStop2)) {
-            System.out.println(edge);
+        List<BusRouteShape> shapes = GraphBuilder.getBusRouteShapes(1131287);
+        for (BusRouteShape shape : shapes) {
+            System.out.println("(" + shape.shapePtLat + ", " + shape.shapePtLon + ")");
         }
-
-        System.out.println(g.getVertices().size());
     }
 
 }

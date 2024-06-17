@@ -5,6 +5,7 @@ import src.java.Main.CalculateDistance;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.SQLException;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -12,9 +13,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class AStar {
-    protected final int AVGWALKINGTIME = 70; // meters/min
-    protected final Graph graph;
-    protected List<String> directions;
+    private final int AVGWALKINGTIME = 70; // meters/min
+    private final Graph graph;
+    private List<String> directions;
 
     public AStar(Graph graph) {
         this.graph = graph;
@@ -91,7 +92,7 @@ public class AStar {
                 return reconstructPath(currentSearchNode);
             }
 
-            System.out.println("Current Node: " + currentSearchNode.place + ", g = " + currentSearchNode.g + ", h = " + currentSearchNode.h + ", f = " + currentSearchNode.f + ", time = " + currentSearchNode.time);
+            //System.out.println("Current Node: " + currentSearchNode.place + ", g = " + currentSearchNode.g + ", h = " + currentSearchNode.h + ", f = " + currentSearchNode.f + ", time = " + currentSearchNode.time);
 
             for (Edge edge : graph.getEdges(currentSearchNode.place)) {
                 if (currentSearchNode.cameFrom != null && edge.getTo().equals(currentSearchNode.cameFrom.place)) {
@@ -103,7 +104,7 @@ public class AStar {
                 String edgeHeadSign = edge.getTripHeadSign();
 
                 if (edgeHeadSign.equals("walk")) {
-                    System.out.println("Considering walking to: " + edge.getTo() + ", time cost: " + edge.getWalkingTime() + ", dist cost: " + edge.getWalkingDist());
+                    //System.out.println("Considering walking to: " + edge.getTo() + ", time cost: " + edge.getWalkingTime() + ", dist cost: " + edge.getWalkingDist());
 
                     timeCost = currentSearchNode.g + edge.getWalkingTime();
                     distCost = currentSearchNode.dist + edge.getWalkingDist();
@@ -118,7 +119,7 @@ public class AStar {
                     continue;
                 }
 
-                System.out.println("Considering edge to: " + edge.getTo() + ", tripHeadsign: " + edge.getTripHeadSign());
+                //System.out.println("Considering edge to: " + edge.getTo() + ", tripHeadsign: " + edge.getTripHeadSign());
 
                 List<Trip> trips = edge.getTrips();
                 Collections.sort(trips);
@@ -127,10 +128,10 @@ public class AStar {
                     //System.out.println("Considering trip: " + trip);
 
                     if (trip.getDepartureTime().compareTo(currentSearchNode.time) >= 0) {
-                        System.out.println("choose trip: " + trip);
+                        //System.out.println("choose trip: " + trip);
                         timeCost = currentSearchNode.g + GraphBuilder.calculateTimeDifference(currentSearchNode.time, trip.getArriveTime());
                         distCost = currentSearchNode.dist + trip.getShapeDistTraveled();
-                        LocalTime time = currentSearchNode.time.plusMinutes(GraphBuilder.calculateTimeDifference(currentSearchNode.time, trip.getArriveTime()));
+                        LocalTime time = trip.getArriveTime();
                         SearchNode searchNode = new SearchNode(edge.getTo(), timeCost, heuristic(edge.getTo(), goal), time, distCost, currentSearchNode, trip);
                         if (searchNode.f < priorityMap.get(searchNode.place)) {
                             priorityMap.put(searchNode.place, searchNode.f);
@@ -153,13 +154,14 @@ public class AStar {
     private List<Place> reconstructPath(SearchNode currentSearchNode) {
         List<SearchNode> pathNodes = new ArrayList<>();
         List<Place> stops = new ArrayList<>();
+
         while (currentSearchNode != null) {
             pathNodes.add(currentSearchNode);
             currentSearchNode = currentSearchNode.cameFrom;
         }
         Collections.reverse(pathNodes);
 
-        for (int i = 0; i < pathNodes.size(); i += 1) {
+        /*for (int i = 0; i < pathNodes.size(); i += 1) {
             if (i == 0) {
                 System.out.println("walk from " + pathNodes.get(0).place + " to " + pathNodes.get(1).place + ", time: " + pathNodes.get(1).time);
             } else if (i == pathNodes.size() - 1) {
@@ -169,69 +171,133 @@ public class AStar {
                 System.out.println(" ---- in trip: " + pathNodes.get(i + 1).trip);
             }
             stops.add(pathNodes.get(i).place);
+        }*/
+
+        constructDirections(pathNodes);
+        return constructShapes(pathNodes);
+
+        //return stops;
+    }
+
+    private void constructDirections(List<SearchNode> pathNodes) {
+        int size = pathNodes.size();
+        for (int i = 0; i < size; i += 1) {
+            StringBuilder sb = new StringBuilder();
+            if (i == 0) {
+                sb.append(pathNodes.get(i).time).append("--").append(pathNodes.get(i).place.getZipCode());
+                directions.add(sb.toString());
+                continue;
+            }
+            if (pathNodes.get(i).trip == null) {
+                sb.append("Walk about ")
+                        .append(pathNodes.get(i).g -  pathNodes.get(i - 1).g)
+                        .append(" min, ")
+                        .append(pathNodes.get(i).dist - pathNodes.get(i - 1).dist)
+                        .append(" m");
+                directions.add(sb.toString());
+                sb = new StringBuilder();
+            }
+            if (i == size - 1) {
+                sb.append(pathNodes.get(i).time).append("--").append(pathNodes.get(i).place.getZipCode());
+                directions.add(sb.toString());
+                continue;
+            }
+            String headSign = pathNodes.get(i).trip == null ? "" : "--" + pathNodes.get(i).trip.getTripHeadSign();
+            sb.append(pathNodes.get(i).time).append("--").append(pathNodes.get(i).place).append(headSign);
+            directions.add(sb.toString());
+        }
+    }
+
+    private List<Place> constructShapes(List<SearchNode> pathNodes) {
+        List<Place> stops = new ArrayList<>();
+        stops.add(pathNodes.get(0).place);
+        List<Integer> shapeIDs = new ArrayList<>();
+
+        for (SearchNode node : pathNodes) {
+            if (node.trip == null) {
+                shapeIDs.add(0);
+            } else {
+                shapeIDs.add(node.trip.getShapeId());
+            }
+        }
+
+        Place start = null;
+        Place end = null;
+        int prev = 0;
+
+        for (int i = 1; i < shapeIDs.size(); i += 1) {
+            int curr = shapeIDs.get(i);
+
+            if (curr == 0) {
+
+                if (prev != 0) {
+                    end = pathNodes.get(i - 1).place;
+
+                    try {
+                        List<BusRouteShape> shapes = GraphBuilder.getBusRouteShapes(prev);
+                        stops.addAll(extractShapeSegment(start, end, shapes));
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                stops.add(pathNodes.get(i).place);
+
+            } else {
+                if (prev == 0) {
+                    start = pathNodes.get(i - 1).place;
+                } else if (prev != curr) {
+                    end = pathNodes.get(i - 1).place;
+
+                    try {
+                        List<BusRouteShape> shapes = GraphBuilder.getBusRouteShapes(prev);
+                        stops.addAll(extractShapeSegment(start, end, shapes));
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
+            prev = curr;
         }
 
         return stops;
     }
 
-    /*private void constructDirections(Node currentNode) {
-        Node p = currentNode;
-        List<Node> pathNodes = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
+    private List<Place> extractShapeSegment(Place start, Place end, List<BusRouteShape> shapes) {
+        List<Place> segment = new ArrayList<>();
+        int startIndex = findClosestShapePoint(start, shapes);
+        int endIndex = findClosestShapePoint(end, shapes);
+        List<BusRouteShape> temp;
 
-        double totalTime = 0.0;
-        double totalDistance = 0.0;
-
-        while (p != null) {
-            pathNodes.add(p);
-            p = p.cameFrom;
+        if (startIndex > endIndex) {
+            temp = shapes.subList(endIndex, startIndex + 1);
+        } else {
+            temp = shapes.subList(startIndex, endIndex + 1);
         }
-        Collections.reverse(pathNodes);
 
-        for (int i = 0; i < pathNodes.size() - 1; i += 1) {
-            sb = new StringBuilder();
-            Node next = pathNodes.get(i + 1);
-            Node curr = next.cameFrom;
-            long dist = Math.round(next.g - curr.g);
+        for (BusRouteShape shape : temp) {
+            segment.add(new Place(shape.shapePtLat, shape.shapePtLon));
+        }
 
-            if (i == 0) {
-                totalDistance += dist;
-                totalTime += (dist / AVGWALKINGTIME);
-                sb.append("Walk from your current location around ")
-                        .append(dist)
-                        .append(" meters to ")
-                        .append(next.place.toString());
-                directions.add(sb.toString());
-            } else if (i == pathNodes.size() - 2) {
-                totalDistance += dist;
-                totalTime += (dist / AVGWALKINGTIME);
-                sb.append("Walk around ")
-                        .append(dist)
-                        .append(" meters to your destination");
-                directions.add(sb.toString());
-            } else {
-                totalDistance += dist;
-                totalTime += (dist / AVGBUSTIME);
-                sb.append("Take bus from ")
-                        .append(curr.place.toString())
-                        .append(" to ")
-                        .append(next.place.toString())
-                        .append(", headsign: ")
-                        .append(next.tripHeadsign)
-                        .append(", distance: ")
-                        .append(dist);
-                directions.add(sb.toString());
+        return segment;
+    }
+
+    private int findClosestShapePoint(Place place, List<BusRouteShape> shapes) {
+        int index = -1;
+        double minDistance = Double.MAX_VALUE;
+
+        for (int i = 0; i < shapes.size(); i += 1) {
+            BusRouteShape shape = shapes.get(i);
+            double distance = CalculateDistance.distanceBetween(place.lat, place.lon, shape.shapePtLat, shape.shapePtLon);
+            if (distance < minDistance) {
+                minDistance = distance;
+                index = i;
             }
         }
 
-        sb = new StringBuilder();
-        sb.append("Total distance: ")
-                .append(Math.round(totalDistance))
-                .append(" meters , total time: ")
-                .append(Math.round(totalTime))
-                .append("minutes");
-        directions.add(sb.toString());
-    }*/
+        return index;
+    }
 
     public static int getRealDistance(Place origin, Place destination) throws Exception {
         String apiKey = "AIzaSyAZwfzWK71qIgXSleA-02n-oXfo5OjOhhU";
@@ -276,15 +342,12 @@ public class AStar {
 
         if (path.isEmpty()) {
             System.out.println("No path found.");
-        }
-
-        /*if (path.isEmpty()) {
-            System.out.println("No path found.");
         } else {
-            System.out.println("Path found:");
-            for (Place place : path) {
-                System.out.println(place);
+            System.out.println("Path found: ");
+            for (String s : aStar.directions) {
+                System.out.println(s);
             }
-        }*/
+
+        }
     }
 }

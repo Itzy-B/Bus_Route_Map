@@ -227,7 +227,7 @@ public class MapLauncher extends Application{
             AStar aStar = new AStar(graph);
             path = aStar.findShortestPath(departure, destination);
 
-            listView.getItems().setAll(aStar.directions);
+            listView.getItems().setAll(aStar.getDirections());
             updateMap();
 
         } else {
