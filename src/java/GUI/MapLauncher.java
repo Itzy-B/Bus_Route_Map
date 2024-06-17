@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -59,11 +61,13 @@ public class MapLauncher extends Application{
     private CheckBox checkBox = null;
     private CheckBox toggleQuerySystem = null;
     private ListView<String> listView;
+    private static AStar aStar;
 
     //private Place departure;
     //private Place destination;
     private static Place departure;
     private static Place destination;
+    private static Map<String, List<Place>> cachedPaths = new HashMap<>();
 
     private List<Place> path;
     /**
@@ -181,6 +185,11 @@ public class MapLauncher extends Application{
     private void zoomIn() {
         zoomLevel += 1;
         scale *= 2;
+        try {
+            searchPlaces();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Platform.runLater(this::updateMap);
     }
 
@@ -196,6 +205,11 @@ public class MapLauncher extends Application{
         if (zoomLevel >= 1) {
             zoomLevel -= 1;
             scale /= 2;
+            try {
+                searchPlaces();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             Platform.runLater(this::updateMap);
         }
     }
@@ -212,21 +226,32 @@ public class MapLauncher extends Application{
 
         // Check if both zip code fields are filled
         if (!zipCode1.isEmpty() && !zipCode2.isEmpty()) {
+            String key = zipCode1 + zipCode2;
+            path = null;
+            if (cachedPaths != null && cachedPaths.containsKey(key)) {
+                path = cachedPaths.get(zipCode1+zipCode2);
+                System.out.println("using cache");
+            }
+
+            if (aStar == null || path == null) {
+                departure = new Place(zipCode1);
+                destination = new Place(zipCode2);
+    
+                ArrayList<Double> midPoint = CalculateDistance.findMidpoint(departure, destination);
+                CENTER_LATITUDE = midPoint.get(0);
+                CENTER_LONGITUDE = midPoint.get(1);
+    
+                Graph graph = new Graph();
+                GraphBuilder graphBuilder = new GraphBuilder(graph);
+                graphBuilder.getBusStops();
+    
+                aStar = new AStar(graph);
+                path = aStar.findShortestPath(departure, destination);
+                cachedPaths.put(zipCode1 + zipCode2, path);
+            }
+
             // Fetch place from zipcode
-            departure = new Place(zipCode1);
-            destination = new Place(zipCode2);
-
-            ArrayList<Double> midPoint = CalculateDistance.findMidpoint(departure, destination);
-            CENTER_LATITUDE = midPoint.get(0);
-            CENTER_LONGITUDE = midPoint.get(1);
-
-            Graph graph = new Graph();
-            GraphBuilder graphBuilder = new GraphBuilder(graph);
-            graphBuilder.getBusStops();
-
-            AStar aStar = new AStar(graph);
-            path = aStar.findShortestPath(departure, destination);
-
+            path = cachedPaths.get(zipCode1 + zipCode2);
             listView.getItems().setAll(aStar.getDirections());
             updateMap();
 
@@ -254,11 +279,13 @@ public class MapLauncher extends Application{
         if (zipCodeField1 instanceof TextField && zipCodeField2 instanceof TextField) {
             String zipCode1 = zipCodeField1.getText();
             String zipCode2 = zipCodeField2.getText();
-            try {
-                departure = new Place(zipCode1);
-                destination = new Place(zipCode2);
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (zipCode1.length() > 0 || zipCode2.length() > 0) {
+                try {
+                    departure = new Place(zipCode1);
+                    destination = new Place(zipCode2);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
         if (departure != null && destination != null && toggleQuerySystem.isSelected()) {
