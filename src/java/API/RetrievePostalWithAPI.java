@@ -78,6 +78,7 @@ public class RetrievePostalWithAPI {
         .send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 500) {
+            System.out.println("API failed");
             ExceptionManager.showError("API error", "Error", "Http error 500, failed to fetch coordinates of postal code " + pCode, AlertType.ERROR);
         }
         System.out.println(response.statusCode());

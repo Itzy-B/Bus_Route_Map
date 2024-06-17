@@ -172,11 +172,19 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         ArrayList<Integer> yPoints = new ArrayList<>();
 
         // ArrayList<ArrayList<Double[]>> list = parser.getPolyGon();
-        int iteratorColors = lengthColours / zipCodes.size();
+        int iteratorColors = lengthColours / zipCodesAll.length;
         //Change this.zipCodesAll to zipCodes to draw only the zipcodes from MassZipLatLon.xldx
-        for (String postcode: this.zipCodesAll) {
-            List<List<Double[]>> polygons = polygonsMap.get(postcode);
+        for (String postCode: this.zipCodesAll) {
+            List<List<Double[]>> polygons = polygonsMap.get(postCode);
             if (polygons == null || polygons.get(0).isEmpty()) {
+                //Postcodes with no polygons in db, so we just draw a circle, give it later a relevant color
+                //Cover only the Maastricht postcodes
+                if(postCode.equals("6211BM") || postCode.equals("6227CC")) {
+                    ArrayList<Double> latLong = Data.getLatLong(postCode);
+                    int[] Xy = adjust(latLong.get(1), latLong.get(0), centerLongitude, centerLatitude, zoomLevel);
+                    g.setColor(new Color(0,0,0, 50));
+                    g.fillOval((int) (Xy[0] + MAP_WIDTH / 2 - 5), (int) (Xy[1] + MAP_HEIGHT / 2 -5), 10, 10);
+                }
                 continue;
             }
             for(List<Double[]> polygon: polygons) {
@@ -184,13 +192,11 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                 yPoints.clear();
 
 
-    
-                //Postcodes with no polygons in db, so we just draw a circle, give it later a relevant color
-                //Cover only the Maastricht postcodes
+
                 // if(index > -1 && index < 2783) {
                 //     // int[] Xy = adjust(longs.get(index), lats.get(index), centerLongitude, centerLatitude, zoomLevel);
                 //     g.setColor(new Color(0,0,0, 50));
-                //     g.fillOval((int) (Xy[0] + MAP_WIDTH / 2 - 5), (int) (Xy[1] + MAP_HEIGHT / 2 - 5), 5, 5);
+                //     g.fillOval((int) (Xy[0] + MAP_WIDTH / 2 - 5), (int) (Xy[1] + MAP_HEIGHT / 2 -5), 5, 5);
                 //     continue;
                 // }
                 
@@ -206,10 +212,10 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                     
                     if (i > 0) {
                         g.drawLine(
-                            (int) (startX + MAP_WIDTH / 2 - 5),
-                            (int) (startY + MAP_HEIGHT / 2 - 5),
-                            (int) (Xy[0] + MAP_WIDTH / 2 - 5),
-                            (int) (Xy[1] + MAP_HEIGHT / 2 - 5)
+                            (int) (startX + MAP_WIDTH / 2 ),
+                            (int) (startY + MAP_HEIGHT / 2 ),
+                            (int) (Xy[0] + MAP_WIDTH / 2 ),
+                            (int) (Xy[1] + MAP_HEIGHT / 2 )
                         );
                     }
                     
@@ -237,8 +243,8 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                 g.setColor(color);
                 g.fillPolygon(
                     //https://stackoverflow.com/questions/71495980/java-8-stream-add-1-to-each-element-and-remove-if-element-is-5-in-the-list
-                    Arrays.stream(xArray).map(x -> x + (int) MAP_WIDTH / 2 - 5).toArray(),
-                    Arrays.stream(yArray).map(y -> y + (int) MAP_HEIGHT / 2 - 5).toArray(),
+                    Arrays.stream(xArray).map(x -> x + (int) MAP_WIDTH / 2 ).toArray(),
+                    Arrays.stream(yArray).map(y -> y + (int) MAP_HEIGHT / 2 ).toArray(),
                     xArray.length
                 );
             
@@ -316,7 +322,11 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
             JOptionPane.showMessageDialog(null, "No coordinates could be found for zipcode", "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
+
         displayer.zoomLevel = 18;
+        if (latLong == null) {
+            JOptionPane.showMessageDialog(null, "No coordinates could be found for zipcode", "Error", JOptionPane.ERROR_MESSAGE);
+        }
         displayer.centerLongitude = latLong.get(1);
         displayer.centerLatitude = latLong.get(0);
 
