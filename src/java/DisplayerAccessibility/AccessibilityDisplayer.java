@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
     private JButton zoomOutButton = new JButton("-");
     private JTextField zipCodeField1 = new JTextField();
     private ArrayList<String> zipCodes = Data.getZipCodes();
+    private String[] zipCodesAll;
     private ArrayList<Double> lats = Data.getLatitudes();
     private ArrayList<Double> longs = Data.getLongitudes();
     private ArrayList<String> colours = getGradientColors();
@@ -164,7 +166,6 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         int lengthColours = colours.size();
         int colorIndex = 0;
         
-        RDToWGS84 parser = new RDToWGS84();
         double startX = 0;
         double startY = 0;
         ArrayList<Integer> xPoints = new ArrayList<>();
@@ -172,7 +173,8 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
 
         // ArrayList<ArrayList<Double[]>> list = parser.getPolyGon();
         int iteratorColors = lengthColours / zipCodes.size();
-        for (String postcode: zipCodes) {
+        //Change this.zipCodesAll to zipCodes to draw only the zipcodes from MassZipLatLon.xldx
+        for (String postcode: this.zipCodesAll) {
             List<List<Double[]>> polygons = polygonsMap.get(postcode);
             if (polygons == null || polygons.get(0).isEmpty()) {
                 continue;
@@ -244,68 +246,6 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                 yPoints.clear();
             }
         }
-
-        // for (ArrayList<Double[]> polygon : list) {
-        //     xPoints.clear();
-        //     yPoints.clear();
-
-        //     if (polygon.get(0)[0] == -1) {
-        //         //Postcodes with no polygons in db, so we just draw a circle, give it later a relevant color
-        //         int index = list.indexOf(polygon);
-        //         //Cover only the Maastricht postcodes
-        //         if(index > -1 && index < 2783) {
-        //             int[] Xy = adjust(longs.get(index), lats.get(index), centerLongitude, centerLatitude, zoomLevel);
-        //             g.setColor(new Color(0,0,0, 50));
-        //             g.fillOval((int) (Xy[0] + MAP_WIDTH / 2 - 5), (int) (Xy[1] + MAP_HEIGHT / 2 - 5), 5, 5);
-        //             continue;
-        //         }
-        //     }
-            
-        //     for (int i = 0; i < polygon.size(); i++) {
-        //         Double[] coordinates = polygon.get(i);
-        //         double lat = coordinates[0];
-        //         double lon = coordinates[1];
-                
-        //         int[] Xy = adjust(lon, lat, centerLongitude, centerLatitude, zoomLevel);
-                
-        //         xPoints.add(Xy[0]);
-        //         yPoints.add(Xy[1]);
-                
-        //         if (i > 0) {
-        //             g.drawLine(
-        //                 (int) (startX + MAP_WIDTH / 2 - 5),
-        //                 (int) (startY + MAP_HEIGHT / 2 - 5),
-        //                 (int) (Xy[0] + MAP_WIDTH / 2 - 5),
-        //                 (int) (Xy[1] + MAP_HEIGHT / 2 - 5)
-        //             );
-        //         }
-                
-        //         startX = Xy[0];
-        //         startY = Xy[1];
-        //     }
-        
-        //     xPoints.add(xPoints.get(0));
-        //     yPoints.add(yPoints.get(0));
-        
-        //     //https://stackoverflow.com/questions/718554/how-to-convert-an-arraylist-containing-integers-to-primitive-int-array
-        //     int[] xArray = xPoints.stream().mapToInt(i -> i).toArray();
-        //     int[] yArray = yPoints.stream().mapToInt(i -> i).toArray();
-        
-            
-        //     String[] split = colours.get(colorIndex).split(",");
-        //     colorIndex+= iteratorColors;
-        //     Color color = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 64);
-        //     g.setColor(color);
-        //     g.fillPolygon(
-        //         //https://stackoverflow.com/questions/71495980/java-8-stream-add-1-to-each-element-and-remove-if-element-is-5-in-the-list
-        //         Arrays.stream(xArray).map(x -> x + (int) MAP_WIDTH / 2 - 5).toArray(),
-        //         Arrays.stream(yArray).map(y -> y + (int) MAP_HEIGHT / 2 - 5).toArray(),
-        //         xArray.length
-        //     );
-        
-        //     xPoints.clear();
-        //     yPoints.clear();
-        // }
 
         imageIcon = new ImageIcon(bufferedImage);
         label.setIcon(imageIcon);
@@ -428,6 +368,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         AccessibilityDisplayer displayer = new AccessibilityDisplayer(true);
         try {
             displayer.polygonsMap = (Map<String, List<List<Double[]>>>) FileManager.getInstance().getObject("polygonsMap.ser");
+            displayer.zipCodesAll = extractKeys(displayer.polygonsMap);
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
@@ -438,6 +379,11 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String[] extractKeys(Map<String, List<List<Double[]>>> polygonsMap) {
+        Collection<String> keys = polygonsMap.keySet();
+        return keys.toArray(new String[keys.size()]);
     }
 
     @Override
