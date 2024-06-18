@@ -41,6 +41,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
     private double centerLongitude = 5.690973;
     Map<String, List<List<Double[]>>> polygonsMap = new HashMap<>();
     private int zoomLevel = 13;
+    private String zoomedPostcode;
     private JButton updateButton = new JButton("Update");
     private JButton zoomInButton = new JButton("+");
     private JButton zoomOutButton = new JButton("-");
@@ -158,7 +159,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         Graphics2D g = (Graphics2D) bufferedImage.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         Stroke originalStroke = g.getStroke();
-        g.setStroke(new BasicStroke(5));
+        g.setStroke(new BasicStroke(1));
         g.setColor(new Color(255,0,0,64));
         g.setStroke(originalStroke);
         ImageIcon imageIcon = new ImageIcon(bufferedImage);
@@ -186,6 +187,24 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                     g.fillOval((int) (Xy[0] + MAP_WIDTH / 2 - 5), (int) (Xy[1] + MAP_HEIGHT / 2 -5), 10, 10);
                 }
                 continue;
+            }
+
+            String[] split = colours.get(colorIndex).split(",");
+            if (colorIndex+ iteratorColors <= colours.size()) {
+                colorIndex+= iteratorColors;
+            }
+            Color color = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 64);
+            Color polygonColor = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 64);
+            g.setColor(color);
+
+            if(this.zoomedPostcode != null && this.zoomedPostcode.equals(postCode)) {
+                g.setStroke(new BasicStroke(5));
+                color = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 255);
+                g.setColor(color);
+            }
+
+            else {
+                g.setStroke(new BasicStroke(1));
             }
             for(List<Double[]> polygon: polygons) {
                 xPoints.clear();
@@ -234,13 +253,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                 int[] xArray = xPoints.stream().mapToInt(i -> i).toArray();
                 int[] yArray = yPoints.stream().mapToInt(i -> i).toArray();
             
-                
-                String[] split = colours.get(colorIndex).split(",");
-                if (colorIndex+ iteratorColors <= colours.size()) {
-                    colorIndex+= iteratorColors;
-                }
-                Color color = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 64);
-                g.setColor(color);
+                g.setColor(polygonColor);
                 g.fillPolygon(
                     //https://stackoverflow.com/questions/71495980/java-8-stream-add-1-to-each-element-and-remove-if-element-is-5-in-the-list
                     Arrays.stream(xArray).map(x -> x + (int) MAP_WIDTH / 2 ).toArray(),
@@ -311,6 +324,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
 
     public void centerToZipCode(AccessibilityDisplayer displayer) {
         String zipCode = displayer.zipCodeField1.getText();
+        displayer.zoomedPostcode = zipCode;
         ArrayList<Double> latLong = new ArrayList<>();
         if (zipCode.length() == 0) {
             JOptionPane.showMessageDialog(null, "No zipcode has been entered", "Error", JOptionPane.ERROR_MESSAGE);
