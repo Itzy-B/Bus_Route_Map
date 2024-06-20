@@ -181,6 +181,7 @@ public class AStar {
 
     private void constructDirections(List<SearchNode> pathNodes) {
         int size = pathNodes.size();
+        String headSign = "";
         for (int i = 0; i < size; i += 1) {
             StringBuilder sb = new StringBuilder();
             if (i == 0) {
@@ -202,8 +203,11 @@ public class AStar {
                 directions.add(sb.toString());
                 continue;
             }
-            String headSign = pathNodes.get(i).trip == null ? "" : "--" + pathNodes.get(i).trip.getTripHeadSign();
-            sb.append(pathNodes.get(i).time).append("--").append(pathNodes.get(i).place).append(headSign);
+            if (pathNodes.get(i + 1).trip != null && !pathNodes.get(i + 1).trip.getTripHeadSign().equals(headSign)) {
+                directions.add(pathNodes.get(i + 1).trip.getTripHeadSign());
+                headSign = pathNodes.get(i + 1).trip.getTripHeadSign();
+            }
+            sb.append(pathNodes.get(i).time).append("--").append(pathNodes.get(i).place);
             directions.add(sb.toString());
         }
     }
@@ -255,6 +259,8 @@ public class AStar {
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     }
+
+                    start = pathNodes.get(i).place;
                 }
             }
 
@@ -334,8 +340,8 @@ public class AStar {
         Graph graph = new Graph();
         GraphBuilder graphBuilder = new GraphBuilder(graph);
         graphBuilder.getBusStops();
-        Place startPlace  = new Place(50.8385716, 5.66547324285714);
-        Place endPlace = new Place(50.8380708633987, 5.71570995359477);
+        Place startPlace  = new Place(50.8419194317073, 5.64520881707317);
+        Place endPlace = new Place(50.8864, 5.7145);
 
         AStar aStar = new AStar(graph);
         List<Place> path = aStar.findShortestPath(startPlace, endPlace);
