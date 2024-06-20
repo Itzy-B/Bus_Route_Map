@@ -18,8 +18,18 @@ import java.util.List;
 public class JSONController {
     private static final String NAME_API_URL_TEMPLATE = "https://geocode.maps.co/reverse?lat=%f&lon=%f&api_key=6666d2ba4331d378476246ngzcb1fcc";
     private static final String API_URL_TEMPLATE = "https://api.geoapify.com/v1/geocode/reverse?lat=%f&lon=%f&apiKey=c9a518e5482a431f8c1dbd0d894ef95e";
+
+    private static final String AMENITY_PATH = "src/java/JSON/amenity.geojson";
+    private static final String SHOP_PATH = "src/java/JSON/shop.geojson";
+    private static final String TOURISM_PATH = "src/java/JSON/tourism.geojson";
+
     private static final String SCHOOL_AMENITY = "school";
     private static final String ATM_AMENITY = "atm";
+    private static final String FUEL_AMENITY = "fuel";
+    private static final String WASTE_AMENITY = "waste_basket";
+
+    private static final String SUPERMARKET_SHOP = "supermarket";
+
 
 
 
@@ -110,9 +120,24 @@ public class JSONController {
         return null;
     }
 
-    public List<Place> getSchoolsFromGeoJSON(String filePath, boolean useAPI) throws IOException, InterruptedException {
+    /**
+     * Returns a list of places from the GEOJSON files provided
+     * @param isAmenity specifies whether the palces are amenities or shops
+     * @param type specifies the type of places to be returned eg. supermarket, shop, school, etc.
+     * @param useAPI Whether the method is to use the API to supplement any missing information (should be left false because it is very slow)
+     * @return Returns a list of places that the user searched for
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public List<Place> getPlacesFromGeoJSON(Boolean isAmenity, String type, boolean useAPI) throws IOException, InterruptedException {
+        String filePath;
+        if(isAmenity){
+            filePath = AMENITY_PATH;
+        }else{
+            filePath = SHOP_PATH;
+        }
         Data.getData();
-        List<Place> schools = new ArrayList<>();
+        List<Place> places = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.readTree(new File(filePath));
 
@@ -120,27 +145,64 @@ public class JSONController {
         if (features != null && features.isArray()) {
             for (JsonNode feature : features) {
                 JsonNode properties = feature.get("properties");
-                if (properties != null) {
-                    JsonNode amenityNode = properties.get("amenity");
-                    if (amenityNode != null && SCHOOL_AMENITY.equals(amenityNode.asText())) {
-                        String name = properties.has("name") ? properties.get("name").asText() : "Unnamed School";
+                if(isAmenity) {
+                    if (properties != null) {
+                        JsonNode amenityNode = properties.get("amenity");
+                        if (amenityNode != null && type.equals(amenityNode.asText())) {
+                            // Exclude waste baskets with waste type dog_excrement
+                            if ("waste_basket".equals(type)) {
+                                JsonNode wasteNode = properties.get("waste");
+                                if (wasteNode != null && "dog_excrement".equals(wasteNode.asText())) {
+                                    continue;  // Skip this feature
+                                }
+                            }
+
+                            String name = properties.has("name") ? properties.get("name").asText() : "Unnamed " + capitalizeFirstLetter(type);
+                            JsonNode geometry = feature.get("geometry");
+                            if (geometry != null && "Point".equals(geometry.get("type").asText())) {
+                                JsonNode coordinates = geometry.get("coordinates");
+                                if (coordinates != null && coordinates.isArray() && coordinates.size() == 2) {
+                                    double longitude = coordinates.get(0).asDouble();
+                                    double latitude = coordinates.get(1).asDouble();
+                                    if (useAPI) {
+                                        String[] data = getPostalCode(latitude, longitude);
+                                        String postcode = data[0];
+                                        if (name.equals("Unnamed " + capitalizeFirstLetter(type)) && data[1] != null) {
+                                            name = data[1];
+                                        }
+                                        places.add(new Place(name, postcode, latitude, longitude));
+                                        Thread.sleep(200);
+                                    } else {
+                                        String postcode = Data.findClosestZipCode(latitude, longitude);
+                                        places.add(new Place(name, postcode, latitude, longitude));
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    JsonNode shopNode = properties.get("shop");
+                    if (shopNode != null && type.equals(shopNode.asText())) {
+
+                        String name = properties.has("name") ? properties.get("name").asText() : "Unnamed " + capitalizeFirstLetter(type);
                         JsonNode geometry = feature.get("geometry");
                         if (geometry != null && "Point".equals(geometry.get("type").asText())) {
                             JsonNode coordinates = geometry.get("coordinates");
                             if (coordinates != null && coordinates.isArray() && coordinates.size() == 2) {
                                 double longitude = coordinates.get(0).asDouble();
                                 double latitude = coordinates.get(1).asDouble();
-                                if(useAPI){
+                                if (useAPI) {
                                     String[] data = getPostalCode(latitude, longitude);
                                     String postcode = data[0];
-                                    if(name.equals("Unnamed School") && data[1] != null){
+                                    if (name.equals("Unnamed " + capitalizeFirstLetter(type)) && data[1] != null) {
                                         name = data[1];
                                     }
-                                    schools.add(new Place(name, postcode, latitude, longitude));
+                                    places.add(new Place(name, postcode, latitude, longitude));
                                     Thread.sleep(200);
-                                }else{
+                                } else {
                                     String postcode = Data.findClosestZipCode(latitude, longitude);
-                                    schools.add(new Place(name, postcode, latitude, longitude));
+                                    places.add(new Place(name, postcode, latitude, longitude));
                                 }
 
                             }
@@ -149,63 +211,31 @@ public class JSONController {
                 }
             }
         }
-        return schools;
+        return places;
     }
 
-    public List<Place> getATMsFromGeoJSON(String filePath, boolean useAPI) throws IOException, InterruptedException {
-        Data.getData();
-        List<Place> atms = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode rootNode = mapper.readTree(new File(filePath));
-
-        JsonNode features = rootNode.get("features");
-        if (features != null && features.isArray()) {
-            for (JsonNode feature : features) {
-                JsonNode properties = feature.get("properties");
-                if (properties != null) {
-                    JsonNode amenityNode = properties.get("amenity");
-                    if (amenityNode != null && ATM_AMENITY.equals(amenityNode.asText())) {
-                        String name = properties.has("name") ? properties.get("name").asText() : "Unnamed ATM";
-                        JsonNode geometry = feature.get("geometry");
-                        if (geometry != null && "Point".equals(geometry.get("type").asText())) {
-                            JsonNode coordinates = geometry.get("coordinates");
-                            if (coordinates != null && coordinates.isArray() && coordinates.size() == 2) {
-                                double longitude = coordinates.get(0).asDouble();
-                                double latitude = coordinates.get(1).asDouble();
-                                if(useAPI){
-                                    String[] data = getPostalCode(latitude, longitude);
-                                    String postcode = data[0];
-                                    if(name.equals("Unnamed ATM") && data[1] != null){
-                                        name = data[1];
-                                    }
-                                    atms.add(new Place(name, postcode, latitude, longitude));
-                                    Thread.sleep(200);
-                                }else{
-                                    String postcode = Data.findClosestZipCode(latitude, longitude);
-                                    atms.add(new Place(name, postcode, latitude, longitude));
-                                }
-
-                            }
-                        }
-                    }
-                }
-            }
+    private String capitalizeFirstLetter(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
         }
-        return atms;
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
 
     public static void main(String[] args) {
         JSONController controller = new JSONController();
+        int count = 0;
         try {
             long startTime = System.currentTimeMillis(); // Start timing
-            List<Place> atms = controller.getATMsFromGeoJSON("src/java/JSON/amenity.geojson", false);
-            for (Place atm : atms) {
-                System.out.println(atm);
+            List<Place> places = controller.getPlacesFromGeoJSON(true, SCHOOL_AMENITY, false);
+            for (Place place : places) {
+                System.out.println(place);
+                count++;
             }
             long endTime = System.currentTimeMillis(); // End timing
             long duration = endTime - startTime; // Calculate the duration
             System.out.println("Time taken: " + duration + " ms");
+            System.out.println("Number of places: " + count);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
