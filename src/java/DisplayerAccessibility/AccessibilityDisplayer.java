@@ -160,7 +160,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         Stroke originalStroke = g.getStroke();
         g.setStroke(new BasicStroke(1));
-        g.setColor(new Color(255,0,0,64));
+        g.setColor(new Color(255,255,255,64));
         g.setStroke(originalStroke);
         ImageIcon imageIcon = new ImageIcon(bufferedImage);
         JLabel label = new JLabel(imageIcon);
@@ -193,20 +193,24 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
             if (colorIndex+ iteratorColors <= colours.size()) {
                 colorIndex+= iteratorColors;
             }
-            Color color = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 64);
+            Color color = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 255);
             Color polygonColor = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 64);
             g.setColor(color);
 
-            if(this.zoomedPostcode != null && this.zoomedPostcode.equals(postCode)) {
-                g.setStroke(new BasicStroke(5));
-                color = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 255);
-                g.setColor(color);
-            }
 
-            else {
-                g.setStroke(new BasicStroke(1));
-            }
+
+
             for(List<Double[]> polygon: polygons) {
+                if(this.zoomedPostcode != null && this.zoomedPostcode.equals(postCode)) {
+                    // g.setStroke(new BasicStroke((int) (5 * (zoomLevel /18))));
+                    g.setStroke(new BasicStroke((float) 2));
+
+                    color = new Color(0,0,0);
+                    g.setColor(color);
+                }
+                else {
+                    g.setStroke(new BasicStroke((float) 0.5));
+                }
                 xPoints.clear();
                 yPoints.clear();
 
