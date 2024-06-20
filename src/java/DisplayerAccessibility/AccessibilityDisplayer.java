@@ -193,7 +193,8 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
             if (colorIndex+ iteratorColors <= colours.size()) {
                 colorIndex+= iteratorColors;
             }
-            Color color = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 255);
+            // Color color = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 255);
+            Color color = new Color(0,0,0, 255);
             Color polygonColor = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 64);
             g.setColor(color);
 

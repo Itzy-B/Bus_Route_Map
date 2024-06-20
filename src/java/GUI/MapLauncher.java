@@ -233,7 +233,15 @@ public class MapLauncher extends Application{
                 System.out.println("using cache");
             }
 
-            if (aStar == null || path == null) {
+            if (aStar == null) {
+                Graph graph = new Graph();
+                GraphBuilder graphBuilder = new GraphBuilder(graph);
+                graphBuilder.getBusStops();
+    
+                aStar = new AStar(graph);
+            }
+            
+            if(path == null) {
                 departure = new Place(zipCode1);
                 destination = new Place(zipCode2);
     
@@ -241,11 +249,7 @@ public class MapLauncher extends Application{
                 CENTER_LATITUDE = midPoint.get(0);
                 CENTER_LONGITUDE = midPoint.get(1);
     
-                Graph graph = new Graph();
-                GraphBuilder graphBuilder = new GraphBuilder(graph);
-                graphBuilder.getBusStops();
-    
-                aStar = new AStar(graph);
+
                 path = aStar.findShortestPath(departure, destination);
                 cachedPaths.put(zipCode1 + zipCode2, path);
             }
