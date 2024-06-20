@@ -19,6 +19,7 @@ public class JSONController {
     private static final String NAME_API_URL_TEMPLATE = "https://geocode.maps.co/reverse?lat=%f&lon=%f&api_key=6666d2ba4331d378476246ngzcb1fcc";
     private static final String API_URL_TEMPLATE = "https://api.geoapify.com/v1/geocode/reverse?lat=%f&lon=%f&apiKey=c9a518e5482a431f8c1dbd0d894ef95e";
     private static final String SCHOOL_AMENITY = "school";
+    private static final String ATM_AMENITY = "atm";
 
 
 
@@ -151,14 +152,56 @@ public class JSONController {
         return schools;
     }
 
+    public List<Place> getATMsFromGeoJSON(String filePath, boolean useAPI) throws IOException, InterruptedException {
+        Data.getData();
+        List<Place> atms = new ArrayList<>();
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode rootNode = mapper.readTree(new File(filePath));
+
+        JsonNode features = rootNode.get("features");
+        if (features != null && features.isArray()) {
+            for (JsonNode feature : features) {
+                JsonNode properties = feature.get("properties");
+                if (properties != null) {
+                    JsonNode amenityNode = properties.get("amenity");
+                    if (amenityNode != null && ATM_AMENITY.equals(amenityNode.asText())) {
+                        String name = properties.has("name") ? properties.get("name").asText() : "Unnamed ATM";
+                        JsonNode geometry = feature.get("geometry");
+                        if (geometry != null && "Point".equals(geometry.get("type").asText())) {
+                            JsonNode coordinates = geometry.get("coordinates");
+                            if (coordinates != null && coordinates.isArray() && coordinates.size() == 2) {
+                                double longitude = coordinates.get(0).asDouble();
+                                double latitude = coordinates.get(1).asDouble();
+                                if(useAPI){
+                                    String[] data = getPostalCode(latitude, longitude);
+                                    String postcode = data[0];
+                                    if(name.equals("Unnamed ATM") && data[1] != null){
+                                        name = data[1];
+                                    }
+                                    atms.add(new Place(name, postcode, latitude, longitude));
+                                    Thread.sleep(200);
+                                }else{
+                                    String postcode = Data.findClosestZipCode(latitude, longitude);
+                                    atms.add(new Place(name, postcode, latitude, longitude));
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return atms;
+    }
+
 
     public static void main(String[] args) {
         JSONController controller = new JSONController();
         try {
             long startTime = System.currentTimeMillis(); // Start timing
-            List<Place> schools = controller.getSchoolsFromGeoJSON("src/java/JSON/amenity.geojson", false);
-            for (Place school : schools) {
-                System.out.println(school);
+            List<Place> atms = controller.getATMsFromGeoJSON("src/java/JSON/amenity.geojson", false);
+            for (Place atm : atms) {
+                System.out.println(atm);
             }
             long endTime = System.currentTimeMillis(); // End timing
             long duration = endTime - startTime; // Calculate the duration
