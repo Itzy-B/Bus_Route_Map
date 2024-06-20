@@ -1,10 +1,11 @@
 package src.java.GUI;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Edge {
+public class Edge implements Serializable {
     private Place from;
     private Place to;
     private String tripHeadSign;

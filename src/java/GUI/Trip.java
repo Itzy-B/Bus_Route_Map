@@ -1,8 +1,9 @@
 package src.java.GUI;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 
-public class Trip implements Comparable<Trip> {
+public class Trip implements Comparable<Trip>, Serializable {
     private int tripId;
     private String tripHeadSign;
     private int shapeDistTraveled;

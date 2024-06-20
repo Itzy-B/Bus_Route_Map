@@ -16,7 +16,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -28,6 +27,7 @@ import src.java.Database.DatabaseController;
 import src.java.Main.BusRouteFinder;
 import src.java.Main.CalculateDistance;
 import src.java.Singletons.ExceptionManager;
+import src.java.Singletons.FileManager;
 /**
  * This class represents the graphical user interface (GUI) for launching a map application.
  */
@@ -91,6 +91,11 @@ public class MapLauncher extends Application{
         // Load the map image from the URL
         // Image mapImage = new Image("/staticmap.png");
         Image mapImage = new Image(mapUrl);
+        try {
+            aStar = (AStar) FileManager.getInstance().getObject("astar.ser");
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        };
 
         // Create an ImageView to display the map image
         mapView = new ImageView(mapImage);
@@ -193,10 +198,6 @@ public class MapLauncher extends Application{
         Platform.runLater(this::updateMap);
     }
 
-    private boolean getCheckBoxState() {
-        return checkBox.isSelected();
-    }
-
     private boolean getQueryButtonState() {
         return toggleQuerySystem.isSelected();
     }
@@ -239,6 +240,7 @@ public class MapLauncher extends Application{
                 graphBuilder.getBusStops();
     
                 aStar = new AStar(graph);
+                FileManager.getInstance().serializeObject(aStar, "astar.ser", "astar.ser");
             }
             
             if(path == null) {

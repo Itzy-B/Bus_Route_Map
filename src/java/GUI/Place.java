@@ -3,13 +3,14 @@ package src.java.GUI;
 import src.java.Main.CalculateDistance;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
 /**
  * Represents a geographic place identified by a zip code, latitude, and longitude.
  */
-public class Place {
+public class Place implements Serializable{
     protected String name;
     protected String zipCode;
     protected double lat;

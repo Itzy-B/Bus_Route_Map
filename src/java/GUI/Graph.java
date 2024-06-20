@@ -1,8 +1,9 @@
 package src.java.GUI;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Graph {
+public class Graph implements Serializable{
     private Map<Place, Set<Edge>> adjList = new HashMap<>();
 
     public void addVertex(Place vertex) {

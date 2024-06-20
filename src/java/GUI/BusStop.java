@@ -1,10 +1,11 @@
 package src.java.GUI;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class BusStop extends Place {
+public class BusStop extends Place implements Serializable {
     private int stopId;
     private String name;
 

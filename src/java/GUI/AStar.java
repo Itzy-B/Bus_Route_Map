@@ -12,7 +12,7 @@ import java.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class AStar {
+public class AStar implements Serializable {
     private final int AVGWALKINGTIME = 70; // meters/min
     private final Graph graph;
     private List<String> directions;
