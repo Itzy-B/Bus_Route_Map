@@ -287,8 +287,8 @@ public class MapLauncher extends Application{
             String zipCode2 = zipCodeField2.getText();
             if (zipCode1.length() > 0 || zipCode2.length() > 0) {
                 try {
-                    departure = new Place(zipCode1);
-                    destination = new Place(zipCode2);
+                    if (!departure.getZipCode().equals(zipCode1)) departure = new Place(zipCode1);
+                    if (!destination.getZipCode().equals(zipCode2)) destination = new Place(zipCode2);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
