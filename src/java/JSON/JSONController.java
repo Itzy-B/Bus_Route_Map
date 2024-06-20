@@ -30,7 +30,7 @@ public class JSONController {
 
     private static final String SUPERMARKET_SHOP = "supermarket";
 
-
+    private static final double EARTH_RADIUS = 6371e3;
 
 
     public static String[] getPostalCode(double latitude, double longitude) {
@@ -221,13 +221,106 @@ public class JSONController {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
+    public static double vincentyDistance(double lat1, double lon1, double lat2, double lon2) {
+        final double a = 6378137.0; // WGS-84 semi-major axis constant in meters
+        final double f = 1 / 298.257223563; // WGS-84 flattening factor
+        final double b = 6356752.314245; // WGS-84 semi-minor axis
+
+        double L = Math.toRadians(lon2 - lon1);
+        double U1 = Math.atan((1 - f) * Math.tan(Math.toRadians(lat1)));
+        double U2 = Math.atan((1 - f) * Math.tan(Math.toRadians(lat2)));
+        double sinU1 = Math.sin(U1), cosU1 = Math.cos(U1);
+        double sinU2 = Math.sin(U2), cosU2 = Math.cos(U2);
+
+        double cosSigma, sigma, sinSigma, cos2SigmaM, sinAlpha;
+        double lambda = L, lambdaP, iterLimit = 100;
+        do {
+            double sinLambda = Math.sin(lambda), cosLambda = Math.cos(lambda);
+            sinSigma = Math.sqrt((cosU2 * sinLambda) * (cosU2 * sinLambda) +
+                    (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda) * (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda));
+            if (sinSigma == 0) {
+                return 0; // co-incident points
+            }
+            cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * cosLambda;
+            sigma = Math.atan2(sinSigma, cosSigma);
+            sinAlpha = cosU1 * cosU2 * sinLambda / sinSigma;
+            cos2SigmaM = cosSigma - 2 * sinU1 * sinU2 / (1 - sinAlpha * sinAlpha);
+            double C = f / 16 * (1 - sinAlpha * sinAlpha) * (4 + f * (4 - 3 * (1 - sinAlpha * sinAlpha)));
+            lambdaP = lambda;
+            lambda = L + (1 - C) * f * sinAlpha *
+                    (sigma + C * sinSigma * (cos2SigmaM + C * cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)));
+        } while (Math.abs(lambda - lambdaP) > 1e-12 && --iterLimit > 0);
+
+        if (iterLimit == 0) {
+            return Double.POSITIVE_INFINITY; // formula failed to converge
+        }
+
+        double uSquared = (1 - sinAlpha * sinAlpha) * (a * a - b * b) / (b * b);
+        double A = 1 + uSquared / 16384 * (4096 + uSquared * (-768 + uSquared * (320 - 175 * uSquared)));
+        double B = uSquared / 1024 * (256 + uSquared * (-128 + uSquared * (74 - 47 * uSquared)));
+        double deltaSigma = B * sinSigma * (cos2SigmaM + B / 4 * (cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM) -
+                B / 6 * cos2SigmaM * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * cos2SigmaM * cos2SigmaM)));
+
+        return b * A * (sigma - deltaSigma);
+    }
+
+    public List<Place> getNearbyAmenities(String filePath, String postCode, double radius) throws IOException {
+        Data.getData();
+        ArrayList<Double> LatLon = Data.getLatLong(postCode);
+        Double latitude = LatLon.get(0);
+        Double longitude = LatLon.get(1);
+        List<Place> places = new ArrayList<>();
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode rootNode = mapper.readTree(new File(filePath));
+
+        JsonNode features = rootNode.get("features");
+        if (features != null && features.isArray()) {
+            for (JsonNode feature : features) {
+                JsonNode properties = feature.get("properties");
+                if (properties != null) {
+                    JsonNode amenityNode = properties.get("amenity");
+                    if (amenityNode != null) {
+                        // Exclude waste baskets with waste type dog_excrement
+                        if ("waste_basket".equals(amenityNode.asText())) {
+                            JsonNode wasteNode = properties.get("waste");
+                            if (wasteNode != null && "dog_excrement".equals(wasteNode.asText())) {
+                                continue;  // Skip this feature
+                            }
+                        }
+
+                        JsonNode geometry = feature.get("geometry");
+                        if (geometry != null && "Point".equals(geometry.get("type").asText())) {
+                            JsonNode coordinates = geometry.get("coordinates");
+                            if (coordinates != null && coordinates.isArray() && coordinates.size() == 2) {
+                                double placeLongitude = coordinates.get(0).asDouble();
+                                double placeLatitude = coordinates.get(1).asDouble();
+
+                                // Calculate the distance
+                                double distance = vincentyDistance(latitude, longitude, placeLatitude, placeLongitude);
+
+                                // Check if the distance is within the specified radius
+                                if (distance <= radius) {
+                                    String name = properties.has("name") ? properties.get("name").asText() : "Unnamed " + capitalizeFirstLetter(amenityNode.asText());
+                                    String postcode = Data.findClosestZipCode(placeLatitude, placeLongitude);
+                                    places.add(new Place(name, postcode, placeLatitude, placeLongitude));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return places;
+    }
+
 
     public static void main(String[] args) {
         JSONController controller = new JSONController();
         int count = 0;
         try {
             long startTime = System.currentTimeMillis(); // Start timing
-            List<Place> places = controller.getPlacesFromGeoJSON(true, SCHOOL_AMENITY, false);
+//            List<Place> places = controller.getPlacesFromGeoJSON(true, SCHOOL_AMENITY, false);
+            List<Place> places = controller.getNearbyAmenities(AMENITY_PATH,"6212BT", 2000);
             for (Place place : places) {
                 System.out.println(place);
                 count++;
@@ -238,8 +331,6 @@ public class JSONController {
             System.out.println("Number of places: " + count);
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
     }
 }
