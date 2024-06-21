@@ -13,6 +13,7 @@ import java.util.Objects;
 public class Place implements Serializable{
     protected String name;
     protected String zipCode;
+    protected String type;
     protected double lat;
     protected double lon;
 
@@ -80,5 +81,17 @@ public class Place implements Serializable{
     @Override
     public int hashCode() {
         return Objects.hash(lat, lon);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
     }
 }

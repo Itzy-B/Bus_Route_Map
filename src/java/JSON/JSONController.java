@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import src.java.GUI.Data;
 import src.java.GUI.Place;
+import src.java.Singletons.FileManager;
 
 
 import java.io.BufferedReader;
@@ -12,8 +13,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class JSONController {
     private static final String NAME_API_URL_TEMPLATE = "https://geocode.maps.co/reverse?lat=%f&lon=%f&api_key=6666d2ba4331d378476246ngzcb1fcc";
@@ -302,7 +303,9 @@ public class JSONController {
                                 if (distance <= radius) {
                                     String name = properties.has("name") ? properties.get("name").asText() : "Unnamed " + capitalizeFirstLetter(amenityNode.asText());
                                     String postcode = Data.findClosestZipCode(placeLatitude, placeLongitude);
-                                    places.add(new Place(name, postcode, placeLatitude, placeLongitude));
+                                    Place place = new Place(name, postcode, placeLatitude, placeLongitude);
+                                    place.setType(amenityNode.asText());
+                                    places.add(place);
                                 }
                             }
                         }
@@ -313,24 +316,112 @@ public class JSONController {
         return places;
     }
 
+    public int calculateTotalScore(String filePath, String postCode, double radius) throws IOException {
+        List<Place> nearbyAmenities = getNearbyAmenities(filePath, postCode, radius);
+        int totalScore = 0;
 
-    public static void main(String[] args) {
-        JSONController controller = new JSONController();
-        int count = 0;
-        try {
-            long startTime = System.currentTimeMillis(); // Start timing
-//            List<Place> places = controller.getPlacesFromGeoJSON(true, SCHOOL_AMENITY, false);
-            List<Place> places = controller.getNearbyAmenities(AMENITY_PATH,"6212BT", 2000);
-            for (Place place : places) {
-                System.out.println(place);
-                count++;
+        for (Place place : nearbyAmenities) {
+            Amenity amenity = Amenity.fromString(place.getType());
+            if (amenity != null) {
+                totalScore += amenity.getPoints();
             }
-            long endTime = System.currentTimeMillis(); // End timing
-            long duration = endTime - startTime; // Calculate the duration
-            System.out.println("Time taken: " + duration + " ms");
-            System.out.println("Number of places: " + count);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
+        return totalScore;
+    }
+
+
+//    public static void main(String[] args) {
+//        JSONController controller = new JSONController();
+//        int count = 0;
+//        try {
+//            long startTime = System.currentTimeMillis(); // Start timing
+////            List<Place> places = controller.getPlacesFromGeoJSON(true, SCHOOL_AMENITY, false);
+//            List<Place> places = controller.getNearbyAmenities(AMENITY_PATH,"6212BT", 2000);
+//            for (Place place : places) {
+//                System.out.println(place);
+//                count++;
+//            }
+//            long endTime = System.currentTimeMillis(); // End timing
+//            long duration = endTime - startTime; // Calculate the duration
+//            System.out.println("Time taken: " + duration + " ms");
+//            System.out.println("Number of places: " + count);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+    public static HashMap<String, Integer> calculateScores(int radius) {
+        Data data = new Data();
+        data.getData();
+        JSONController controller = new JSONController();
+        HashMap<String, Integer> scores = new HashMap<>();
+        ArrayList<String> zipCodes = new ArrayList<>(data.getZipCodes()); // Create a copy of the list
+
+        for (String zipCode : zipCodes) {
+            try {
+                int score = controller.calculateTotalScore(AMENITY_PATH, zipCode, radius);
+                //FileManager.saveStringToFile(String.valueOf(score), "scores.txt");
+                System.out.println(zipCode + ": " + score);
+                scores.put(zipCode, score);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Error calculating score for " + zipCode);
+                scores.put(zipCode, 0); // Add a default value or handle the error as needed
+            }
+        }
+        scores = sortByValues(scores);
+        return scores;
+    }
+
+    public static LinkedHashMap<String, Integer> sortByValues(HashMap<String, Integer> map) {
+        return map.entrySet()
+                .stream()
+                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
+    }
+
+
+
+//    public static void main(String[] args) {
+//        // Example usage
+//        String postCode = "6222CN";  // Replace with an actual postcode
+//        double radius = 500;  // Radius in meters
+//
+//        JSONController controller = new JSONController();
+//
+//        try {
+//            // Get nearby amenities
+//            List<Place> nearbyAmenities = controller.getNearbyAmenities(AMENITY_PATH, postCode, radius);
+//            System.out.println("Nearby Amenities:");
+//            for (Place place : nearbyAmenities) {
+//                System.out.println(place);
+//            }
+//
+//            // Calculate total score
+//            int totalScore = controller.calculateTotalScore(AMENITY_PATH, postCode, radius);
+//            System.out.println("Total Score: " + totalScore);
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+    public static void main(String[] args) throws IOException {
+        JSONController controller = new JSONController();
+        // Example usage
+        HashMap<String, Integer> loadedScores = FileManager.readHashMapFromFile("scores.txt");
+
+        // Create a new HashMap to assign numbers to each post code
+        HashMap<String, Integer> numberedZipCodes = new HashMap<>();
+        int number = 1;
+        for (String zipCode : loadedScores.keySet()) {
+            numberedZipCodes.put(zipCode, number++);
+        }
+        FileManager.saveHashMapToFile(numberedZipCodes, "numberedScores.txt");
     }
 }

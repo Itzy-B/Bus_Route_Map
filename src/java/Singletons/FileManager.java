@@ -1,17 +1,14 @@
 package src.java.Singletons;
 
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class FileManager {
@@ -77,4 +74,36 @@ public class FileManager {
         return object;
     }
 
+    public static void saveHashMapToFile(HashMap<String, Integer> hashMap, String filePath) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (Map.Entry<String, Integer> entry : hashMap.entrySet()) {
+                writer.write("\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"");
+                writer.newLine();
+            }
+        }
     }
+
+    public static HashMap<String, Integer> readHashMapFromFile(String filePath) throws IOException {
+        HashMap<String, Integer> hashMap = new HashMap<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Remove quotes and split by colon
+                String[] parts = line.replace("\"", "").split(":");
+                if (parts.length == 2) {
+                    String key = parts[0].trim();
+                    Integer value = Integer.parseInt(parts[1].trim());
+                    hashMap.put(key, value);
+                }
+            }
+        }
+        return hashMap;
+    }
+    public static void saveStringToFile(String string, String filePath) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+            writer.write(string);
+            writer.newLine();
+        }
+    }
+
+}
