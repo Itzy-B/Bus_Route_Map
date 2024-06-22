@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,7 @@ import javax.swing.JTextField;
 import src.java.GUI.Data;
 import src.java.Singletons.FileManager;
 
-public class AccessibilityDisplayer extends JFrame implements ActionListener{
+public class AccessibilityDisplayerSwing extends JFrame implements ActionListener{
     private final double MAP_WIDTH = 600;
     private final double MAP_HEIGHT = 600;
     private double centerLatitude = 50.851368;
@@ -61,7 +60,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
     private String URL;
     private int prevX, prevY;
 
-    public AccessibilityDisplayer(boolean start) {
+    public AccessibilityDisplayerSwing(boolean start) {
         frame = new JFrame();
         frame.setTitle("Image Display");
         frame.setSize(600, 600);
@@ -85,7 +84,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         frame.setVisible(true);
     }
 
-    public AccessibilityDisplayer() {
+    public AccessibilityDisplayerSwing() {
     }
 
     public void addMouseListenersPanning(JLabel label) {
@@ -162,7 +161,15 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         Color lineColor = new Color(0,0,0, 255);
         bufferedImage.flush();
         Graphics2D g = (Graphics2D) bufferedImage.getGraphics();
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION	, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_DITHERING	, RenderingHints.VALUE_DITHER_ENABLE);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING	, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING	, RenderingHints.VALUE_ANTIALIAS_ON);
+
+
+
+
         Stroke originalStroke = g.getStroke();
         g.setStroke(new BasicStroke(1));
         g.setColor(new Color(255,255,255,64));
@@ -180,29 +187,33 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         //Change this.zipCodesAll to zipCodes to draw only the zipcodes from MassZipLatLon.xldx
         for (String postCode: this.zipCodesAll) {
             List<List<Double[]>> polygons = polygonsMap.get(postCode);
-            if (polygons == null || polygons.get(0).isEmpty()) {
-                //Postcodes with no polygons in db, so we just draw a circle, give it later a relevant color
-                //Cover only the Maastricht postcodes
-                if(postCode.equals("6211BM") || postCode.equals("6227CC")) {
-                    ArrayList<Double> latLong = Data.getLatLong(postCode);
-                    int[] xY = adjust(latLong.get(1), latLong.get(0), centerLongitude, centerLatitude, zoomLevel);
-                    g.setColor(new Color(0,0,0, 50));
-                    g.fillOval((int) (xY[0] + MAP_WIDTH / 2 - 5), (int) (xY[1] + MAP_HEIGHT / 2 -5), 10, 10);
-                }
-                continue;
-            }
-
             //Set polygon color according to postal code score
             if (scoresMap.get(postCode) != null) {
                 int score = scoresMap.get(postCode);
                 String[] split = colours.get(getColorIndexForScore(score, scoresMap, colours)).split(",");
-                polygonColor = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 128);
+                // String string = (postCode + " -" + score + " -"+ Integer.parseInt(split[0]) + "," + Integer.parseInt(split[1]));
+                // FileManager.getInstance().saveStringToFile(string, "text.txt");
+                polygonColor = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 255);
             }
 
             else {
                 polygonColor = new Color(255,255,255, 64);
             }
             g.setColor(lineColor);
+
+            if (polygons == null || polygons.get(0).isEmpty()) {
+                //Postcodes with no polygons in db, so we just draw a circle, give it later a relevant color
+                //Cover only the Maastricht postcodes
+                if(postCode.equals("6211BM") || postCode.equals("6227CC")) {
+                    ArrayList<Double> latLong = Data.getLatLong(postCode);
+                    int[] xY = adjust(latLong.get(1), latLong.get(0), centerLongitude, centerLatitude, zoomLevel);
+                    g.setColor(polygonColor);
+                    g.fillOval((int) (xY[0] + MAP_WIDTH / 2 - 5), (int) (xY[1] + MAP_HEIGHT / 2 -5), 10, 10);
+                }
+                continue;
+            }
+
+
 
             //Loop through all the polygons of one postal code
             for(List<Double[]> polygon: polygons) {
@@ -281,9 +292,9 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
     // to the center of the bitmap
 
     // https://stackoverflow.com/questions/23898964/getting-pixel-coordinated-from-google-static-maps
-    public int[] adjust(double X, double Y, double xcenter, double ycenter, int zoomlevel) {
-        int xr = (lToX(X) - lToX(xcenter)) >> (21 - zoomlevel);
-        int yr = (lToY(Y) - lToY(ycenter)) >> (21 - zoomlevel);
+    public int[] adjust(double x, double y, double xcenter, double ycenter, int zoomlevel) {
+        int xr = (lToX(x) - lToX(xcenter)) >> (21 - zoomlevel);
+        int yr = (lToY(y) - lToY(ycenter)) >> (21 - zoomlevel);
         return new int[] { xr, yr };
     }
 
@@ -297,13 +308,14 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
     }
 
     public static void main(String[] args) {
-        AccessibilityDisplayer displayer = new AccessibilityDisplayer();
+        AccessibilityDisplayerSwing displayer = new AccessibilityDisplayerSwing();
         displayer.runAccessibilityDisplayer();
     }
 
-    public static int getColorIndexForScore(int score, HashMap<String, Integer> scoreMap, ArrayList<String> colors) {
+    public int getColorIndexForScore(int score, HashMap<String, Integer> scoreMap, ArrayList<String> colors) {
         int maxScore = Integer.MIN_VALUE;
         int minScore = Integer.MAX_VALUE;
+
         
         for (int value : scoreMap.values()) {
             if (value > maxScore) {
@@ -315,18 +327,31 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         }
 
         //https://en.wikipedia.org/wiki/Normalization_(statistics)
-        return (int) ((double) (score - minScore) / (maxScore - minScore) * (colors.size() - 1));
+        int colorIndex = (int) ((double) (score - minScore) / (maxScore - minScore) * (colors.size() - 1));
+        return colorIndex;
     }
 
     public ArrayList<String> getGradientColors() {
-        ArrayList<String> colors = new ArrayList<>();
-        for (int r = 255; r >= 0; r--) {
-            for (int g = 0; g <= 255; g++) {
-                colors.add(r + "," + g + ",0");
+            ArrayList<String> colors = new ArrayList<>();
+            int steps = 256;
+    
+            for (int i = 0; i < steps; i++) {
+                int r = 255;
+                int g = i;
+                int b = 0;
+                colors.add(r + "," + g + "," + b);
             }
+    
+            // Yellow to Green
+            for (int i = 0; i < steps; i++) {
+                int r = 255 - i;
+                int g = 255;
+                int b = 0;
+                colors.add(r + "," + g + "," + b);
+            }
+    
+            return colors;
         }
-        return colors;
-    }
 
     public String requestNewImageIcon() {
         StringBuilder mapUrlBuilder = new StringBuilder("https://maps.googleapis.com/maps/api/staticmap");
@@ -339,7 +364,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         return mapUrlBuilder.toString();
     }
 
-    public void centerToZipCode(AccessibilityDisplayer displayer) {
+    public void centerToZipCode(AccessibilityDisplayerSwing displayer) {
         String zipCode = displayer.zipCodeField1.getText();
         displayer.zoomedPostcode = zipCode;
         ArrayList<Double> latLong = new ArrayList<>();
@@ -363,7 +388,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
 
     }
 
-    public void createActionListeners(AccessibilityDisplayer displayer) {
+    public void createActionListeners(AccessibilityDisplayerSwing displayer) {
         displayer.zoomInButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -406,7 +431,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
 
     public void runAccessibilityDisplayer() {
         Data.getData();
-        AccessibilityDisplayer displayer = new AccessibilityDisplayer(true);
+        AccessibilityDisplayerSwing displayer = new AccessibilityDisplayerSwing(true);
         try {
             displayer.polygonsMap = (Map<String, List<List<Double[]>>>) FileManager.getInstance().getObject("polygonsMap.ser");
             displayer.scoresMap = (HashMap<String, Integer>) FileManager.getInstance().getObject("scores.ser");
