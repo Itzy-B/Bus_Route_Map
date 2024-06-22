@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -28,7 +29,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import src.java.GUI.Data;
@@ -178,7 +178,6 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         ArrayList<Integer> xPoints = new ArrayList<>();
         ArrayList<Integer> yPoints = new ArrayList<>();
 
-        // ArrayList<ArrayList<Double[]>> list = parser.getPolyGon();
         int iteratorColors = lengthColours / zipCodesAll.length;
         //Change this.zipCodesAll to zipCodes to draw only the zipcodes from MassZipLatLon.xldx
         for (String postCode: this.zipCodesAll) {
@@ -215,7 +214,6 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
 
             for(List<Double[]> polygon: polygons) {
                 if(this.zoomedPostcode != null && this.zoomedPostcode.equals(postCode)) {
-                    // g.setStroke(new BasicStroke((int) (5 * (zoomLevel /18))));
                     g.setStroke(new BasicStroke((float) 2));
 
                     lineColor = new Color(0,0,0);
@@ -226,15 +224,6 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                 }
                 xPoints.clear();
                 yPoints.clear();
-
-
-
-                // if(index > -1 && index < 2783) {
-                //     // int[] Xy = adjust(longs.get(index), lats.get(index), centerLongitude, centerLatitude, zoomLevel);
-                //     g.setColor(new Color(0,0,0, 50));
-                //     g.fillOval((int) (Xy[0] + MAP_WIDTH / 2 - 5), (int) (Xy[1] + MAP_HEIGHT / 2 -5), 5, 5);
-                //     continue;
-                // }
                 
                 for (int i = 0; i < polygon.size(); i++) {
                     Double[] coordinates = polygon.get(i);
@@ -322,7 +311,6 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         int maxScore = Integer.MIN_VALUE;
         int minScore = Integer.MAX_VALUE;
         
-        // Find the minimum and maximum scores
         for (int value : scoreMap.values()) {
             if (value > maxScore) {
                 maxScore = value;
@@ -332,7 +320,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
             }
         }
 
-        // Normalize the score to fit within the color range
+        //https://en.wikipedia.org/wiki/Normalization_(statistics)
         int colorIndex = (int) ((double) (score - minScore) / (maxScore - minScore) * (colors.size() - 1));
         
         return colorIndex;
@@ -443,8 +431,9 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         }
     }
 
+    //https://stackoverflow.com/questions/16203880/get-array-of-maps-keys
     public static String[] extractKeys(Map<String, List<List<Double[]>>> polygonsMap) {
-        Collection<String> keys = polygonsMap.keySet();
+        Set<String> keys = polygonsMap.keySet();
         return keys.toArray(new String[keys.size()]);
     }
 
