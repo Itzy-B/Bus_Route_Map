@@ -12,7 +12,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -103,13 +102,13 @@ public class AccessibilityDisplayerJavaFx extends Application {
             }
         });
 
-        mapView.setOnMousePressed(e -> {
+        canvas.setOnMousePressed(e -> {
             prevX = e.getX();
             prevY = e.getY();
         });
 
-        mapView.setOnMouseDragged(e -> {
-            double mouseSensitivity = 10.0;
+        canvas.setOnMouseDragged(e -> {
+            double mouseSensitivity = 40.0;
             double deltaX = e.getX() - prevX;
             double deltaY = e.getY() - prevY;
             prevX = e.getX();
@@ -128,7 +127,7 @@ public class AccessibilityDisplayerJavaFx extends Application {
             }
         });
 
-        mapView.setOnMouseClicked(e -> {
+        canvas.setOnMouseClicked(e -> {
             if (e.getClickCount() == 2) {
                 doubleClickZoom(e.getX(), e.getY());
             }
@@ -160,25 +159,22 @@ public class AccessibilityDisplayerJavaFx extends Application {
             primaryStage.setTitle("Accessibility Displayer");
             VBox root = new VBox();
 
-            // Create HBox for buttons and fields
             HBox box = new HBox(10);
             box.setPadding(new Insets(10));
             
-            // Initialize UI elements
             updateButton = new Button("Update");
             zoomInButton = new Button("Zoom In");
             zoomOutButton = new Button("Zoom Out");
             zipCodeField1 = new TextField();
+            zipCodeField1.setPrefWidth(230);
+            zipCodeField1.setPromptText("Enter a zipcode to center");
             scoreField = new Label();
             
-            // Add buttons and fields to HBox
             box.getChildren().addAll(updateButton, zoomInButton, zoomOutButton, zipCodeField1, scoreField);
             
-            // Create canvas
             canvas = new Canvas(MAP_WIDTH, MAP_HEIGHT);
             createActionListeners();
             
-            // Add HBox and canvas to VBox
             root.getChildren().addAll(box, canvas);
             Scene scene = new Scene(root, 800, 600);
             primaryStage.setScene(scene);
@@ -206,12 +202,6 @@ public class AccessibilityDisplayerJavaFx extends Application {
         }
     }
 
-    // gc.drawImage(SwingFXUtils.toFXImage(bufferedImage, null), 0, 0);
-
-    // // Drawing polygons and other elements goes here
-
-    // mapView.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
-
     private void drawScreen() throws IOException {
         // Load the background image
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -235,8 +225,8 @@ public class AccessibilityDisplayerJavaFx extends Application {
                 int score = scoresMap.get(postCode);
                 String[] split = colours.get(getColorIndexForScore(score, scoresMap, colours)).split(",");
                 if (postCode.equals(zoomedPostcode)) {
-                    scoreField.setText("score: " + score);
-                    // scoreField.setText("score: " +score + " " + Integer.parseInt(split[0]) + " " + Integer.parseInt(split[1]));
+                    // scoreField.setText("score: " + score);
+                    scoreField.setText("score: " +score + " " + Integer.parseInt(split[0]) + " " + Integer.parseInt(split[1]));
                 }
                 polygonColor = Color.rgb(Integer.parseInt(split[0]), Integer.parseInt(split[1]), 0, 0.5);
             } else {
@@ -320,8 +310,8 @@ public class AccessibilityDisplayerJavaFx extends Application {
         double lonPerPixel = 360 / (256 * Math.pow(2, zoomLevel));
         double latPerPixel = 360 / (256 * Math.pow(2, zoomLevel));
 
-        centerLongitude += (x - MAP_WIDTH / 2) * lonPerPixel;
-        centerLatitude -= (y - MAP_HEIGHT / 2) * latPerPixel;
+        this.centerLongitude += (x - MAP_WIDTH / 2) * lonPerPixel;
+        this.centerLatitude -= (y - MAP_HEIGHT / 2) * latPerPixel;
 
         zoomLevel++;
         requestNewImageIcon();
@@ -367,25 +357,14 @@ public class AccessibilityDisplayerJavaFx extends Application {
     }
 
     private ArrayList<String> getGradientColors() {
-        ArrayList<String> colors = new ArrayList<>();
-        int steps = 256;
-
-        for (int i = 0; i < steps; i++) {
-            int r = 255;
-            int g = i;
-            int b = 0;
-            colors.add(r + "," + g + "," + b);
+            ArrayList<String> colors = new ArrayList<>();
+            for (int r = 255; r >= 0; r--) {
+                for (int g = 0; g <= 255; g++) {
+                    colors.add(r + "," + g + ",0");
+                }
+            }
+            return colors;
         }
-
-        for (int i = 0; i < steps; i++) {
-            int r = 255 - i;
-            int g = 255;
-            int b = i;
-            colors.add(r + "," + g + "," + b);
-        }
-
-        return colors;
-    }
 
 
     //https://stackoverflow.com/questions/16203880/get-array-of-maps-keys
