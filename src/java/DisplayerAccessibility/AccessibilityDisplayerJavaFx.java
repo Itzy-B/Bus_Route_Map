@@ -357,14 +357,25 @@ public class AccessibilityDisplayerJavaFx extends Application {
     }
 
     private ArrayList<String> getGradientColors() {
-            ArrayList<String> colors = new ArrayList<>();
-            for (int r = 255; r >= 0; r--) {
-                for (int g = 0; g <= 255; g++) {
-                    colors.add(r + "," + g + ",0");
-                }
-            }
-            return colors;
+        ArrayList<String> colors = new ArrayList<>();
+        int steps = 256;
+
+        for (int i = 0; i < steps; i++) {
+            int r = 255;
+            int g = i;
+            int b = 0;
+            colors.add(r + "," + g + "," + b);
         }
+
+        for (int i = 0; i < steps; i++) {
+            int r = 255 - i;
+            int g = 255;
+            int b = i;
+            colors.add(r + "," + g + "," + b);
+        }
+
+        return colors;
+    }
 
 
     //https://stackoverflow.com/questions/16203880/get-array-of-maps-keys
