@@ -220,26 +220,40 @@ public class AccessibilityDisplayerJavaFx extends Application {
         for (String postCode : polygonsMap.keySet()) {
             List<List<Double[]>> polygons = polygonsMap.get(postCode);
             Color polygonColor;
+            String[] split = null;
             //Set polygon color according to postal code score
             if (scoresMap.get(postCode) != null) {
                 int score = scoresMap.get(postCode);
-                String[] split = colours.get(getColorIndexForScore(score, scoresMap, colours)).split(",");
+                split = colours.get(getColorIndexForScore(score, scoresMap, colours)).split(",");
                 if (postCode.equals(zoomedPostcode)) {
                     // scoreField.setText("score: " + score);
                     scoreField.setText("score: " +score + " " + Integer.parseInt(split[0]) + " " + Integer.parseInt(split[1]));
                 }
-                polygonColor = Color.rgb(Integer.parseInt(split[0]), Integer.parseInt(split[1]), 0, 0.5);
+                polygonColor = Color.rgb(Integer.parseInt(split[0]), Integer.parseInt(split[1]), 0, 0.6);
             } else {
                 polygonColor = Color.rgb(255, 255, 255, 0.64);
             }
 
-            if (polygons == null || polygons.isEmpty()) {
+            gc.setStroke(lineColor);
+            gc.setLineWidth(this.zoomedPostcode != null && this.zoomedPostcode.equals(postCode) ? 2 : 0.5);
+
+            if (polygons == null || polygons.get(0).isEmpty()) {
+                if(postCode.equals("6211BM") || postCode.equals("6227CC")) {
+                    ArrayList<Double> latLong = Data.getLatLong(postCode);
+                    int[] xY = adjust(latLong.get(1), latLong.get(0), centerLongitude, centerLatitude, zoomLevel);
+                    gc.setFill(Color.rgb(Integer.parseInt(split[0]), Integer.parseInt(split[1]), 0, 1));
+                    if (!(zoomedPostcode == null)) {
+                        if (zoomedPostcode.equals("6211BM") || zoomedPostcode.equals("6227CC")) {
+                            gc.strokeOval((int) (xY[0] + MAP_WIDTH / 2 - 5), (int) (xY[1] + MAP_HEIGHT / 2 - 5), 10, 10);
+                        }
+                    }
+                    gc.fillOval((int) (xY[0] + MAP_WIDTH / 2 - 5), (int) (xY[1] + MAP_HEIGHT / 2 -5), 10, 10);
+
+                }
                 continue;
             }
 
-            gc.setStroke(lineColor);
             //Draw darker outline on highlighted postal code
-            gc.setLineWidth(this.zoomedPostcode != null && this.zoomedPostcode.equals(postCode) ? 2 : 0.5);
 
 
             //Loop through all the polygons of one postal code
