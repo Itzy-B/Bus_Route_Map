@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -29,6 +28,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import src.java.GUI.Data;
@@ -40,6 +40,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
     private double centerLatitude = 50.851368;
     private double centerLongitude = 5.690973;
     Map<String, List<List<Double[]>>> polygonsMap = new HashMap<>();
+    HashMap<String, Integer> scoresMap = new HashMap<>();
     private int zoomLevel = 13;
     private String zoomedPostcode;
     private JButton updateButton = new JButton("Update");
@@ -56,6 +57,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
     private final double offset = 268435456;
     private final double radius = offset / Math.PI;
     private JFrame frame;
+    private JLabel scoreField;
     private String URL;
     private int prevX, prevY;
 
@@ -70,12 +72,13 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         JLabel label = new JLabel(imageIcon);
         zipCodeField1.setPreferredSize(new Dimension(150, 30));
         TextPrompt textPrompt = new TextPrompt("Enter a zipcode to center", zipCodeField1);
-        Random rand = new Random();
+        scoreField = new JLabel();
         frame.add(updateButton);
         frame.add(zoomInButton);
         frame.add(zoomOutButton);
         frame.add(zipCodeField1);
         frame.add(textPrompt);
+        frame.add(scoreField);
         frame.add(panel);
         panel.add(label);
 
@@ -155,6 +158,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         URL url = new URL(URL);
         java.awt.Image image = ImageIO.read(url);
         BufferedImage bufferedImage = (BufferedImage) image;
+        Color lineColor = new Color(0,0,0, 255);
         bufferedImage.flush();
         Graphics2D g = (Graphics2D) bufferedImage.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -162,10 +166,12 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         g.setStroke(new BasicStroke(1));
         g.setColor(new Color(255,255,255,64));
         g.setStroke(originalStroke);
+        if (this.zoomedPostcode != null) this.scoreField.setText("score: " + Integer.toString(this.scoresMap.get(this.zoomedPostcode)));
         ImageIcon imageIcon = new ImageIcon(bufferedImage);
         JLabel label = new JLabel(imageIcon);
         int lengthColours = colours.size();
         int colorIndex = 0;
+        Color polygonColor = null;
         
         double startX = 0;
         double startY = 0;
@@ -189,14 +195,20 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                 continue;
             }
 
-            String[] split = colours.get(colorIndex).split(",");
             if (colorIndex+ iteratorColors <= colours.size()) {
                 colorIndex+= iteratorColors;
             }
-            // Color color = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 255);
-            Color color = new Color(0,0,0, 255);
-            Color polygonColor = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 64);
-            g.setColor(color);
+
+            if (scoresMap.get(postCode) != null) {
+                int score = scoresMap.get(postCode);
+                String[] split = colours.get(getColorForScore(score, scoresMap, colours)).split(",");
+                polygonColor = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 128);
+            }
+
+            else {
+                polygonColor = new Color(255,255,255, 64);
+            }
+            g.setColor(lineColor);
 
 
 
@@ -206,8 +218,8 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                     // g.setStroke(new BasicStroke((int) (5 * (zoomLevel /18))));
                     g.setStroke(new BasicStroke((float) 2));
 
-                    color = new Color(0,0,0);
-                    g.setColor(color);
+                    lineColor = new Color(0,0,0);
+                    g.setColor(lineColor);
                 }
                 else {
                     g.setStroke(new BasicStroke((float) 0.5));
@@ -306,6 +318,26 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         displayer.runAccessibilityDisplayer();
     }
 
+    public static int getColorForScore(int score, HashMap<String, Integer> scoreMap, ArrayList<String> colors) {
+        int maxScore = Integer.MIN_VALUE;
+        int minScore = Integer.MAX_VALUE;
+        
+        // Find the minimum and maximum scores
+        for (int value : scoreMap.values()) {
+            if (value > maxScore) {
+                maxScore = value;
+            }
+            if (value < minScore) {
+                minScore = value;
+            }
+        }
+
+        // Normalize the score to fit within the color range
+        int colorIndex = (int) ((double) (score - minScore) / (maxScore - minScore) * (colors.size() - 1));
+        
+        return colorIndex;
+    }
+
     public ArrayList<String> getGradientColors() {
         ArrayList<String> colors = new ArrayList<>();
         for (int r = 255; r >= 0; r--) {
@@ -397,6 +429,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         AccessibilityDisplayer displayer = new AccessibilityDisplayer(true);
         try {
             displayer.polygonsMap = (Map<String, List<List<Double[]>>>) FileManager.getInstance().getObject("polygonsMap.ser");
+            displayer.scoresMap = (HashMap<String, Integer>) FileManager.getInstance().getObject("scores.ser");
             displayer.zipCodesAll = extractKeys(displayer.polygonsMap);
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();

@@ -40,13 +40,46 @@ public class RDToWGS84 {
     }
 
     public static void main(String[] args) {
-        RDToWGS84 parser = new RDToWGS84();
-        parser.getPolyGon();
-        ArrayList<String> file = parser.readFileLineByLine("./polygons.csv");
-        for (String string: file) {
-            parser.parsePolygon(string.substring(7), string.split(",")[0]);
+        // RDToWGS84 parser = new RDToWGS84();
+        // parser.getPolyGon();
+        // ArrayList<String> file = parser.readFileLineByLine("./polygons.csv");
+        // for (String string: file) {
+        //     parser.parsePolygon(string.substring(7), string.split(",")[0]);
+        // }
+        // FileManager.getInstance().serializeObject(parser.polygonsMap, "polygonsMap", "polygonsMap.ser");
+        String filePath = "/home/tristanko/Stiahnuté/scores.txt";
+        
+        try {
+            HashMap<String, Integer> hashMap = convertFileToHashMap(filePath);
+            System.out.println("");
+            FileManager.getInstance().serializeObject(hashMap, "scores", "scores.ser");
+            // Print the HashMap to verify the result
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        FileManager.getInstance().serializeObject(parser.polygonsMap, "polygonsMap", "polygonsMap.ser");
+    }
+
+    public static HashMap<String, Integer> convertFileToHashMap(String filePath) throws IOException {
+        HashMap<String, Integer> hashMap = new HashMap<>();
+        
+        BufferedReader reader = new BufferedReader(new FileReader(filePath));
+        String line;
+        
+        while ((line = reader.readLine()) != null) {
+            String[] keyValue = line.replace("\"", "").split(":");
+            if (keyValue.length == 2) {
+                try {
+                    String key = keyValue[0];
+                    Integer value = Integer.parseInt(keyValue[1]);
+                    hashMap.put(key, value);
+                } catch (NumberFormatException e) {
+                    System.err.println("Skipping line due to invalid number format: " + line);
+                }
+            }
+        }
+        
+        reader.close();
+        return hashMap;
     }
 
     public ArrayList<ArrayList<Double[]>> getPolyGon() {
