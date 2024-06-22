@@ -13,9 +13,9 @@ import java.util.Map;
 import src.java.Singletons.FileManager;
 
 //Data for postcode polygons from: https://service.pdok.nl/cbs/postcode6/atom/postcode6_volledige_postcode.xml
-//convertRDTiWGS84 from AI of course, I am not a genius, and somehow AI managed to create this function
 public class RDToWGS84 {
     Map<String, List<List<Double[]>>> polygonsMap = new HashMap<>();
+    //Full credits to: https://github.com/glenndehaan/rd-to-wgs84/blob/master/src/core.js for convertRDToWGS84 function
     public double[] convertRDToWGS84(double x, double y) {
         double dX = (x - 155000) * Math.pow(10, -5);
         double dY = (y - 463000) * Math.pow(10, -5);
@@ -53,7 +53,6 @@ public class RDToWGS84 {
             HashMap<String, Integer> hashMap = convertFileToHashMap(filePath);
             System.out.println("");
             FileManager.getInstance().serializeObject(hashMap, "scores", "scores.ser");
-            // Print the HashMap to verify the result
         } catch (IOException e) {
             e.printStackTrace();
         }
