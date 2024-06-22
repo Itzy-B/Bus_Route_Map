@@ -153,6 +153,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         }
     }
 
+    //Brain method
     public void drawScreen() throws IOException {
         panel.removeAll();
         URL url = new URL(URL);
@@ -169,8 +170,6 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         if (this.zoomedPostcode != null) this.scoreField.setText("score: " + Integer.toString(this.scoresMap.get(this.zoomedPostcode)));
         ImageIcon imageIcon = new ImageIcon(bufferedImage);
         JLabel label = new JLabel(imageIcon);
-        int lengthColours = colours.size();
-        int colorIndex = 0;
         Color polygonColor = null;
         
         double startX = 0;
@@ -178,7 +177,6 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         ArrayList<Integer> xPoints = new ArrayList<>();
         ArrayList<Integer> yPoints = new ArrayList<>();
 
-        int iteratorColors = lengthColours / zipCodesAll.length;
         //Change this.zipCodesAll to zipCodes to draw only the zipcodes from MassZipLatLon.xldx
         for (String postCode: this.zipCodesAll) {
             List<List<Double[]>> polygons = polygonsMap.get(postCode);
@@ -187,20 +185,17 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
                 //Cover only the Maastricht postcodes
                 if(postCode.equals("6211BM") || postCode.equals("6227CC")) {
                     ArrayList<Double> latLong = Data.getLatLong(postCode);
-                    int[] Xy = adjust(latLong.get(1), latLong.get(0), centerLongitude, centerLatitude, zoomLevel);
+                    int[] xY = adjust(latLong.get(1), latLong.get(0), centerLongitude, centerLatitude, zoomLevel);
                     g.setColor(new Color(0,0,0, 50));
-                    g.fillOval((int) (Xy[0] + MAP_WIDTH / 2 - 5), (int) (Xy[1] + MAP_HEIGHT / 2 -5), 10, 10);
+                    g.fillOval((int) (xY[0] + MAP_WIDTH / 2 - 5), (int) (xY[1] + MAP_HEIGHT / 2 -5), 10, 10);
                 }
                 continue;
             }
 
-            if (colorIndex+ iteratorColors <= colours.size()) {
-                colorIndex+= iteratorColors;
-            }
-
+            //Set polygon color according to postal code score
             if (scoresMap.get(postCode) != null) {
                 int score = scoresMap.get(postCode);
-                String[] split = colours.get(getColorForScore(score, scoresMap, colours)).split(",");
+                String[] split = colours.get(getColorIndexForScore(score, scoresMap, colours)).split(",");
                 polygonColor = new Color(Integer.parseInt(split[0]),Integer.parseInt(split[1]),0, 128);
             }
 
@@ -209,48 +204,47 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
             }
             g.setColor(lineColor);
 
-
-
-
+            //Loop through all the polygons of one postal code
             for(List<Double[]> polygon: polygons) {
+                //Draw darker outline on highlighted postal code
                 if(this.zoomedPostcode != null && this.zoomedPostcode.equals(postCode)) {
-                    g.setStroke(new BasicStroke((float) 2));
+                    g.setStroke(new BasicStroke(2));
 
                     lineColor = new Color(0,0,0);
                     g.setColor(lineColor);
                 }
+
                 else {
                     g.setStroke(new BasicStroke((float) 0.5));
                 }
                 xPoints.clear();
                 yPoints.clear();
                 
+
+                //Loop through the coordinate points of postal codes, draw lines through them
+                //And at them to xPoints and yPoints to draw the polygon
                 for (int i = 0; i < polygon.size(); i++) {
                     Double[] coordinates = polygon.get(i);
                     double lat = coordinates[0];
                     double lon = coordinates[1];
                     
-                    int[] Xy = adjust(lon, lat, centerLongitude, centerLatitude, zoomLevel);
+                    int[] xY = adjust(lon, lat, centerLongitude, centerLatitude, zoomLevel);
                     
-                    xPoints.add(Xy[0]);
-                    yPoints.add(Xy[1]);
+                    xPoints.add(xY[0]);
+                    yPoints.add(xY[1]);
                     
                     if (i > 0) {
                         g.drawLine(
                             (int) (startX + MAP_WIDTH / 2 ),
                             (int) (startY + MAP_HEIGHT / 2 ),
-                            (int) (Xy[0] + MAP_WIDTH / 2 ),
-                            (int) (Xy[1] + MAP_HEIGHT / 2 )
+                            (int) (xY[0] + MAP_WIDTH / 2 ),
+                            (int) (xY[1] + MAP_HEIGHT / 2 )
                         );
                     }
                     
-                    startX = Xy[0];
-                    startY = Xy[1];
+                    startX = xY[0];
+                    startY = xY[1];
                 }
-
-                if(xPoints.size() == 0) {
-                    System.out.println("");
-                } 
             
                 xPoints.add(xPoints.get(0));
                 yPoints.add(yPoints.get(0));
@@ -307,7 +301,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         displayer.runAccessibilityDisplayer();
     }
 
-    public static int getColorForScore(int score, HashMap<String, Integer> scoreMap, ArrayList<String> colors) {
+    public static int getColorIndexForScore(int score, HashMap<String, Integer> scoreMap, ArrayList<String> colors) {
         int maxScore = Integer.MIN_VALUE;
         int minScore = Integer.MAX_VALUE;
         
@@ -321,9 +315,7 @@ public class AccessibilityDisplayer extends JFrame implements ActionListener{
         }
 
         //https://en.wikipedia.org/wiki/Normalization_(statistics)
-        int colorIndex = (int) ((double) (score - minScore) / (maxScore - minScore) * (colors.size() - 1));
-        
-        return colorIndex;
+        return (int) ((double) (score - minScore) / (maxScore - minScore) * (colors.size() - 1));
     }
 
     public ArrayList<String> getGradientColors() {
