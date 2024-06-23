@@ -137,7 +137,7 @@ public class JSONController {
         }else{
             filePath = SHOP_PATH;
         }
-        Data.getData();
+        // Data.getData();
         List<Place> places = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.readTree(new File(filePath));
@@ -266,7 +266,7 @@ public class JSONController {
     }
 
     public List<Place> getNearbyAmenities(String filePath, String postCode, double radius) throws IOException {
-        Data.getData();
+        // Data.getData();
         ArrayList<Double> LatLon = Data.getLatLong(postCode);
         Double latitude = LatLon.get(0);
         Double longitude = LatLon.get(1);
