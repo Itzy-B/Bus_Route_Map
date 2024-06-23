@@ -22,7 +22,9 @@ public class Data {
      */
     public static void getData() {
         boolean isFirstRow = true; // Flag to indicate the first row
-        try (FileInputStream fis = new FileInputStream("src/java/Resources/MassZipLatLon.xlsx");
+        try (FileInputStream fis = new FileInputStream("src/java/Resources/relevantPostalCodes.xlsx");
+        // try (FileInputStream fis = new FileInputStream("src/java/Resources/MassZipLatLon.xlsx");
+
              XSSFWorkbook wb = new XSSFWorkbook(fis)) {
 
             XSSFSheet sheet = wb.getSheetAt(0);
@@ -78,6 +80,7 @@ public class Data {
             return latLong;
         }
         else{
+            System.out.println("attempting to get" + zipCode);
             RetrievePostalWithAPI api = new RetrievePostalWithAPI();
             latLong = api.getPCode(zipCode);
             if (latLong.size() > 0) {

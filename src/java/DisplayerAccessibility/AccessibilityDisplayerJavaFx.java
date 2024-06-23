@@ -9,8 +9,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.SplitMenuButton;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Alert.AlertType;
@@ -56,10 +57,29 @@ public class AccessibilityDisplayerJavaFx extends Application {
     private double prevX, prevY;
     private final double offset = 268435456;
     private final double radius = offset / Math.PI;
+    private int selectedOption = 1; 
+    private RadioMenuItem option1 = new RadioMenuItem("Standard Official Xlsx");
+    private RadioMenuItem option2 = new RadioMenuItem("Custom 100m");
+    private RadioMenuItem option3 = new RadioMenuItem("Custom 500m");
 
     public static void main(String[] args) {
         launch(args);
     }
+
+    public int getSelectedOption() {
+        if (option1.isSelected()) return 1;
+        if (option2.isSelected()) return 2;
+        if (option3.isSelected()) return 3;
+        return 1;
+    }
+
+    public String getScorePath(int option) {
+        if (option == 1) return "scores.ser";
+        if (option == 2) return "scores100m.ser";
+        if (option == 3) return "scores500m.ser";
+        return "scores.ser";
+    }
+
 
     @Override
     public void start(Stage primaryStage) {
@@ -178,29 +198,27 @@ public class AccessibilityDisplayerJavaFx extends Application {
             transparencyField.setPrefWidth(310);
             scoreField = new Label();
             
-            box.getChildren().addAll(updateButton, zoomInButton, zoomOutButton, zipCodeField1, scoreField, checkBox, transparencyField);
-            
+        MenuBar menuBar = new MenuBar();
 
-            ToggleGroup toggleGroup = new ToggleGroup();
-            SplitMenuButton splitMenuButton = new SplitMenuButton();
-            splitMenuButton.setText("Options");
-            VBox vbox = new VBox(5);
-            RadioButton radioButton1 = new RadioButton("Option 1");
-            RadioButton radioButton2 = new RadioButton("Option 2");
-            RadioButton radioButton3 = new RadioButton("Option 3");
-            radioButton1.setToggleGroup(toggleGroup);
-            radioButton2.setToggleGroup(toggleGroup);
-            radioButton3.setToggleGroup(toggleGroup);
-            vbox.getChildren().addAll(radioButton1, radioButton2, radioButton3);
+        Menu optionsMenu = new Menu("Options");
 
-            // Adjusting layout to include the SplitMenuButton
-            box.getChildren().add(splitMenuButton); 
+        ToggleGroup toggleGroup = new ToggleGroup();
+        option1.setToggleGroup(toggleGroup);
+        option1.setSelected(true);
+        option2.setToggleGroup(toggleGroup);
+        option3.setToggleGroup(toggleGroup);
 
-            canvas = new Canvas(MAP_WIDTH, MAP_HEIGHT);
-            createActionListeners();
-            
-            root.getChildren().addAll(box, canvas);
-            Scene scene = new Scene(root, 1000, 650);
+        optionsMenu.getItems().addAll(option1, option2, option3);
+
+        menuBar.getMenus().add(optionsMenu);
+
+        box.getChildren().addAll(updateButton, zoomInButton, zoomOutButton, zipCodeField1, scoreField, checkBox, transparencyField, menuBar);
+
+        canvas = new Canvas(MAP_WIDTH, MAP_HEIGHT);
+        createActionListeners();
+
+        root.getChildren().addAll(box, canvas);
+            Scene scene = new Scene(root, 1050, 650);
             primaryStage.setScene(scene);
             primaryStage.show();
             try {
@@ -227,6 +245,16 @@ public class AccessibilityDisplayerJavaFx extends Application {
     }
 
     private void drawScreen() throws IOException {
+        if (selectedOption != getSelectedOption()) {
+            selectedOption = getSelectedOption();
+            String scorePath = getScorePath(selectedOption);
+            try {
+                scoresMap = (HashMap<String, Integer>) FileManager.getInstance().getObject(scorePath);
+            } catch (ClassNotFoundException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
         // Load the background image
         GraphicsContext gc = canvas.getGraphicsContext2D();
         double transparencyValue = 0.5;
