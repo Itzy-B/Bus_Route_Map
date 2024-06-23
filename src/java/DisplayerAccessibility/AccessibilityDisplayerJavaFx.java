@@ -7,8 +7,11 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -16,6 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import src.java.GUI.Data;
+import src.java.Singletons.ExceptionManager;
 import src.java.Singletons.FileManager;
 
 import javax.imageio.ImageIO;
@@ -36,7 +40,9 @@ public class AccessibilityDisplayerJavaFx extends Application {
     private Button updateButton = new Button("Update");
     private Button zoomInButton = new Button("+");
     private Button zoomOutButton = new Button("-");
+    private CheckBox checkBox = new CheckBox("Disable map");
     private TextField zipCodeField1 = new TextField();
+    private TextField transparencyField = new TextField();
     private ArrayList<String> zipCodes = Data.getZipCodes();
     private String[] zipCodesAll;
     private ArrayList<Double> lats = Data.getLatitudes();
@@ -65,7 +71,7 @@ public class AccessibilityDisplayerJavaFx extends Application {
         root.getChildren().addAll(updateButton, zoomInButton, zoomOutButton, zipCodeField1, scoreField, mapView);
 
         createActionListeners();
-        primaryStage.setScene(new Scene(root, 600, 600));
+        primaryStage.setScene(new Scene(root, 700, 700));
         primaryStage.show();
 
         runAccessibilityDisplayer();
@@ -166,17 +172,19 @@ public class AccessibilityDisplayerJavaFx extends Application {
             zoomInButton = new Button("Zoom In");
             zoomOutButton = new Button("Zoom Out");
             zipCodeField1 = new TextField();
-            zipCodeField1.setPrefWidth(230);
+            zipCodeField1.setPrefWidth(190);
             zipCodeField1.setPromptText("Enter a zipcode to center");
+            transparencyField.setPromptText("Enter value for transparency from 0.0 to 1.0");
+            transparencyField.setPrefWidth(310);
             scoreField = new Label();
             
-            box.getChildren().addAll(updateButton, zoomInButton, zoomOutButton, zipCodeField1, scoreField);
+            box.getChildren().addAll(updateButton, zoomInButton, zoomOutButton, zipCodeField1, scoreField, checkBox, transparencyField);
             
             canvas = new Canvas(MAP_WIDTH, MAP_HEIGHT);
             createActionListeners();
             
             root.getChildren().addAll(box, canvas);
-            Scene scene = new Scene(root, 800, 600);
+            Scene scene = new Scene(root, 1000, 650);
             primaryStage.setScene(scene);
             primaryStage.show();
             try {
@@ -205,10 +213,23 @@ public class AccessibilityDisplayerJavaFx extends Application {
     private void drawScreen() throws IOException {
         // Load the background image
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        URL url = new URL(URL);
-        BufferedImage bufferedImage = ImageIO.read(url);
-        Image image = new Image(url.toString());
-        gc.drawImage(image, 0, 0);
+        double transparencyValue = 0.5;
+        try {
+            if (transparencyField.getText() != null && transparencyField.getText().length() > 0) {
+                transparencyValue = Double.parseDouble(transparencyField.getText());
+            }
+            } catch (NumberFormatException e) {
+                ExceptionManager.showInstantError("Invalid Format", "Problem", "Please enter valid number format in transparency field", AlertType.ERROR);
+            }
+    
+        if (checkBox.isSelected()) {
+            gc.clearRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
+        }
+        else {
+            URL url = new URL(URL);
+            Image image = new Image(url.toString());
+            gc.drawImage(image, 0, 0);
+        }
 
         // Draw the polygons
         Color lineColor = Color.BLACK;
@@ -229,7 +250,7 @@ public class AccessibilityDisplayerJavaFx extends Application {
                     // scoreField.setText("score: " + score);
                     scoreField.setText("score: " +score + " " + Integer.parseInt(split[0]) + " " + Integer.parseInt(split[1]));
                 }
-                polygonColor = Color.rgb(Integer.parseInt(split[0]), Integer.parseInt(split[1]), 0, 0.6);
+                polygonColor = Color.rgb(Integer.parseInt(split[0]), Integer.parseInt(split[1]), 0, transparencyValue);
             } else {
                 polygonColor = Color.rgb(255, 255, 255, 0.64);
             }
@@ -241,7 +262,7 @@ public class AccessibilityDisplayerJavaFx extends Application {
                 if(postCode.equals("6211BM") || postCode.equals("6227CC")) {
                     ArrayList<Double> latLong = Data.getLatLong(postCode);
                     int[] xY = adjust(latLong.get(1), latLong.get(0), centerLongitude, centerLatitude, zoomLevel);
-                    gc.setFill(Color.rgb(Integer.parseInt(split[0]), Integer.parseInt(split[1]), 0, 1));
+                    gc.setFill(Color.rgb(Integer.parseInt(split[0]), Integer.parseInt(split[1]), 0, transparencyValue));
                     if (!(zoomedPostcode == null)) {
                         if (zoomedPostcode.equals("6211BM") || zoomedPostcode.equals("6227CC")) {
                             gc.strokeOval((int) (xY[0] + MAP_WIDTH / 2 - 5), (int) (xY[1] + MAP_HEIGHT / 2 - 5), 10, 10);
