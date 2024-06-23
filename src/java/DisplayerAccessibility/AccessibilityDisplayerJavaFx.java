@@ -11,7 +11,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -247,8 +246,8 @@ public class AccessibilityDisplayerJavaFx extends Application {
                 int score = scoresMap.get(postCode);
                 split = colours.get(getColorIndexForScore(score, scoresMap, colours)).split(",");
                 if (postCode.equals(zoomedPostcode)) {
-                    // scoreField.setText("score: " + score);
-                    scoreField.setText("score: " +score + " " + Integer.parseInt(split[0]) + " " + Integer.parseInt(split[1]));
+                    scoreField.setText("score: " + score);
+                    // scoreField.setText("score: " +score + " " + Integer.parseInt(split[0]) + " " + Integer.parseInt(split[1]));
                 }
                 polygonColor = Color.rgb(Integer.parseInt(split[0]), Integer.parseInt(split[1]), 0, transparencyValue);
             } else {
@@ -302,8 +301,8 @@ public class AccessibilityDisplayerJavaFx extends Application {
                     startY = xY[1];
                 }
 
-                // xPoints.add(xPoints.get(0));
-                // yPoints.add(yPoints.get(0));
+                xPoints.add(xPoints.get(0));
+                yPoints.add(yPoints.get(0));
                 
                 //https://stackoverflow.com/questions/71495980/java-8-stream-add-1-to-each-element-and-remove-if-element-is-5-in-the-list
                 //https://stackoverflow.com/questions/718554/how-to-convert-an-arraylist-containing-integers-to-primitive-int-array
