@@ -9,7 +9,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,8 +24,6 @@ import src.java.GUI.Data;
 import src.java.Singletons.ExceptionManager;
 import src.java.Singletons.FileManager;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -179,6 +180,22 @@ public class AccessibilityDisplayerJavaFx extends Application {
             
             box.getChildren().addAll(updateButton, zoomInButton, zoomOutButton, zipCodeField1, scoreField, checkBox, transparencyField);
             
+
+            ToggleGroup toggleGroup = new ToggleGroup();
+            SplitMenuButton splitMenuButton = new SplitMenuButton();
+            splitMenuButton.setText("Options");
+            VBox vbox = new VBox(5);
+            RadioButton radioButton1 = new RadioButton("Option 1");
+            RadioButton radioButton2 = new RadioButton("Option 2");
+            RadioButton radioButton3 = new RadioButton("Option 3");
+            radioButton1.setToggleGroup(toggleGroup);
+            radioButton2.setToggleGroup(toggleGroup);
+            radioButton3.setToggleGroup(toggleGroup);
+            vbox.getChildren().addAll(radioButton1, radioButton2, radioButton3);
+
+            // Adjusting layout to include the SplitMenuButton
+            box.getChildren().add(splitMenuButton); 
+
             canvas = new Canvas(MAP_WIDTH, MAP_HEIGHT);
             createActionListeners();
             
@@ -301,8 +318,8 @@ public class AccessibilityDisplayerJavaFx extends Application {
                     startY = xY[1];
                 }
 
-                xPoints.add(xPoints.get(0));
-                yPoints.add(yPoints.get(0));
+                // xPoints.add(xPoints.get(0));
+                // yPoints.add(yPoints.get(0));
                 
                 //https://stackoverflow.com/questions/71495980/java-8-stream-add-1-to-each-element-and-remove-if-element-is-5-in-the-list
                 //https://stackoverflow.com/questions/718554/how-to-convert-an-arraylist-containing-integers-to-primitive-int-array
