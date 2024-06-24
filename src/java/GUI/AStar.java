@@ -12,6 +12,10 @@ import java.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+
+/**
+ * AStar class implements the A* search algorithm for finding the shortest path between two places.
+ */
 public class AStar implements Serializable {
     private final int AVGWALKINGTIME = 70; // meters/min
     private final Graph graph;
@@ -26,6 +30,14 @@ public class AStar implements Serializable {
         return this.directions;
     }
 
+    /**
+     * Main method to find the shortest path between two places.
+     *
+     * @param startPlace The starting place.
+     * @param endPlace The ending place.
+     * @return A list of places representing the shortest path.
+     * @throws Exception If an error occurs during the search.
+     */
     public List<Place> findShortestPath(Place startPlace, Place endPlace) throws Exception {
         connectBusStops();
 
@@ -35,6 +47,13 @@ public class AStar implements Serializable {
         return aStarSearch(startPlace, endPlace, LocalTime.of(12, 0, 0));
     }
 
+    /**
+     * Method to connect a place to the nearest bus stops.
+     *
+     * @param place The place to connect.
+     * @param stops The number of nearest bus stops to connect.
+     * @throws Exception If an error occurs while getting the real distance.
+     */
     private void connectPlaceToGraph(Place place, int stops) throws Exception {
         List<BusStop> nearestBusStops = graph.findNearestBusStops(place.getLatitude(), place.getLongitude(), stops);
         graph.addVertex(place);
@@ -42,6 +61,7 @@ public class AStar implements Serializable {
             int walkingDist = getRealDistance(place, busStop);
             long walkingTime = Math.ceilDiv(walkingDist, AVGWALKINGTIME);
 
+            // Add edges for walking between the place and the bus stop
             Edge walkEdge = new Edge(place, busStop, walkingTime, walkingDist, "walk");
             graph.addEdge(walkEdge);
 
@@ -50,6 +70,9 @@ public class AStar implements Serializable {
         }
     }
 
+    /**
+     * Method to connect all bus stops within 100 meters of each other.
+     */
     private void connectBusStops() {
         for (Place p1 : graph.getVertices()) {
              for (Place p2 : graph.getVertices()) {
@@ -70,6 +93,15 @@ public class AStar implements Serializable {
         }
     }
 
+
+    /**
+     * A* search algorithm to find the shortest path between the start and goal places.
+     *
+     * @param start The starting place.
+     * @param goal The goal place.
+     * @param startTime The starting time.
+     * @return A list of places representing the shortest path.
+     */
     private List<Place> aStarSearch(Place start, Place goal, LocalTime startTime) {
         PriorityQueue<SearchNode> openSet = new PriorityQueue<>(Comparator.comparingDouble(searchNode -> searchNode.f));
         Map<Place, Long> priorityMap = new HashMap<>();
@@ -94,6 +126,7 @@ public class AStar implements Serializable {
 
             //System.out.println("Current Node: " + currentSearchNode.place + ", g = " + currentSearchNode.g + ", h = " + currentSearchNode.h + ", f = " + currentSearchNode.f + ", time = " + currentSearchNode.time);
 
+            // Loop through all edges of the current node
             for (Edge edge : graph.getEdges(currentSearchNode.place)) {
                 if (currentSearchNode.cameFrom != null && edge.getTo().equals(currentSearchNode.cameFrom.place)) {
                     continue;
@@ -114,8 +147,6 @@ public class AStar implements Serializable {
                         priorityMap.put(searchNode.place, searchNode.f);
                     }
                     openSet.add(searchNode);
-
-
                     continue;
                 }
 
@@ -124,6 +155,7 @@ public class AStar implements Serializable {
                 List<Trip> trips = edge.getTrips();
                 Collections.sort(trips);
 
+                // Check all possible trips in one edge
                 for (Trip trip : trips) {
                     //System.out.println("Considering trip: " + trip);
 
@@ -146,11 +178,26 @@ public class AStar implements Serializable {
         return Collections.emptyList();
     }
 
+
+    /**
+     * Heuristic function to estimate the distance between the current place and the goal.
+     *
+     * @param place The current place.
+     * @param goal The goal place.
+     * @return The estimated distance.
+     */
     private long heuristic(Place place, Place goal) {
         double dist = CalculateDistance.distanceBetween(place.getLatitude(), place.getLongitude(), goal.getLatitude(), goal.getLongitude());
         return Math.round(dist / AVGWALKINGTIME);
     }
 
+
+    /**
+     * Method to reconstruct the path from the goal to the start.
+     *
+     * @param currentSearchNode The goal search node.
+     * @return A list of places representing the shortest path.
+     */
     private List<Place> reconstructPath(SearchNode currentSearchNode) {
         List<SearchNode> pathNodes = new ArrayList<>();
         List<Place> stops = new ArrayList<>();
@@ -179,6 +226,11 @@ public class AStar implements Serializable {
         //return stops;
     }
 
+    /**
+     * Method to construct the directions from the path nodes.
+     *
+     * @param pathNodes The list of search nodes representing the path.
+     */
     private void constructDirections(List<SearchNode> pathNodes) {
         int size = pathNodes.size();
         String headSign = "";
@@ -212,6 +264,12 @@ public class AStar implements Serializable {
         }
     }
 
+    /**
+     * Method to construct the shapes from the path nodes.
+     *
+     * @param pathNodes The list of search nodes representing the path.
+     * @return A list of places representing the shapes.
+     */
     private List<Place> constructShapes(List<SearchNode> pathNodes) {
         List<Place> stops = new ArrayList<>();
         stops.add(pathNodes.get(0).place);
@@ -270,6 +328,14 @@ public class AStar implements Serializable {
         return stops;
     }
 
+    /**
+     * Method to extract the shape segment between the start and end places.
+     *
+     * @param start The starting place.
+     * @param end The ending place.
+     * @param shapes The list of bus route shapes.
+     * @return A list of places representing the shape segment.
+     */
     private List<Place> extractShapeSegment(Place start, Place end, List<BusRouteShape> shapes) {
         List<Place> segment = new ArrayList<>();
         int startIndex = findClosestShapePoint(start, shapes);
@@ -289,6 +355,14 @@ public class AStar implements Serializable {
         return segment;
     }
 
+
+    /**
+     * Method to find the closest shape point to a place.
+     *
+     * @param place The place to find the closest shape point.
+     * @param shapes The list of bus route shapes.
+     * @return The index of the closest shape point.
+     */
     private int findClosestShapePoint(Place place, List<BusRouteShape> shapes) {
         int index = -1;
         double minDistance = Double.MAX_VALUE;
@@ -305,6 +379,14 @@ public class AStar implements Serializable {
         return index;
     }
 
+    /**
+     * Method to get the real walking distance between two places using Google Maps API.
+     *
+     * @param origin The origin place.
+     * @param destination The destination place.
+     * @return The real walking distance in meters.
+     * @throws Exception If an error occurs while getting the distance.
+     */
     public static int getRealDistance(Place origin, Place destination) throws Exception {
         String apiKey = "AIzaSyAZwfzWK71qIgXSleA-02n-oXfo5OjOhhU";
         String originStr = origin.lat + "," + origin.lon;

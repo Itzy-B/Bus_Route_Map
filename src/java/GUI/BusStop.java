@@ -5,10 +5,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The BusStop class represents a bus stop with a specific ID, name, latitude, and longitude.
+ * It extends the Place class.
+ */
 public class BusStop extends Place implements Serializable {
     private int stopId;
     private String name;
 
+    /**
+     * Constructor to initialize a BusStop object.
+     *
+     * @param stopId The ID of the bus stop.
+     * @param name The name of the bus stop.
+     * @param lat The latitude of the bus stop.
+     * @param lon The longitude of the bus stop.
+     */
     public BusStop(int stopId, String name, double lat, double lon) {
         super(lat, lon);
         this.stopId = stopId;

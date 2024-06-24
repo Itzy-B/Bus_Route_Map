@@ -3,6 +3,9 @@ package src.java.GUI;
 import java.io.Serializable;
 import java.time.LocalTime;
 
+/**
+ * The Trip class represents a bus trip with its associated details.
+ */
 public class Trip implements Comparable<Trip>, Serializable {
     private int tripId;
     private String tripHeadSign;
@@ -13,6 +16,16 @@ public class Trip implements Comparable<Trip>, Serializable {
 
     private int shapeId;
 
+    /**
+     * Constructor to initialize a Trip object.
+     *
+     * @param tripId The ID of the trip.
+     * @param arriveTime The arrival time of the trip.
+     * @param departureTime The departure time of the trip.
+     * @param tripHeadSign The head sign of the trip.
+     * @param shapeDistTraveled The distance traveled along the shape.
+     * @param shapeId The ID of the shape.
+     */
     public Trip(int tripId,  LocalTime arriveTime, LocalTime departureTime, String tripHeadSign, int shapeDistTraveled, int shapeId) {
         this.tripId = tripId;
         this.tripHeadSign = tripHeadSign;

@@ -7,11 +7,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The GraphBuilder class is responsible for building the graph by retrieving data from the database.
+ */
 public class GraphBuilder {
     private final Graph g;
 
     public GraphBuilder(Graph g) {this.g = g;}
 
+    /**
+     * Retrieves bus stop data from the database and adds it to the graph.
+     *
+     * @throws SQLException If an SQL error occurs.
+     */
     public void getBusStops() throws SQLException {
         String query = "SELECT stop_id, stop_name, stop_lat, stop_lon, trip_id, stop_sequence, arrival_time, departure_time, trip_headsign, shape_dist_traveled, shape_id " +
                 "FROM maas_stops_time " +
@@ -57,6 +65,14 @@ public class GraphBuilder {
         }
     }
 
+
+    /**
+     * Retrieves the shape data for a given shape ID from the database.
+     *
+     * @param shapeId The shape ID to retrieve data for.
+     * @return A list of BusRouteShape objects representing the shape.
+     * @throws SQLException If an SQL error occurs.
+     */
     public static List<BusRouteShape> getBusRouteShapes(int shapeId) throws SQLException {
         String query = "SELECT shape_id, shape_pt_sequence, shape_pt_lat, shape_pt_lon, shape_dist_traveled " +
                 "FROM shapes " +
@@ -84,14 +100,24 @@ public class GraphBuilder {
         return shapes;
     }
 
-
-    // convert time string to LocalTime
+    /**
+     * Converts a time string to a LocalTime object.
+     *
+     * @param timeStr The time string in "HH:mm:ss" format.
+     * @return The corresponding LocalTime object.
+     */
     public static LocalTime convertToLocalTime(String timeStr) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         return LocalTime.parse(timeStr, formatter);
     }
 
-    // calculate the difference in minutes between two time strings
+    /**
+     * Calculates the difference in minutes between two LocalTime objects.
+     *
+     * @param startTime The start time.
+     * @param endTime The end time.
+     * @return The difference in minutes.
+     */
     public static long calculateTimeDifference(LocalTime startTime, LocalTime endTime) {
         Duration duration = Duration.between(startTime, endTime);
         return duration.toMinutes();
