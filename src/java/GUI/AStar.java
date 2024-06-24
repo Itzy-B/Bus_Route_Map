@@ -30,6 +30,10 @@ public class AStar implements Serializable {
         return this.directions;
     }
 
+    public void setDirections(List<String> directions) {
+        this.directions = directions;
+    }
+
     /**
      * Main method to find the shortest path between two places.
      *

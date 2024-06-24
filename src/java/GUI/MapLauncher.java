@@ -244,6 +244,7 @@ public class MapLauncher extends Application{
             }
             
             if(path == null) {
+                aStar.setDirections(new ArrayList<>());
                 departure = new Place(zipCode1);
                 destination = new Place(zipCode2);
     
@@ -258,6 +259,7 @@ public class MapLauncher extends Application{
 
             // Fetch place from zipcode
             path = cachedPaths.get(zipCode1 + zipCode2);
+            listView.getItems().clear();
             listView.getItems().setAll(aStar.getDirections());
             updateMap();
 
