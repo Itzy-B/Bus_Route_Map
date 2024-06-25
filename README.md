@@ -5,7 +5,7 @@ Group 25 Team Members: Tristan Dormans, Mehmet Levent Koca, Alen Quiroz Engel, V
 ## IMPORTANT TO BE ABLE TO RUN THE APPLICATION
 1. Set up a JavaFX environment on your IDEA to be able to run the application GUI.
 
-2. You might also need to set up the VM options in your run configurations as:<br>
+2. If you have an error saying "JavaFX runtime components missing", you also need to set up the VM options in your run configurations as:<br>
 --module-path "your physical path to JavaFX lib" --add-modules javafx.controls,javafx.fxml
 
 3. Install mySQL in your computer and create a new local user<br>
