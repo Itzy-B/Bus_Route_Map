@@ -213,7 +213,7 @@ public class AccessibilityDisplayerJavaFx extends Application {
 
         ToggleGroup toggleGroup = new ToggleGroup();
         option1.setToggleGroup(toggleGroup);
-        option1.setSelected(true);
+        option3.setSelected(true);
         option2.setToggleGroup(toggleGroup);
         option3.setToggleGroup(toggleGroup);
         option4.setToggleGroup(toggleGroup);
