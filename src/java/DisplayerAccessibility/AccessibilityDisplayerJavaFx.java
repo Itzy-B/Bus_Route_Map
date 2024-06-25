@@ -143,7 +143,7 @@ public class AccessibilityDisplayerJavaFx extends Application {
         });
 
         canvas.setOnMouseDragged(e -> {
-            double mouseSensitivity = 40.0;
+            double mouseSensitivity = 30.0;
             double deltaX = e.getX() - prevX;
             double deltaY = e.getY() - prevY;
             prevX = e.getX();
