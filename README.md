@@ -35,24 +35,18 @@ Now, there are multiple things you can do:
     There are two text fields labeled "Enter Zip Code 1" and "Enter Zip Code 2", these are for the user to insert their desired points 
     in the map. By inserting 2 Zip Codes, the user will be able to clculate the distance between the two points in the map.
 
-3) 'Search' Button
-    Once the two desired Zip Codes have been inserted, the user is able to press the 'Search' button. This runs the algorithm to 
-    calculate the distance betwen the two points in the map and shows a visual represenation of the distance between the two points.
-
-4) 'Toggle graphhopper' Button
-    Toggle to enable the calculation of the actual distance by car, press the search button again to refresh the screen after toggling.
-
 4) Information on Screen
     After the 'Search' button is clicked, the user is presented with different pieces of information on screen:
-        - There is a clear red line shows between the two points, giving a visual representation of the 'straight line distance' between 
-        the two points.
-        - To the very right of the GUI, some text is also displayed, giving the user information on the exact distance in kilometers 
-        or meters, the 'Average time by walk', 'Average time by bike', and 'Average time by car'. All of these time markers are calculated 
-        based on average speed of the different traveling times and the straight line distance calculated.
+    The visualised bus route, displayed with a red line.
+    Route information is displayed on the right of the map image, including departure, walking times, transfer information and total travel time.
 
-5) To exit the program simply press the cross on the top right of the GUI, or alternatively press 'ALT' + 'F4'. Repeat this step for the terminal window.
+5) Accessibility Displayer
+    Press the button 'Show accessibility of postal codes' to open up a new window. In this window you will be presented with a map containing colored coded postal codes of Maastricht according to their social-economic accessibility. It is required to press the 'Update' button any time a value is changed in the other fields of this GUI. The options button will open up a menu with different score maps, please press the 'update' button after selecting an option. The other GUI buttons speak for themselves.
+
+
+5) To exit the program simply press the cross on the top right of the GUI, or alternatively press 'ALT' + 'F4'. 
 
 Thank you,
 Group 25.
 
-21st of March, 2024.
+25st of June, 2024.
