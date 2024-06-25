@@ -17,7 +17,7 @@ import org.json.JSONObject;
  * AStar class implements the A* search algorithm for finding the shortest path between two places.
  */
 public class AStar implements Serializable {
-    private final int AVGWALKINGTIME = 70; // meters/min
+    private final int AVGWALKINGTIME = 70; // Average walking speed in meters/min
     private final Graph graph;
     private List<String> directions;
 
@@ -128,8 +128,6 @@ public class AStar implements Serializable {
                 return reconstructPath(currentSearchNode);
             }
 
-            //System.out.println("Current Node: " + currentSearchNode.place + ", g = " + currentSearchNode.g + ", h = " + currentSearchNode.h + ", f = " + currentSearchNode.f + ", time = " + currentSearchNode.time);
-
             // Loop through all edges of the current node
             for (Edge edge : graph.getEdges(currentSearchNode.place)) {
                 if (currentSearchNode.cameFrom != null && edge.getTo().equals(currentSearchNode.cameFrom.place)) {
@@ -141,7 +139,6 @@ public class AStar implements Serializable {
                 String edgeHeadSign = edge.getTripHeadSign();
 
                 if (edgeHeadSign.equals("walk")) {
-                    //System.out.println("Considering walking to: " + edge.getTo() + ", time cost: " + edge.getWalkingTime() + ", dist cost: " + edge.getWalkingDist());
 
                     timeCost = currentSearchNode.g + edge.getWalkingTime();
                     distCost = currentSearchNode.dist + edge.getWalkingDist();
@@ -154,17 +151,13 @@ public class AStar implements Serializable {
                     continue;
                 }
 
-                //System.out.println("Considering edge to: " + edge.getTo() + ", tripHeadsign: " + edge.getTripHeadSign());
-
                 List<Trip> trips = edge.getTrips();
                 Collections.sort(trips);
 
                 // Check all possible trips in one edge
                 for (Trip trip : trips) {
-                    //System.out.println("Considering trip: " + trip);
 
                     if (trip.getDepartureTime().compareTo(currentSearchNode.time) >= 0) {
-                        //System.out.println("choose trip: " + trip);
                         timeCost = currentSearchNode.g + GraphBuilder.calculateTimeDifference(currentSearchNode.time, trip.getArriveTime());
                         distCost = currentSearchNode.dist + trip.getShapeDistTraveled();
                         LocalTime time = trip.getArriveTime();
@@ -212,22 +205,8 @@ public class AStar implements Serializable {
         }
         Collections.reverse(pathNodes);
 
-        /*for (int i = 0; i < pathNodes.size(); i += 1) {
-            if (i == 0) {
-                System.out.println("walk from " + pathNodes.get(0).place + " to " + pathNodes.get(1).place + ", time: " + pathNodes.get(1).time);
-            } else if (i == pathNodes.size() - 1) {
-                System.out.println("walk from " + pathNodes.get(pathNodes.size() - 2).place + " to " + pathNodes.get(pathNodes.size() - 1).place + ", time: " + pathNodes.get(pathNodes.size() - 1).time);
-            } else {
-                System.out.println("take bus from " + pathNodes.get(i).place + " to " + pathNodes.get(i + 1).place + ", time: " + pathNodes.get(i + 1).time);
-                System.out.println(" ---- in trip: " + pathNodes.get(i + 1).trip);
-            }
-            stops.add(pathNodes.get(i).place);
-        }*/
-
         constructDirections(pathNodes);
         return constructShapes(pathNodes);
-
-        //return stops;
     }
 
     /**
@@ -240,30 +219,33 @@ public class AStar implements Serializable {
         String headSign = "";
         for (int i = 0; i < size; i += 1) {
             StringBuilder sb = new StringBuilder();
+            SearchNode node = pathNodes.get(i);
             if (i == 0) {
-                sb.append(pathNodes.get(i).time).append("--").append(pathNodes.get(i).place.getZipCode());
+                sb.append(node.time).append("--").append(node.place.getZipCode());
                 directions.add(sb.toString());
                 continue;
             }
-            if (pathNodes.get(i).trip == null) {
+            if (node.trip == null) {
                 sb.append("Walk about ")
-                        .append(pathNodes.get(i).g -  pathNodes.get(i - 1).g)
+                        .append(node.g -  pathNodes.get(i - 1).g)
                         .append(" min, ")
-                        .append(pathNodes.get(i).dist - pathNodes.get(i - 1).dist)
+                        .append(node.dist - pathNodes.get(i - 1).dist)
                         .append(" m");
                 directions.add(sb.toString());
                 sb = new StringBuilder();
+            } else if (!node.trip.getTripHeadSign().equals(headSign)) {
+                sb.append("Transfer to ").append(node.trip.getTripHeadSign()).append(", departs at ").append(node.trip.getDepartureTime()).append(", ").append(pathNodes.get(i - 1).place);
+                directions.add(sb.toString());
+                headSign = node.trip.getTripHeadSign();
+                sb = new StringBuilder();
             }
             if (i == size - 1) {
-                sb.append(pathNodes.get(i).time).append("--").append(pathNodes.get(i).place.getZipCode());
+                sb.append(node.time).append("--").append(node.place.getZipCode());
                 directions.add(sb.toString());
+                directions.add("Total time cost: " + node.g + " minutes");
                 continue;
             }
-            if (pathNodes.get(i + 1).trip != null && !pathNodes.get(i + 1).trip.getTripHeadSign().equals(headSign)) {
-                directions.add(pathNodes.get(i + 1).trip.getTripHeadSign());
-                headSign = pathNodes.get(i + 1).trip.getTripHeadSign();
-            }
-            sb.append(pathNodes.get(i).time).append("--").append(pathNodes.get(i).place);
+            sb.append(node.time).append("--").append(node.place);
             directions.add(sb.toString());
         }
     }
