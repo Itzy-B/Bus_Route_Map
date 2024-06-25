@@ -197,7 +197,6 @@ public class AStar implements Serializable {
      */
     private List<Place> reconstructPath(SearchNode currentSearchNode) {
         List<SearchNode> pathNodes = new ArrayList<>();
-        List<Place> stops = new ArrayList<>();
 
         while (currentSearchNode != null) {
             pathNodes.add(currentSearchNode);
@@ -242,7 +241,13 @@ public class AStar implements Serializable {
             if (i == size - 1) {
                 sb.append(node.time).append("--").append(node.place.getZipCode());
                 directions.add(sb.toString());
-                directions.add("Total time cost: " + node.g + " minutes");
+                long hours = node.g / 60;
+                long minutes = node.g % 60;
+                if (hours == 0) {
+                    directions.add("Total time cost: " + node.g + " minutes");
+                } else {
+                    directions.add("Total time cost: " + hours + " hours, " + minutes + " minutes");
+                }
                 continue;
             }
             sb.append(node.time).append("--").append(node.place);
