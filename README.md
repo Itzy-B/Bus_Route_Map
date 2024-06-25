@@ -20,22 +20,9 @@ URL = jdbc:mysql://localhost:3306/gtfs<br>
 USER = DACS2024<br>
 PASSWORD = DACS2024<br>
 
-Run this query
-    CREATE TABLE IF NOT EXISTS `gtfs`.`maas_stops_time` (
-    `stop_id` INT(11),
-    `stop_name` VARCHAR(255),
-    `stop_lat` DECIMAL(9,6),
-    `stop_lon` DECIMAL(9,6),
-    `trip_id` BIGINT,
-    `stop_sequence` INT(11),
-    `arrival_time` TIME,
-    `departure_time` TIME,
-    `trip_headsign` VARCHAR(255),
-    `shape_dist_traveled` FLOAT,
-    `shape_id` BIGINT,
-    PRIMARY KEY (`stop_id`, `trip_id`));
-
-5. Open SQL console to run script.sql file to import data
+5. When you already set up your local database connection, import two data files:<br>
+(1)Import maas_stops_time.csv file as Table "maas_stops_time"<br>
+(2)Import shapes.csv file as Table "shapes"<br>
 
 ***** HOW TO RUN *****
 
