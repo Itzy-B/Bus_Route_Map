@@ -61,6 +61,10 @@ public class AccessibilityDisplayerJavaFx extends Application {
     private RadioMenuItem option1 = new RadioMenuItem("Standard Official Xlsx");
     private RadioMenuItem option2 = new RadioMenuItem("Custom 100m");
     private RadioMenuItem option3 = new RadioMenuItem("Custom 500m");
+    private RadioMenuItem option4 = new RadioMenuItem("Official Xlsx 1000m");
+    private RadioMenuItem option5 = new RadioMenuItem("Custom 1000m");
+    private RadioMenuItem option6 = new RadioMenuItem("");
+
 
     public static void main(String[] args) {
         launch(args);
@@ -70,6 +74,9 @@ public class AccessibilityDisplayerJavaFx extends Application {
         if (option1.isSelected()) return 1;
         if (option2.isSelected()) return 2;
         if (option3.isSelected()) return 3;
+        if (option4.isSelected()) return 4;
+        if (option5.isSelected()) return 5;
+
         return 1;
     }
 
@@ -77,6 +84,8 @@ public class AccessibilityDisplayerJavaFx extends Application {
         if (option == 1) return "scores.ser";
         if (option == 2) return "scores100m.ser";
         if (option == 3) return "scores500m.ser";
+        if (option == 4) return "scores1000official.ser";
+        if (option == 5) return "scores1000custom.ser";
         return "scores.ser";
     }
 
@@ -207,18 +216,21 @@ public class AccessibilityDisplayerJavaFx extends Application {
         option1.setSelected(true);
         option2.setToggleGroup(toggleGroup);
         option3.setToggleGroup(toggleGroup);
+        option4.setToggleGroup(toggleGroup);
+        option5.setToggleGroup(toggleGroup);
+        option6.setToggleGroup(toggleGroup);
 
-        optionsMenu.getItems().addAll(option1, option2, option3);
+
+
+        optionsMenu.getItems().addAll(option1, option2, option3, option4, option5, option6);
 
         menuBar.getMenus().add(optionsMenu);
-
         box.getChildren().addAll(updateButton, zoomInButton, zoomOutButton, zipCodeField1, scoreField, checkBox, transparencyField, menuBar);
 
         canvas = new Canvas(MAP_WIDTH, MAP_HEIGHT);
         createActionListeners();
-
         root.getChildren().addAll(box, canvas);
-            Scene scene = new Scene(root, 1050, 650);
+            Scene scene = new Scene(root, 1100, 650);
             primaryStage.setScene(scene);
             primaryStage.show();
             try {
