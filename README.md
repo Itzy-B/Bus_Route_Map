@@ -44,7 +44,7 @@ Now, there are multiple things you can do:
     Press the button 'Show accessibility of postal codes' to open up a new window. In this window you will be presented with a map containing colored coded postal codes of Maastricht according to their social-economic accessibility. It is required to press the 'Update' button any time a value is changed in the other fields of this GUI. The options button will open up a menu with different score maps, please press the 'update' button after selecting an option. The other GUI buttons speak for themselves.
 
 
-5) To exit the program simply press the cross on the top right of the GUI, or alternatively press 'ALT' + 'F4'. 
+6) To exit the program simply press the cross on the top right of the GUI, or alternatively press 'ALT' + 'F4'. 
 
 Thank you,
 Group 25.
