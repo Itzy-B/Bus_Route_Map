@@ -5,10 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class FileManager {
@@ -83,8 +80,8 @@ public class FileManager {
         }
     }
 
-    public static HashMap<String, Integer> readHashMapFromFile(String filePath) throws IOException {
-        HashMap<String, Integer> hashMap = new HashMap<>();
+    public static LinkedHashMap<String, Integer> readLinkedHashMapFromFile(String filePath) throws IOException {
+        LinkedHashMap<String, Integer> linkedHashMap = new LinkedHashMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -93,11 +90,11 @@ public class FileManager {
                 if (parts.length == 2) {
                     String key = parts[0].trim();
                     Integer value = Integer.parseInt(parts[1].trim());
-                    hashMap.put(key, value);
+                    linkedHashMap.put(key, value);
                 }
             }
         }
-        return hashMap;
+        return linkedHashMap;
     }
     public static void saveStringToFile(String string, String filePath) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {

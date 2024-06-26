@@ -316,6 +316,14 @@ public class JSONController {
         return places;
     }
 
+    /**
+     * Returns the amenity score for the given post code within a radius
+     * @param filePath Path to the geojson file (Usually amenities.geojson)
+     * @param postCode Post code to calculate the amenity score for
+     * @param radius Radius of search in meters
+     * @return Returns the integer amenity score for the post code
+     * @throws IOException
+     */
     public int calculateTotalScore(String filePath, String postCode, double radius) throws IOException {
         List<Place> nearbyAmenities = getNearbyAmenities(filePath, postCode, radius);
         int totalScore = 0;
@@ -330,26 +338,6 @@ public class JSONController {
         return totalScore;
     }
 
-
-//    public static void main(String[] args) {
-//        JSONController controller = new JSONController();
-//        int count = 0;
-//        try {
-//            long startTime = System.currentTimeMillis(); // Start timing
-////            List<Place> places = controller.getPlacesFromGeoJSON(true, SCHOOL_AMENITY, false);
-//            List<Place> places = controller.getNearbyAmenities(AMENITY_PATH,"6212BT", 2000);
-//            for (Place place : places) {
-//                System.out.println(place);
-//                count++;
-//            }
-//            long endTime = System.currentTimeMillis(); // End timing
-//            long duration = endTime - startTime; // Calculate the duration
-//            System.out.println("Time taken: " + duration + " ms");
-//            System.out.println("Number of places: " + count);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     public static HashMap<String, Integer> calculateScores(int radius) {
         Data data = new Data();
@@ -386,42 +374,26 @@ public class JSONController {
                 ));
     }
 
-
-
-//    public static void main(String[] args) {
-//        // Example usage
-//        String postCode = "6222CN";  // Replace with an actual postcode
-//        double radius = 500;  // Radius in meters
-//
-//        JSONController controller = new JSONController();
-//
-//        try {
-//            // Get nearby amenities
-//            List<Place> nearbyAmenities = controller.getNearbyAmenities(AMENITY_PATH, postCode, radius);
-//            System.out.println("Nearby Amenities:");
-//            for (Place place : nearbyAmenities) {
-//                System.out.println(place);
-//            }
-//
-//            // Calculate total score
-//            int totalScore = controller.calculateTotalScore(AMENITY_PATH, postCode, radius);
-//            System.out.println("Total Score: " + totalScore);
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-    public static void main(String[] args) throws IOException {
+    public static void numberScores(String readFilePath, String storeFilePath) throws IOException {
         JSONController controller = new JSONController();
         // Example usage
-        HashMap<String, Integer> loadedScores = FileManager.readHashMapFromFile("scores.txt");
+        HashMap<String, Integer> loadedScores = FileManager.readLinkedHashMapFromFile(readFilePath);
+        Set<String> keySet = loadedScores.keySet();
+        String[] keys = keySet.toArray(new String[0]);
 
         // Create a new HashMap to assign numbers to each post code
-        HashMap<String, Integer> numberedZipCodes = new HashMap<>();
-        int number = 1;
-        for (String zipCode : loadedScores.keySet()) {
-            numberedZipCodes.put(zipCode, number++);
+        LinkedHashMap<String, Integer> numberedZipCodes = new LinkedHashMap<>();
+        for(int i = 0; i < keys.length; i++){
+            numberedZipCodes.put(keys[i], i+1);
         }
-        FileManager.saveHashMapToFile(numberedZipCodes, "numberedScores.txt");
+
+        FileManager.saveHashMapToFile(numberedZipCodes, storeFilePath);
     }
+
+
+    public static void main(String[] args) throws IOException {
+         numberScores("scores-1000.txt", "numbered-scores-1000.txt");
+    }
+
+
 }
