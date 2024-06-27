@@ -2,9 +2,9 @@ package src.java.GUI;
 
 import java.sql.*;
 public class DatabaseConnection {
-      static String URL = "jdbc:mysql://localhost:3306/gtfs";
-      static String USER = "DACS2024";
-      static String PASSWORD = "DACS2024";
+      static String URL = "jdbc:mysql://mysql-gtfs-gtfs-project.b.aivencloud.com:11327/gtfs";
+      static String USER = "avnaccess";
+      static String PASSWORD = "AVNS_TNLT5EILS9-WsKfLk0M";
 
     public static Connection getConnection() throws SQLException {
         try {

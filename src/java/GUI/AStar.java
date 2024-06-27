@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import org.json.JSONArray;
@@ -48,7 +49,20 @@ public class AStar implements Serializable {
         connectPlaceToGraph(startPlace, 10);
         connectPlaceToGraph(endPlace, 10);
 
-        return aStarSearch(startPlace, endPlace, LocalTime.of(12, 0, 0));
+        // Get the current local time
+        LocalTime currentTime = LocalTime.now();
+
+        // Round down the seconds by setting them to zero
+        LocalTime roundedTime = currentTime.withSecond(0).withNano(0);
+
+        // Define a formatter to ensure output is in HH:mm:ss format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+        // Format the rounded time
+        String formattedTime = roundedTime.format(formatter);
+        String[] time= formattedTime.split(":");
+
+        return aStarSearch(startPlace, endPlace, LocalTime.of(Integer.parseInt(time[0]), Integer.parseInt(time[1]), Integer.parseInt(time[2])));
     }
 
     /**
